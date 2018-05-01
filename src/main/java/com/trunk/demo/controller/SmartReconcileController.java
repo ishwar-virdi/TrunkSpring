@@ -19,7 +19,7 @@ import com.trunk.demo.worker.UserManager;
 import com.trunk.demo.worker.TokenGenerator;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
 public class SmartReconcileController {
 
 	@Autowired
