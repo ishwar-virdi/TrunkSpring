@@ -1,4 +1,4 @@
-package com.trunk.demo.pojo;
+package com.trunk.demo.model.s3;
 
 public class FileUpload {
 	private String keyName;

@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.trunk.demo.worker.S3Services;
-import com.trunk.demo.pojo.FileUpload;
-import com.trunk.demo.pojo.LoginDetails;
-import com.trunk.demo.pojo.MatchFiles;
-import com.trunk.demo.worker.FileMatcher;
-import com.trunk.demo.worker.UserManager;
-import com.trunk.demo.worker.TokenGenerator;
+import com.trunk.demo.model.LoginDetails;
+import com.trunk.demo.model.MatchFiles;
+import com.trunk.demo.model.s3.FileUpload;
+import com.trunk.demo.service.FileMatcher;
+import com.trunk.demo.service.TokenGenerator;
+import com.trunk.demo.service.mongo.UserManager;
+import com.trunk.demo.service.s3.S3Service;
 
 @RestController
 @CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
@@ -24,7 +24,8 @@ public class SmartReconcileController {
 
 	@Autowired
 	private UserManager userManager;
-	
+	@Autowired
+	private S3Service s3Service;
 	
 	@RequestMapping("/api/token")
 	public String tokenCreator() {
@@ -43,12 +44,12 @@ public class SmartReconcileController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/uploadFile")
 	public JSONObject uploadFile(@RequestBody FileUpload fu) {
-		return S3Services.uploadFile(fu.getKeyName(), fu.getUploadFilePath());
+		return s3Service.uploadFile(fu.getKeyName(), fu.getUploadFilePath());
 	}
 
 	@RequestMapping(value = "/api/readFile/{keyName}")
 	public JSONObject uploadFile(@PathVariable String keyName) {
-		return S3Services.downloadFile(keyName);
+		return s3Service.downloadFile(keyName);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/matchFile")

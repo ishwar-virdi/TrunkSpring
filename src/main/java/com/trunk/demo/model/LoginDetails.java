@@ -1,27 +1,29 @@
-package com.trunk.demo.pojo;
+package com.trunk.demo.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+public class LoginDetails {
 
-@Document(collection = "Users")
-public class User {
-
-	@Id
-	private String id;
-	@Indexed(unique = true)
+	private String token;
 	private String username;
 	private String password;
-
-	public User(String username, String password) {
+	
+	public LoginDetails(String token, String username, String password) {
 		super();
+		this.token = token;
 		this.username = username;
 		this.password = password;
 	}
 
-	public User() {
+	public LoginDetails() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	public String getUsername() {
@@ -39,9 +41,7 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	public String getId() {
-		return id;
-	}
-
+	
+	
+	
 }
