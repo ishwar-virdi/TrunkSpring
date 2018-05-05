@@ -1,5 +1,6 @@
 package com.trunk.demo.controller;
 
+import java.io.IOException;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.trunk.demo.model.LoginDetails;
 import com.trunk.demo.model.MatchFiles;
@@ -26,7 +29,7 @@ public class SmartReconcileController {
 	private UserManager userManager;
 	@Autowired
 	private S3Service s3Service;
-	
+
 	@RequestMapping("/api/token")
 	public String tokenCreator() {
 		return TokenGenerator.generateUUID();
@@ -34,9 +37,9 @@ public class SmartReconcileController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/register")
 	public String registerUser(@RequestBody LoginDetails ld) {
-		return userManager.register(ld.getUsername(),ld.getPassword());
+		return userManager.register(ld.getUsername(), ld.getPassword());
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/api/login")
 	public String loginChecker(@RequestBody LoginDetails ld) {
 		return userManager.loginValidator(ld);
@@ -57,8 +60,14 @@ public class SmartReconcileController {
 		return FileMatcher.matchTheFiles(mf);
 	}
 
-	
-	/* COULD BE USEFULL LATER
+	@RequestMapping(path = "/{type}/{date}/upload/", method = RequestMethod.POST)
+	public void uploadFile(@PathVariable("type") String type, @PathVariable("date") String date,
+			@RequestParam("file") MultipartFile file) throws IOException {
+		s3Service.newUploadFile(type, date, file.getOriginalFilename(), file.getInputStream());
+	}
+
+	/*
+	 * COULD BE USEFULL LATER
 	 * 
 	 * @CrossOrigin(origins = "http://localhost:3000")
 	 * 

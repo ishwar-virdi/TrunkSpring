@@ -1,6 +1,7 @@
 package com.trunk.demo.interfaces.s3;
 
 import java.io.File;
+import java.io.InputStream;
 
 import javax.annotation.PostConstruct;
 
@@ -93,6 +94,16 @@ public class S3RepositoryImpl implements S3Repository {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	@Override
+	public JSONObject newUploadFile(String type, String date, String originalFilename, InputStream inputStream) {
+
+		String[] dateSplit = date.split("-");
+		String fileLocation = type + "/" + dateSplit[0] + "/" + dateSplit[1] + "/" + originalFilename;
+		s3Client.putObject(bucketName, fileLocation, inputStream, null);
+		
+		return null;
 	}
 
 }
