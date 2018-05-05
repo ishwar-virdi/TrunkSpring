@@ -1,29 +1,27 @@
-package com.trunk.demo.pojo;
+package com.trunk.demo.model.mongo;
 
-public class LoginDetails {
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-	private String token;
+@Document(collection = "Users")
+public class User {
+
+	@Id
+	private String id;
+	@Indexed(unique = true)
 	private String username;
 	private String password;
-	
-	public LoginDetails(String token, String username, String password) {
+
+	public User(String username, String password) {
 		super();
-		this.token = token;
 		this.username = username;
 		this.password = password;
 	}
 
-	public LoginDetails() {
+	public User() {
 		super();
 		// TODO Auto-generated constructor stub
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
 	}
 
 	public String getUsername() {
@@ -41,7 +39,9 @@ public class LoginDetails {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	
-	
+
+	public String getId() {
+		return id;
+	}
+
 }

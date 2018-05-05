@@ -1,4 +1,4 @@
-package com.trunk.demo.pojo;
+package com.trunk.demo.model;
 
 import java.util.List;
 

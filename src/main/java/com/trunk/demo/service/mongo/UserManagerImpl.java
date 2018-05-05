@@ -1,4 +1,4 @@
-package com.trunk.demo.worker;
+package com.trunk.demo.service.mongo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Service;
 
-import com.trunk.demo.interfaces.UsersRepository;
-import com.trunk.demo.pojo.LoginDetails;
-import com.trunk.demo.pojo.User;
+import com.trunk.demo.interfaces.mongo.UsersRepository;
+import com.trunk.demo.model.LoginDetails;
+import com.trunk.demo.model.mongo.User;
 
 @EnableMongoRepositories(basePackages = "com.trunk.demo.interfaces")
 @Service
-public class UserManager {
+public class UserManagerImpl implements UserManager{
 
 	@Autowired
 	private UsersRepository usersRepo;
