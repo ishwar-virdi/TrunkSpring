@@ -1,13 +1,13 @@
 package com.trunk.demo.model.s3;
 
 public class BankStatementTransaction {
-	private int accountNumber;
+	private double accountNumber;
 	private String currency;
 	private String date;
 	private String description;
 	private float credits;
 	
-	public BankStatementTransaction(int accountNumber, String currency, String date, String description, float credits) {
+	public BankStatementTransaction(double accountNumber, String currency, String date, String description, float credits) {
 		this.accountNumber = accountNumber;
 		this.currency = currency;
 		this.date = date;
@@ -15,7 +15,7 @@ public class BankStatementTransaction {
 		this.credits = credits;
 	}
 	
-	public int getAccountNumber() {
+	public double getAccountNumber() {
 		return this.accountNumber;
 	}
 	

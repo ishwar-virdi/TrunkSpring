@@ -9,8 +9,9 @@ public class BankStatement {
 	public BankStatement(ArrayList<BankStatementTransaction> transactions) {
 		this.allTransactions = transactions;
 		this.transactions = new ArrayList<BankStatementTransaction>();
+		int size = transactions.size();
 		
-		for(int i = 0; i < transactions.size(); i++) {
+		for(int i = 0; i < size; i++) {
 			if (transactions.get(i).getDescription().toUpperCase().contains("MERCHANT SETTLEMENT")) {
 				transactions.add(transactions.get(i));
 			}

@@ -14,6 +14,7 @@ import com.trunk.demo.model.LoginDetails;
 import com.trunk.demo.model.MatchFiles;
 import com.trunk.demo.model.s3.FileUpload;
 import com.trunk.demo.service.FileMatcher;
+import com.trunk.demo.service.ReconcileFiles;
 import com.trunk.demo.service.TokenGenerator;
 import com.trunk.demo.service.mongo.UserManager;
 import com.trunk.demo.service.s3.S3Service;
@@ -26,6 +27,8 @@ public class SmartReconcileController {
 	private UserManager userManager;
 	@Autowired
 	private S3Service s3Service;
+	@Autowired
+	private ReconcileFiles reconcileFiles;
 	
 	@RequestMapping("/api/token")
 	public String tokenCreator() {
@@ -55,6 +58,11 @@ public class SmartReconcileController {
 	@RequestMapping(method = RequestMethod.POST, value = "/api/matchFile")
 	public JSONObject matchFile(@RequestBody MatchFiles mf) {
 		return FileMatcher.matchTheFiles(mf);
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/api/reconcile")
+	public String reconcile() {
+		return reconcileFiles.reconcileDocuments().toString();
 	}
 
 	

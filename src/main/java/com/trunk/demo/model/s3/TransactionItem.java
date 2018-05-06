@@ -41,4 +41,15 @@ public abstract class TransactionItem {
 	public void setIsReconciled(boolean isReconciled) {
 		this.isReconciled = isReconciled;
 	}
+	
+	public String getReversedDate() {
+		String newDate = this.settlementDate.substring(6, 8) + this.settlementDate.substring(4, 6) + this.settlementDate.substring(0, 4);
+		
+		if (newDate.charAt(0) == '0') {
+			newDate = newDate.substring(1, 8);
+		}
+		
+		return newDate;
+		
+	}
 }
