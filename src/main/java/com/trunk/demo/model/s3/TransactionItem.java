@@ -1,0 +1,44 @@
+package com.trunk.demo.model.s3;
+
+import java.util.UUID;
+
+public abstract class TransactionItem {
+	protected UUID uniqueId;
+	protected float amount;
+	protected String currency;
+	protected String settlementDate;
+	protected String status;
+	protected boolean isReconciled;
+	
+	public boolean compareCurrency(String otherCurrency) {
+		return otherCurrency.equals(this.currency);
+	}
+	
+	public UUID getUniqueId() {
+		return this.uniqueId;
+	}
+	
+	public float getAmount() {
+		return this.amount;
+	}
+	
+	public String getCurrency() {
+		return this.currency;
+	}
+	
+	public String getSettlementDate() {
+		return this.settlementDate;
+	}
+	
+	public String getStatus() {
+		return this.status;
+	}
+	
+	public boolean getIsReconciled() {
+		return this.isReconciled;
+	}
+	
+	public void setIsReconciled(boolean isReconciled) {
+		this.isReconciled = isReconciled;
+	}
+}
