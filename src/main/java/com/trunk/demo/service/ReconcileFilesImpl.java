@@ -78,20 +78,13 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		Map<String, Float> amexTotals = this.addUpSameDayTransactions(settlementDocument.getAmexTransactions());
 		Map<String, Float> visaTotals = this.addUpSameDayTransactions(settlementDocument.getVisaTransactions());
 		Map<String, Float> mastercardTotals = this.addUpSameDayTransactions(settlementDocument.getMastercardTransactions());
+		//Don't need this
 		Map<String, Float> bankTransferTotals = this.addUpSameDayTransactions(settlementDocument.getBankTransferTransactions());
-		System.out.println(amexTotals);
-		System.out.println(visaTotals);
-		System.out.println(mastercardTotals);
-		System.out.println(bankTransferTotals);
 		
-		ArrayList<String> reconciledAmex = this.reconcileItems(amexTotals);
-		ArrayList<String> reconciledVisa = this.reconcileItems(visaTotals);
-		ArrayList<String> reconciledMastercard = this.reconcileItems(mastercardTotals);
-		ArrayList<String> reconciledBankTransfer = this.reconcileItems(bankTransferTotals);
-		System.out.println(reconciledAmex);
-		System.out.println(reconciledVisa);
-		System.out.println(reconciledMastercard);
-		System.out.println(reconciledBankTransfer);
+		ArrayList<String> reconciledAmex = this.reconcileItems(amexTotals, bankStatement.getCreditCardTransactions());
+		ArrayList<String> reconciledVisa = this.reconcileItems(visaTotals, bankStatement.getCreditCardTransactions());
+		ArrayList<String> reconciledMastercard = this.reconcileItems(mastercardTotals, bankStatement.getCreditCardTransactions());
+		ArrayList<String> reconciledBankTransfer = this.reconcileItems(bankTransferTotals, bankStatement.getBankTransferTransactions());
 		
 		settlementDocument.setAmexTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledAmex, settlementDocument.getAmexTransactions()));
 		settlementDocument.setVisaTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledVisa, settlementDocument.getVisaTransactions()));
@@ -123,15 +116,13 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		return transactionItems;
 	}
 	
-	private ArrayList<String> reconcileItems(Map<String, Float> totals) {
-		ArrayList<BankStatementTransaction> bankTransactions = bankStatement.getTransactions();
+	private ArrayList<String> reconcileItems(Map<String, Float> bankTransferTotals, ArrayList<BankStatementTransaction> bankDirectDebitTransactions) {
 		ArrayList<String> response = new ArrayList<String>();
 		
-		for (Map.Entry<String, Float> entry : totals.entrySet()) {
-			System.out.println(entry);
-			for (int i = 0; i < bankTransactions.size(); i++) {
-				if (bankTransactions.get(i).getDate().equals(entry.getKey())) {
-					response.add(bankTransactions.get(i).getDate());
+		for (Map.Entry<String, Float> entry : bankTransferTotals.entrySet()) {
+			for (int i = 0; i < bankDirectDebitTransactions.size(); i++) {
+				if (bankDirectDebitTransactions.get(i).getDate().equals(entry.getKey())) {
+					response.add(bankDirectDebitTransactions.get(i).getDate());
 					break;
 				}
 			}
