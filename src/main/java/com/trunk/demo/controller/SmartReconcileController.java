@@ -20,7 +20,7 @@ import com.trunk.demo.service.mongo.UserManager;
 import com.trunk.demo.service.s3.S3Service;
 
 @RestController
-@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
+@CrossOrigin(origins = "http://localhost:3000")
 public class SmartReconcileController {
 
 	@Autowired

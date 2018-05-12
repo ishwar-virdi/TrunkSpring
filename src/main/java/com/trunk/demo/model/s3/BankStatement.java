@@ -8,20 +8,29 @@ public class BankStatement {
 	private ArrayList<BankStatementTransaction> creditCardTransactions;
 	//Only contains the direct debit transactions that we care about
 	private ArrayList<BankStatementTransaction> bankTransferTransactions;
-	//I would like to replace this hard coded string with pulling it out of the settlement file instead
-	private String bankStatementDescription = "DE DRAW ID518431";
+	//Used to find the relevant credit card transaction lump sums
+	private static final String creditCardDescription = "MERCHANT SETTLEMENT";
 	
 	public BankStatement(ArrayList<BankStatementTransaction> transactions) {
 		this.allTransactions = transactions;
 		this.creditCardTransactions = new ArrayList<BankStatementTransaction>();
 		this.bankTransferTransactions = new ArrayList<BankStatementTransaction>();
+		
 		int size = transactions.size();
 		
 		for(int i = 0; i < size; i++) {
-			if (transactions.get(i).getDescription().toUpperCase().contains("MERCHANT SETTLEMENT")) {
+			if (transactions.get(i).getDescription().toUpperCase().contains(creditCardDescription))
 				this.creditCardTransactions.add(transactions.get(i));
-			} else if (transactions.get(i).getDescription().toUpperCase().contains(bankStatementDescription)) {
-				this.bankTransferTransactions.add(transactions.get(i));
+		}
+	}
+	
+	public void extractBankTransferItems(ArrayList<String> transactionDescription) {
+		int size = this.allTransactions.size();
+		
+		for(int i = 0; i < size; i++) {
+			for (int x = 0; x < transactionDescription.size(); x++) {
+				if (this.allTransactions.get(i).getDescription().toUpperCase().replaceAll("\\s","").contains(transactionDescription.get(x).toUpperCase())) 
+					this.bankTransferTransactions.add(this.allTransactions.get(i));
 			}
 		}
 	}

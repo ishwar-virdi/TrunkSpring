@@ -7,8 +7,9 @@ import org.json.JSONObject;
 
 public class BankTransferTransaction extends TransactionItem {
 	private double bankAccountNumber;
+	private String bankStatementReference;
 	
-	public BankTransferTransaction(UUID uniqueId, float amount, String currency, String settlementDate, String status, double bankAccountNumber, boolean isReconciled) {
+	public BankTransferTransaction(UUID uniqueId, float amount, String currency, String settlementDate, String status, double bankAccountNumber, boolean isReconciled, String bankStatementReference) {
 		this.uniqueId = uniqueId;
 		this.amount = amount;
 		this.currency = currency;
@@ -16,9 +17,10 @@ public class BankTransferTransaction extends TransactionItem {
 		this.status = status;
 		this.isReconciled = isReconciled;
 		this.bankAccountNumber = bankAccountNumber;
+		this.bankStatementReference = bankStatementReference;
 	}
 	
-	public BankTransferTransaction(float amount, String currency, String settlementDate, String status, double bankAccountNumber) {
+	public BankTransferTransaction(float amount, String currency, String settlementDate, String status, double bankAccountNumber, String bankStatementReference) {
 		this.uniqueId = UUID.randomUUID();
 		this.amount = amount;
 		this.currency = currency;
@@ -26,10 +28,15 @@ public class BankTransferTransaction extends TransactionItem {
 		this.status = status;
 		this.isReconciled = false;
 		this.bankAccountNumber = bankAccountNumber;
+		this.bankStatementReference = bankStatementReference;
 	}
 	
 	public double getBankAccountNumber() {
 		return this.bankAccountNumber;
+	}
+	
+	public String getBankStatementReference() {
+		return this.bankStatementReference;
 	}
 
 	public JSONObject getJson() {
@@ -43,6 +50,7 @@ public class BankTransferTransaction extends TransactionItem {
 			response.put("status", this.status);
 			response.put("isReconciled", this.isReconciled);
 			response.put("bankAccountNumber", this.bankAccountNumber);
+			response.put("bankStatementReference", bankStatementReference);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

@@ -28,7 +28,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 				new CreditCardTransaction(4125, "AUD", "20180321", "Approved", CardScheme.AMEX)
 		};
 		
-		CreditCardTransaction[] visa = {
+		CreditCardTransaction[] visaMastercard = {
 				new CreditCardTransaction(100, "AUD", "20180301", "Approved", CardScheme.VISA),
 				new CreditCardTransaction(140, "AUD", "20180305", "Approved", CardScheme.VISA),
 				new CreditCardTransaction(140, "AUD", "20180305", "Approved", CardScheme.VISA),
@@ -40,12 +40,10 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 				new CreditCardTransaction(250, "AUD", "20180327", "Approved", CardScheme.VISA)
 		};
 		
-		CreditCardTransaction[] mastercard = new CreditCardTransaction[0];
-		
 		BankTransferTransaction[] bank = {
-				new BankTransferTransaction(275, "AUD", "20180301", "Approved", 3202422713d),
-				new BankTransferTransaction(140, "AUD", "20180305", "Approved", 3202422713d),
-				new BankTransferTransaction(275, "AUD", "20180315", "Approved", 3202422713d)
+				new BankTransferTransaction(275, "AUD", "20180301", "Approved", 3202422713d, "DE DRAW ID 518431"),
+				new BankTransferTransaction(140, "AUD", "20180305", "Approved", 3202422713d, "DE DRAW ID 518431"),
+				new BankTransferTransaction(275, "AUD", "20180315", "Approved", 3202422713d, "DE DRAW ID 518431")
 		};
 		
 		ArrayList<BankStatementTransaction> bankStatement = new ArrayList<BankStatementTransaction>();
@@ -60,7 +58,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		bankStatement.add(new BankStatementTransaction(32024322713d, "AUD", "5032018", "DEPOSIT DE DRAW DECRBAL DE DRAW ID518431 APMASPHERIC DIRECT DEBIT", 140));
 		bankStatement.add(new BankStatementTransaction(32024322713d, "AUD", "5032018", "MERCHANT SETTLEMENT     0808810 AILO HOLDINGS PTY LTD    SYDNEY       AU", 700));
 		
-		this.settlementDocument = new SettlementDocument(amex, visa, mastercard, bank);
+		this.settlementDocument = new SettlementDocument(amex, visaMastercard, bank);
 		this.bankStatement = new BankStatement(bankStatement);
 	}
 	
@@ -75,26 +73,23 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	public JSONObject reconcileDocuments() {
 		JSONObject response = new JSONObject();
 		
+		this.bankStatement.extractBankTransferItems(this.settlementDocument.getBankStatementStrings());
+		
 		Map<String, Float> amexTotals = this.addUpSameDayTransactions(settlementDocument.getAmexTransactions());
-		Map<String, Float> visaTotals = this.addUpSameDayTransactions(settlementDocument.getVisaTransactions());
-		Map<String, Float> mastercardTotals = this.addUpSameDayTransactions(settlementDocument.getMastercardTransactions());
+		Map<String, Float> visaMastercardTotals = this.addUpSameDayTransactions(settlementDocument.getVisaMastercardTransactions());
 		//Don't need this
 		Map<String, Float> bankTransferTotals = this.addUpSameDayTransactions(settlementDocument.getBankTransferTransactions());
 		
 		ArrayList<String> reconciledAmex = this.reconcileItems(amexTotals, bankStatement.getCreditCardTransactions());
-		ArrayList<String> reconciledVisa = this.reconcileItems(visaTotals, bankStatement.getCreditCardTransactions());
-		ArrayList<String> reconciledMastercard = this.reconcileItems(mastercardTotals, bankStatement.getCreditCardTransactions());
+		ArrayList<String> reconciledVisa = this.reconcileItems(visaMastercardTotals, bankStatement.getCreditCardTransactions());
 		ArrayList<String> reconciledBankTransfer = this.reconcileItems(bankTransferTotals, bankStatement.getBankTransferTransactions());
 		
 		settlementDocument.setAmexTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledAmex, settlementDocument.getAmexTransactions()));
-		settlementDocument.setVisaTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledVisa, settlementDocument.getVisaTransactions()));
-		settlementDocument.setMastercardTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledMastercard, settlementDocument.getMastercardTransactions()));
-		settlementDocument.setBankTransferTransactions((BankTransferTransaction[]) this.matchReconciledWithSettlementItems(reconciledBankTransfer, settlementDocument.getBankTransferTransactions()));
+		settlementDocument.setVisaTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledVisa, settlementDocument.getVisaMastercardTransactions()));		settlementDocument.setBankTransferTransactions((BankTransferTransaction[]) this.matchReconciledWithSettlementItems(reconciledBankTransfer, settlementDocument.getBankTransferTransactions()));
 		
 		try {
 			response.put("Amex", settlementDocument.getAmexTransactionsJSON());
-			response.put("Visa", settlementDocument.getVisaTransactionsJSON());
-			response.put("Mastercard", settlementDocument.getMastercardTransactionsJSON());
+			response.put("VisaMastercard", settlementDocument.getVisaMastercardTransactionsJSON());
 			response.put("BankTransfer", settlementDocument.getBankTransactionsJSON());
 		} catch (JSONException e) {
 			e.printStackTrace();

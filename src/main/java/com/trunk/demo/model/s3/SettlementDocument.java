@@ -1,17 +1,17 @@
 package com.trunk.demo.model.s3;
 
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 
 public class SettlementDocument {
 	private CreditCardTransaction[] amexTransactions;
-	private CreditCardTransaction[] visaTransactions;
-	private CreditCardTransaction[] mastercardTransactions;
+	private CreditCardTransaction[] visaMastercardTransactions;
 	private BankTransferTransaction[] bankTransferTransactions;
 	
-	public SettlementDocument(CreditCardTransaction[] amexTransactions, CreditCardTransaction[] visaTransactions, CreditCardTransaction[] mastercardTransactions, BankTransferTransaction[] bankTransferTransactions) {
+	public SettlementDocument(CreditCardTransaction[] amexTransactions, CreditCardTransaction[] visaMastercardTransactions, BankTransferTransaction[] bankTransferTransactions) {
 		this.amexTransactions = amexTransactions;
-		this.visaTransactions = visaTransactions;
-		this.mastercardTransactions = mastercardTransactions;
+		this.visaMastercardTransactions = visaMastercardTransactions;
 		this.bankTransferTransactions = bankTransferTransactions;
 	}
 	
@@ -19,12 +19,8 @@ public class SettlementDocument {
 		return this.amexTransactions;
 	}
 	
-	public CreditCardTransaction[] getVisaTransactions() {
-		return this.visaTransactions;
-	}
-	
-	public CreditCardTransaction[] getMastercardTransactions() {
-		return this.mastercardTransactions;
+	public CreditCardTransaction[] getVisaMastercardTransactions() {
+		return this.visaMastercardTransactions;
 	}
 	
 	public BankTransferTransaction[] getBankTransferTransactions() {
@@ -35,12 +31,8 @@ public class SettlementDocument {
 		this.amexTransactions = amexTransactions;
 	}
 	
-	public void setVisaTransactions(CreditCardTransaction[] visaTransactions) {
-		this.visaTransactions = visaTransactions;
-	}
-	
-	public void setMastercardTransactions(CreditCardTransaction[] mastercardTransactions) {
-		this.mastercardTransactions = mastercardTransactions;
+	public void setVisaTransactions(CreditCardTransaction[] visaMastercardTransactions) {
+		this.visaMastercardTransactions = visaMastercardTransactions;
 	}
 	
 	public void setBankTransferTransactions(BankTransferTransaction[] bankTransferTransactions) {
@@ -57,21 +49,11 @@ public class SettlementDocument {
 		return response;
 	}
 	
-	public JSONArray getVisaTransactionsJSON() {
+	public JSONArray getVisaMastercardTransactionsJSON() {
 		JSONArray response = new JSONArray();
 		
-		for (int i = 0; i < this.visaTransactions.length; i++) {
-			response.put(this.visaTransactions[i].getJson());
-		}
-		
-		return response;
-	}
-	
-	public JSONArray getMastercardTransactionsJSON() {
-		JSONArray response = new JSONArray();
-		
-		for (int i = 0; i < this.mastercardTransactions.length; i++) {
-			response.put(this.mastercardTransactions[i].getJson());
+		for (int i = 0; i < this.visaMastercardTransactions.length; i++) {
+			response.put(this.visaMastercardTransactions[i].getJson());
 		}
 		
 		return response;
@@ -82,6 +64,16 @@ public class SettlementDocument {
 		
 		for (int i = 0; i < this.bankTransferTransactions.length; i++) {
 			response.put(this.bankTransferTransactions[i].getJson());
+		}
+		
+		return response;
+	}
+	
+	public ArrayList<String> getBankStatementStrings() {
+		ArrayList<String> response = new ArrayList<String>();
+				
+		for (int i = 0; i < this.bankTransferTransactions.length; i++) {
+			response.add(bankTransferTransactions[i].getBankStatementReference().replaceAll("\\s",""));
 		}
 		
 		return response;
