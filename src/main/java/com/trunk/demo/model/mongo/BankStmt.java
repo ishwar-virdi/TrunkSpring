@@ -9,90 +9,90 @@ public class BankStmt {
 	@Id
 	private String id;
 	
-	private String AccountDescription;
-	private long AccountNumber;
-	private String Currency;
-	private String Date;
-	private String TransactionDescription;
-	private double Debits;
-	private double Credits;
-	private double Balance;
+	private String accountDescription;
+	private long accountNumber;
+	private String currency;
+	private String date;
+	private String transactionDescription;
+	private double debits;
+	private double credits;
+	private double balance;
 	
 	public BankStmt(String accountDescription, long accountNumber, String currency, String date,
 			String transactionDescription, double debits, double credits, double balance) {
 		super();
-		AccountDescription = accountDescription;
-		AccountNumber = accountNumber;
-		Currency = currency;
-		Date = date;
-		TransactionDescription = transactionDescription;
-		Debits = debits;
-		Credits = credits;
-		Balance = balance;
+		this.accountDescription = accountDescription;
+		this.accountNumber = accountNumber;
+		this.currency = currency;
+		this.date = date;
+		this.transactionDescription = transactionDescription;
+		this.debits = debits;
+		this.credits = credits;
+		this.balance = balance;
 	}
 
 	public String getAccountDescription() {
-		return AccountDescription;
+		return this.accountDescription;
 	}
 
 	public void setAccountDescription(String accountDescription) {
-		AccountDescription = accountDescription;
+		this.accountDescription = accountDescription;
 	}
 
 	public long getAccountNumber() {
-		return AccountNumber;
+		return this.accountNumber;
 	}
 
 	public void setAccountNumber(long accountNumber) {
-		AccountNumber = accountNumber;
+		this.accountNumber = accountNumber;
 	}
 
 	public String getCurrency() {
-		return Currency;
+		return this.currency;
 	}
 
 	public void setCurrency(String currency) {
-		Currency = currency;
+		this.currency = currency;
 	}
 
 	public String getDate() {
-		return Date;
+		return this.date;
 	}
 
 	public void setDate(String date) {
-		Date = date;
+		this.date = date;
 	}
 
 	public String getTransactionDescription() {
-		return TransactionDescription;
+		return this.transactionDescription;
 	}
 
 	public void setTransactionDescription(String transactionDescription) {
-		TransactionDescription = transactionDescription;
+		this.transactionDescription = transactionDescription;
 	}
 
 	public double getDebits() {
-		return Debits;
+		return this.debits;
 	}
 
 	public void setDebits(double debits) {
-		Debits = debits;
+		this.debits = debits;
 	}
 
 	public double getCredits() {
-		return Credits;
+		return this.credits;
 	}
 
 	public void setCredits(double credits) {
-		Credits = credits;
+		this.credits = credits;
 	}
 
 	public double getBalance() {
-		return Balance;
+		return this.balance;
 	}
 
 	public void setBalance(double balance) {
-		Balance = balance;
+		this.balance = balance;
 	}
 
 	public String getId() {

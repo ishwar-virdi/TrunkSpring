@@ -9,143 +9,143 @@ public class SettlementStmt {
 	@Id
 	private String id;
 	
-	private String MerchantID;
-	private String CardPAN;
-	private String CardExpiry;
-	private String BankReference;
-	private double PrincipalAmount;
-	private double Surcharge;
-	private String Currency;
-	private String CustomerName;
-	private String ResponseText;
-	private long ReceiptNumber;
-	private String SettlementDate;
-	private String CardSchemeName;
-	private String TransactionTimeStamp;
-	private String Status;
+	private String merchantID;
+	private String cardPAN;
+	private String cardExpiry;
+	private String bankReference;
+	private double principalAmount;
+	private double surcharge;
+	private String currency;
+	private String customerName;
+	private String responseText;
+	private long receiptNumber;
+	private String settlementDate;
+	private String cardSchemeName;
+	private String transactionTimeStamp;
+	private String status;
 	
 	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, String bankReference, double principalAmount,
 			double surcharge, String currency, String customerName, String responseText, long receiptNumber, String settlementDate,
 			String cardSchemeName, String transactionTimeStamp, String status) {
 		super();
-		MerchantID = merchantID;
-		CardPAN = cardPAN;
-		CardExpiry = cardExpiry;
-		BankReference = bankReference;
-		PrincipalAmount = principalAmount;
-		Surcharge = surcharge;
-		Currency = currency;
-		CustomerName = customerName;
-		ResponseText = responseText;
-		ReceiptNumber = receiptNumber;
-		SettlementDate = settlementDate;
-		CardSchemeName = cardSchemeName;
-		TransactionTimeStamp = transactionTimeStamp;
-		Status = status;
+		this.merchantID = merchantID;
+		this.cardPAN = cardPAN;
+		this.cardExpiry = cardExpiry;
+		this.bankReference = bankReference;
+		this.principalAmount = principalAmount;
+		this.surcharge = surcharge;
+		this.currency = currency;
+		this.customerName = customerName;
+		this.responseText = responseText;
+		this.receiptNumber = receiptNumber;
+		this.settlementDate = settlementDate;
+		this.cardSchemeName = cardSchemeName;
+		this.transactionTimeStamp = transactionTimeStamp;
+		this.status = status;
 	}
 
 	public String getMerchantID() {
-		return MerchantID;
+		return this.merchantID;
 	}
 
 	public void setMerchantID(String merchantID) {
-		MerchantID = merchantID;
+		this.merchantID = merchantID;
 	}
 
 	public String getCardPAN() {
-		return CardPAN;
+		return this.cardPAN;
 	}
 
 	public void setCardPAN(String cardPAN) {
-		CardPAN = cardPAN;
+		this.cardPAN = cardPAN;
 	}
 
 	public String getCardExpiry() {
-		return CardExpiry;
+		return this.cardExpiry;
 	}
 
 	public void setCardExpiry(String cardExpiry) {
-		CardExpiry = cardExpiry;
+		this.cardExpiry = cardExpiry;
 	}
 	
 	public String getBankReference() {
-		return BankReference;
+		return this.bankReference;
 	}
 	
 	public void setBankReference(String bankReference) {
-		BankReference = bankReference;
+		this.bankReference = bankReference;
 	}
 
 	public double getPrincipalAmount() {
-		return PrincipalAmount;
+		return this.principalAmount;
 	}
 
 	public void setPrincipalAmount(double principalAmount) {
-		PrincipalAmount = principalAmount;
+		this.principalAmount = principalAmount;
 	}
 
 	public double getSurcharge() {
-		return Surcharge;
+		return this.surcharge;
 	}
 
 	public void setSurcharge(double surcharge) {
-		Surcharge = surcharge;
+		this.surcharge = surcharge;
 	}
 
 	public String getCurrency() {
-		return Currency;
+		return this.currency;
 	}
 
 	public void setCurrency(String currency) {
-		Currency = currency;
+		this.currency = currency;
 	}
 
 	public String getResponseText() {
-		return ResponseText;
+		return this.responseText;
 	}
 
 	public void setResponseText(String responseText) {
-		ResponseText = responseText;
+		this.responseText = responseText;
 	}
 
 	public long getReceiptNumber() {
-		return ReceiptNumber;
+		return this.receiptNumber;
 	}
 
 	public void setReceiptNumber(long receiptNumber) {
-		ReceiptNumber = receiptNumber;
+		this.receiptNumber = receiptNumber;
 	}
 
 	public String getSettlementDate() {
-		return SettlementDate;
+		return this.settlementDate;
 	}
 
 	public void setSettlementDate(String settlementDate) {
-		SettlementDate = settlementDate;
+		this.settlementDate = settlementDate;
 	}
 
 	public String getCardSchemeName() {
-		return CardSchemeName;
+		return this.cardSchemeName;
 	}
 
 	public void setCardSchemeName(String cardSchemeName) {
-		CardSchemeName = cardSchemeName;
+		this.cardSchemeName = cardSchemeName;
 	}
 
 	public String getTransactionTimeStamp() {
-		return TransactionTimeStamp;
+		return this.transactionTimeStamp;
 	}
 
 	public void setTransactionTimeStamp(String transactionTimeStamp) {
-		TransactionTimeStamp = transactionTimeStamp;
+		this.transactionTimeStamp = transactionTimeStamp;
 	}
 
 	public String getStatus() {
-		return Status;
+		return this.status;
 	}
 
 	public void setStatus(String status) {
-		Status = status;
+		this.status = status;
 	}
 
 	public String getId() {
@@ -153,11 +153,11 @@ public class SettlementStmt {
 	}
 
 	public String getCustomerName() {
-		return CustomerName;
+		return this.customerName;
 	}
 
 	public void setCustomerName(String customerName) {
-		CustomerName = customerName;
+		this.customerName = customerName;
 	}
 	
 	

@@ -77,6 +77,9 @@ public class UploadManagerImpl implements UploadManager {
 					if (!(elements[0].equalsIgnoreCase("Total value of transactions:")
 							|| elements[0].equalsIgnoreCase("Number of transactions:"))) {
 						
+						for (int i = 0; i < elements.length; i++)
+							elements[i] = elements[i].replaceAll("\"", "");
+						
 						BankStmt newStmt = new BankStmt(elements[0],
 								Long.parseLong(elements[1].isEmpty() ? "0" : elements[1]), elements[2], reverseDate(elements[3]),
 								elements[4], Double.parseDouble(elements[5].isEmpty() ? "0" : elements[5]),
