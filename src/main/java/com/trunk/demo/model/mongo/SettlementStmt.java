@@ -12,6 +12,7 @@ public class SettlementStmt {
 	private String MerchantID;
 	private String CardPAN;
 	private String CardExpiry;
+	private String BankReference;
 	private double PrincipalAmount;
 	private double Surcharge;
 	private String Currency;
@@ -23,13 +24,14 @@ public class SettlementStmt {
 	private String TransactionTimeStamp;
 	private String Status;
 	
-	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, double principalAmount,
+	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, String bankReference, double principalAmount,
 			double surcharge, String currency, String customerName, String responseText, long receiptNumber, String settlementDate,
 			String cardSchemeName, String transactionTimeStamp, String status) {
 		super();
 		MerchantID = merchantID;
 		CardPAN = cardPAN;
 		CardExpiry = cardExpiry;
+		BankReference = bankReference;
 		PrincipalAmount = principalAmount;
 		Surcharge = surcharge;
 		Currency = currency;
@@ -64,6 +66,14 @@ public class SettlementStmt {
 
 	public void setCardExpiry(String cardExpiry) {
 		CardExpiry = cardExpiry;
+	}
+	
+	public String getBankReference() {
+		return BankReference;
+	}
+	
+	public void setBankReference(String bankReference) {
+		BankReference = bankReference;
 	}
 
 	public double getPrincipalAmount() {
