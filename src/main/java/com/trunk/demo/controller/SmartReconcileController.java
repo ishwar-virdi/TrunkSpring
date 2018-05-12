@@ -15,20 +15,21 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.trunk.demo.model.LoginDetails;
 import com.trunk.demo.model.MatchFiles;
-import com.trunk.demo.model.s3.FileUpload;
 import com.trunk.demo.service.FileMatcher;
 import com.trunk.demo.service.TokenGenerator;
+import com.trunk.demo.service.mongo.UploadManager;
 import com.trunk.demo.service.mongo.UserManager;
-import com.trunk.demo.service.s3.S3Service;
 
 @RestController
+// Use 2nd one for Local Testing. Do Not commit the 2nd active.
 @CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
+// @CrossOrigin(origins = "http://localhost:3000")
 public class SmartReconcileController {
 
 	@Autowired
 	private UserManager userManager;
 	@Autowired
-	private S3Service s3Service;
+	private UploadManager uploadManager;
 
 	@RequestMapping("/api/token")
 	public String tokenCreator() {
@@ -45,26 +46,36 @@ public class SmartReconcileController {
 		return userManager.loginValidator(ld);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/api/uploadFile")
-	public JSONObject uploadFile(@RequestBody FileUpload fu) {
-		return s3Service.uploadFile(fu.getKeyName(), fu.getUploadFilePath());
-	}
-
-	@RequestMapping(value = "/api/readFile/{keyName}")
-	public JSONObject uploadFile(@PathVariable String keyName) {
-		return s3Service.downloadFile(keyName);
-	}
-
 	@RequestMapping(method = RequestMethod.POST, value = "/api/matchFile")
 	public JSONObject matchFile(@RequestBody MatchFiles mf) {
 		return FileMatcher.matchTheFiles(mf);
 	}
 
-	@RequestMapping(path = "/{type}/{date}/upload/", method = RequestMethod.POST)
-	public void uploadFile(@PathVariable("type") String type, @PathVariable("date") String date,
-			@RequestParam("file") MultipartFile file) throws IOException {
-		s3Service.newUploadFile(type, date, file.getOriginalFilename(), file.getInputStream());
+	@RequestMapping(path = "/{type}/upload", method = RequestMethod.POST)
+	public void uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file)
+			throws IOException {
+		uploadManager.newUploadFile(type, file.getInputStream());
 	}
+
+	/*
+	 * Upload File to S3 (No Longer Using. But Useful to Have)
+	 * 
+	 * @RequestMapping(path = "/{type}/{date}/upload", method = RequestMethod.POST)
+	 * public void uploadFile(@PathVariable("type") String
+	 * type, @PathVariable("date") String date,
+	 * 
+	 * @RequestParam("file") MultipartFile file) throws IOException {
+	 * s3Service.newUploadFile(type, date, file.getOriginalFilename(),
+	 * file.getInputStream()); }
+	 * 
+	 * @RequestMapping(method = RequestMethod.POST, value = "/api/uploadFile")
+	 * public JSONObject uploadFile(@RequestBody FileUpload fu) { return
+	 * s3Service.uploadFile(fu.getKeyName(), fu.getUploadFilePath()); }
+	 *
+	 * @RequestMapping(value = "/api/readFile/{keyName}") public JSONObject
+	 * uploadFile(@PathVariable String keyName) { return
+	 * s3Service.downloadFile(keyName); }
+	 */
 
 	/*
 	 * COULD BE USEFULL LATER
