@@ -1,6 +1,7 @@
 package com.trunk.demo.interfaces.s3;
 
 import java.io.File;
+import java.io.InputStream;
 
 import javax.annotation.PostConstruct;
 
@@ -8,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -20,6 +22,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 
+@Service
 public class S3RepositoryImpl implements S3Repository {
 
 	@Autowired
@@ -32,7 +35,8 @@ public class S3RepositoryImpl implements S3Repository {
 	@Value("${jsa.s3.region}")
 	private String region;
 	@Value("${jsa.s3.bucket}")
-	private static String bucketName;
+	private String bucketName;
+	
 
 	@PostConstruct
 	public void setup() {
@@ -93,6 +97,18 @@ public class S3RepositoryImpl implements S3Repository {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	@Override
+	public JSONObject newUploadFile(String type, String date, String originalFilename, InputStream inputStream) {
+		// String[] dateSplit = date.split("-");
+		
+		String fileLocation = type + "/" + date + "/" + originalFilename;
+		
+		s3Client.putObject(bucketName, fileLocation, inputStream, null);
+
+		System.out.println("File Uploaded to S3");
+		return null;
 	}
 
 }
