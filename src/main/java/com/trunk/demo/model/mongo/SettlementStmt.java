@@ -1,6 +1,6 @@
 package com.trunk.demo.model.mongo;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,7 +11,7 @@ public class SettlementStmt {
 	@Id
 	private String id;
 	
-	private Date createDate;
+	private LocalDateTime createDateTime;
 	private String merchantID;
 	private String cardPAN;
 	private String cardExpiry;
@@ -27,13 +27,13 @@ public class SettlementStmt {
 	private String transactionTimeStamp;
 	private String status;
 	private boolean isReconciled;
-	private Date reconciledDateTime;
+	private LocalDateTime reconciledDateTime;
 	
 	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, String bankReference, double principalAmount,
 			double surcharge, String currency, String customerName, String responseText, long receiptNumber, String settlementDate,
 			String cardSchemeName, String transactionTimeStamp, String status) {
 		super();
-		this.createDate = new Date();
+		this.createDateTime = LocalDateTime.now();
 		this.merchantID = merchantID;
 		this.cardPAN = cardPAN;
 		this.cardExpiry = cardExpiry;
@@ -52,8 +52,8 @@ public class SettlementStmt {
 		this.reconciledDateTime = null;
 	}
 	
-	public Date getCreateDate() {
-		return this.createDate;
+	public LocalDateTime getCreateDate() {
+		return this.createDateTime;
 	}
 
 	public String getMerchantID() {
@@ -180,11 +180,11 @@ public class SettlementStmt {
 		this.isReconciled = isReconciled;
 	}
 	
-	public Date getReconciledDateTime() {
+	public LocalDateTime getReconciledDateTime() {
 		return this.reconciledDateTime;
 	}
 	
-	public void setReconciledDateTime(Date dateTime) {
+	public void setReconciledDateTime(LocalDateTime dateTime) {
 		this.reconciledDateTime = dateTime;
 	}
 }
