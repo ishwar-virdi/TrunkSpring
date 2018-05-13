@@ -6,99 +6,98 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "BankStatements")
 public class BankStmt {
 
-	@Id
-	private String id;
-	
-	private String AccountDescription;
-	private long AccountNumber;
-	private String Currency;
-	private String Date;
-	private String TransactionDescription;
-	private double Debits;
-	private double Credits;
-	private double Balance;
-	
-	public BankStmt(String accountDescription, long accountNumber, String currency, String date,
-			String transactionDescription, double debits, double credits, double balance) {
-		super();
-		AccountDescription = accountDescription;
-		AccountNumber = accountNumber;
-		Currency = currency;
-		Date = date;
-		TransactionDescription = transactionDescription;
-		Debits = debits;
-		Credits = credits;
-		Balance = balance;
-	}
+    @Id
+    private String id;
 
-	public String getAccountDescription() {
-		return AccountDescription;
-	}
+    private String AccountDescription;
+    private long AccountNumber;
+    private String Currency;
+    private String Date;
+    private String TransactionDescription;
+    private double Debits;
+    private double Credits;
+    private double Balance;
 
-	public void setAccountDescription(String accountDescription) {
-		AccountDescription = accountDescription;
-	}
+    public BankStmt(String accountDescription, long accountNumber, String currency, String date,
+                    String transactionDescription, double debits, double credits, double balance) {
+        super();
+        AccountDescription = accountDescription;
+        AccountNumber = accountNumber;
+        Currency = currency;
+        Date = date;
+        TransactionDescription = transactionDescription;
+        Debits = debits;
+        Credits = credits;
+        Balance = balance;
+    }
 
-	public long getAccountNumber() {
-		return AccountNumber;
-	}
+    public String getAccountDescription() {
+        return AccountDescription;
+    }
 
-	public void setAccountNumber(long accountNumber) {
-		AccountNumber = accountNumber;
-	}
+    public void setAccountDescription(String accountDescription) {
+        AccountDescription = accountDescription;
+    }
 
-	public String getCurrency() {
-		return Currency;
-	}
+    public long getAccountNumber() {
+        return AccountNumber;
+    }
 
-	public void setCurrency(String currency) {
-		Currency = currency;
-	}
+    public void setAccountNumber(long accountNumber) {
+        AccountNumber = accountNumber;
+    }
 
-	public String getDate() {
-		return Date;
-	}
+    public String getCurrency() {
+        return Currency;
+    }
 
-	public void setDate(String date) {
-		Date = date;
-	}
+    public void setCurrency(String currency) {
+        Currency = currency;
+    }
 
-	public String getTransactionDescription() {
-		return TransactionDescription;
-	}
+    public String getDate() {
+        return Date;
+    }
 
-	public void setTransactionDescription(String transactionDescription) {
-		TransactionDescription = transactionDescription;
-	}
+    public void setDate(String date) {
+        Date = date;
+    }
 
-	public double getDebits() {
-		return Debits;
-	}
+    public String getTransactionDescription() {
+        return TransactionDescription;
+    }
 
-	public void setDebits(double debits) {
-		Debits = debits;
-	}
+    public void setTransactionDescription(String transactionDescription) {
+        TransactionDescription = transactionDescription;
+    }
 
-	public double getCredits() {
-		return Credits;
-	}
+    public double getDebits() {
+        return Debits;
+    }
 
-	public void setCredits(double credits) {
-		Credits = credits;
-	}
+    public void setDebits(double debits) {
+        Debits = debits;
+    }
 
-	public double getBalance() {
-		return Balance;
-	}
+    public double getCredits() {
+        return Credits;
+    }
 
-	public void setBalance(double balance) {
-		Balance = balance;
-	}
+    public void setCredits(double credits) {
+        Credits = credits;
+    }
 
-	public String getId() {
-		return id;
-	}
-	
-	
-	
+    public double getBalance() {
+        return Balance;
+    }
+
+    public void setBalance(double balance) {
+        Balance = balance;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+
 }

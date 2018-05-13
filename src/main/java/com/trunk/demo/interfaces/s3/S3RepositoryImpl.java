@@ -25,90 +25,90 @@ import com.amazonaws.services.s3.model.S3Object;
 @Service
 public class S3RepositoryImpl implements S3Repository {
 
-	@Autowired
-	private static AmazonS3 s3Client;
+    @Autowired
+    private static AmazonS3 s3Client;
 
-	@Value("${jsa.aws.access_key_id}")
-	private String awsId;
-	@Value("${jsa.aws.secret_access_key}")
-	private String awsKey;
-	@Value("${jsa.s3.region}")
-	private String region;
-	@Value("${jsa.s3.bucket}")
-	private String bucketName;
-	
+    @Value("${jsa.aws.access_key_id}")
+    private String awsId;
+    @Value("${jsa.aws.secret_access_key}")
+    private String awsKey;
+    @Value("${jsa.s3.region}")
+    private String region;
+    @Value("${jsa.s3.bucket}")
+    private String bucketName;
 
-	@PostConstruct
-	public void setup() {
-		BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsId, awsKey);
-		s3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.fromName(region))
-				.withCredentials(new AWSStaticCredentialsProvider(awsCreds)).build();
-	}
 
-	public JSONObject downloadFile(String keyName) {
+    @PostConstruct
+    public void setup() {
+        BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsId, awsKey);
+        s3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.fromName(region))
+                .withCredentials(new AWSStaticCredentialsProvider(awsCreds)).build();
+    }
 
-		JSONObject result = new JSONObject();
-		try {
-			S3Object s3object = s3Client.getObject(new GetObjectRequest(bucketName, keyName));
+    public JSONObject downloadFile(String keyName) {
 
-			result.put("contentType", s3object.getObjectMetadata().getContentType());
-			result.put("content", s3object.getObjectContent());
+        JSONObject result = new JSONObject();
+        try {
+            S3Object s3object = s3Client.getObject(new GetObjectRequest(bucketName, keyName));
 
-		} catch (AmazonServiceException ase) {
-			System.out.println("Caught an AmazonServiceException from GET requests, rejected reasons:");
-			System.out.println("Error Message:    " + ase.getMessage());
-			System.out.println("HTTP Status Code: " + ase.getStatusCode());
-			System.out.println("AWS Error Code:   " + ase.getErrorCode());
-			System.out.println("Error Type:       " + ase.getErrorType());
-			System.out.println("Request ID:       " + ase.getRequestId());
-		} catch (AmazonClientException ace) {
-			System.out.println("Caught an AmazonClientException: ");
-			System.out.println("Error Message: " + ace.getMessage());
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return result;
-	}
+            result.put("contentType", s3object.getObjectMetadata().getContentType());
+            result.put("content", s3object.getObjectContent());
 
-	public JSONObject uploadFile(String keyName, String uploadFilePath) {
+        } catch (AmazonServiceException ase) {
+            System.out.println("Caught an AmazonServiceException from GET requests, rejected reasons:");
+            System.out.println("Error Message:    " + ase.getMessage());
+            System.out.println("HTTP Status Code: " + ase.getStatusCode());
+            System.out.println("AWS Error Code:   " + ase.getErrorCode());
+            System.out.println("Error Type:       " + ase.getErrorType());
+            System.out.println("Request ID:       " + ase.getRequestId());
+        } catch (AmazonClientException ace) {
+            System.out.println("Caught an AmazonClientException: ");
+            System.out.println("Error Message: " + ace.getMessage());
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return result;
+    }
 
-		JSONObject result = new JSONObject();
+    public JSONObject uploadFile(String keyName, String uploadFilePath) {
 
-		try {
+        JSONObject result = new JSONObject();
 
-			File file = new File(uploadFilePath);
-			s3Client.putObject(new PutObjectRequest(bucketName, keyName, file));
+        try {
 
-			result.put("result", "success");
+            File file = new File(uploadFilePath);
+            s3Client.putObject(new PutObjectRequest(bucketName, keyName, file));
 
-		} catch (AmazonServiceException ase) {
-			System.out.println("Caught an AmazonServiceException from PUT requests, rejected reasons:");
-			System.out.println("Error Message:    " + ase.getMessage());
-			System.out.println("HTTP Status Code: " + ase.getStatusCode());
-			System.out.println("AWS Error Code:   " + ase.getErrorCode());
-			System.out.println("Error Type:       " + ase.getErrorType());
-			System.out.println("Request ID:       " + ase.getRequestId());
-		} catch (AmazonClientException ace) {
-			System.out.println("Caught an AmazonClientException: ");
-			System.out.println("Error Message: " + ace.getMessage());
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return result;
-	}
+            result.put("result", "success");
 
-	@Override
-	public JSONObject newUploadFile(String type, String date, String originalFilename, InputStream inputStream) {
-		// String[] dateSplit = date.split("-");
-		
-		String fileLocation = type + "/" + date + "/" + originalFilename;
-		
-		s3Client.putObject(bucketName, fileLocation, inputStream, null);
+        } catch (AmazonServiceException ase) {
+            System.out.println("Caught an AmazonServiceException from PUT requests, rejected reasons:");
+            System.out.println("Error Message:    " + ase.getMessage());
+            System.out.println("HTTP Status Code: " + ase.getStatusCode());
+            System.out.println("AWS Error Code:   " + ase.getErrorCode());
+            System.out.println("Error Type:       " + ase.getErrorType());
+            System.out.println("Request ID:       " + ase.getRequestId());
+        } catch (AmazonClientException ace) {
+            System.out.println("Caught an AmazonClientException: ");
+            System.out.println("Error Message: " + ace.getMessage());
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return result;
+    }
 
-		System.out.println("File Uploaded to S3");
-		return null;
-	}
+    @Override
+    public JSONObject newUploadFile(String type, String date, String originalFilename, InputStream inputStream) {
+        // String[] dateSplit = date.split("-");
+
+        String fileLocation = type + "/" + date + "/" + originalFilename;
+
+        s3Client.putObject(bucketName, fileLocation, inputStream, null);
+
+        System.out.println("File Uploaded to S3");
+        return null;
+    }
 
 }

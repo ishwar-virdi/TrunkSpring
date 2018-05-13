@@ -3,27 +3,26 @@ package com.trunk.demo.model;
 import java.util.List;
 
 public class MatchFiles {
-	
-	private List<String> fileKeyNames;
 
-	public MatchFiles(List<String> fileKeyNames) {
-		super();
-		this.fileKeyNames = fileKeyNames;
-	}
+    private List<String> fileKeyNames;
 
-	public MatchFiles() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    public MatchFiles(List<String> fileKeyNames) {
+        super();
+        this.fileKeyNames = fileKeyNames;
+    }
 
-	public List<String> getFileKeyNames() {
-		return fileKeyNames;
-	}
+    public MatchFiles() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
 
-	public void setFileKeyNames(List<String> fileKeyNames) {
-		this.fileKeyNames = fileKeyNames;
-	}
-	
-	
-	
+    public List<String> getFileKeyNames() {
+        return fileKeyNames;
+    }
+
+    public void setFileKeyNames(List<String> fileKeyNames) {
+        this.fileKeyNames = fileKeyNames;
+    }
+
+
 }

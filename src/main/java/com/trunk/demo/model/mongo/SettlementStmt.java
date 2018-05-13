@@ -6,150 +6,149 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "SettlementStatements")
 public class SettlementStmt {
 
-	@Id
-	private String id;
-	
-	private String MerchantID;
-	private String CardPAN;
-	private String CardExpiry;
-	private double PrincipalAmount;
-	private double Surcharge;
-	private String Currency;
-	private String CustomerName;
-	private String ResponseText;
-	private long ReceiptNumber;
-	private String SettlementDate;
-	private String CardSchemeName;
-	private String TransactionTimeStamp;
-	private String Status;
-	
-	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, double principalAmount,
-			double surcharge, String currency, String customerName, String responseText, long receiptNumber, String settlementDate,
-			String cardSchemeName, String transactionTimeStamp, String status) {
-		super();
-		MerchantID = merchantID;
-		CardPAN = cardPAN;
-		CardExpiry = cardExpiry;
-		PrincipalAmount = principalAmount;
-		Surcharge = surcharge;
-		Currency = currency;
-		CustomerName = customerName;
-		ResponseText = responseText;
-		ReceiptNumber = receiptNumber;
-		SettlementDate = settlementDate;
-		CardSchemeName = cardSchemeName;
-		TransactionTimeStamp = transactionTimeStamp;
-		Status = status;
-	}
+    @Id
+    private String id;
 
-	public String getMerchantID() {
-		return MerchantID;
-	}
+    private String MerchantID;
+    private String CardPAN;
+    private String CardExpiry;
+    private double PrincipalAmount;
+    private double Surcharge;
+    private String Currency;
+    private String CustomerName;
+    private String ResponseText;
+    private long ReceiptNumber;
+    private String SettlementDate;
+    private String CardSchemeName;
+    private String TransactionTimeStamp;
+    private String Status;
 
-	public void setMerchantID(String merchantID) {
-		MerchantID = merchantID;
-	}
+    public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, double principalAmount,
+                          double surcharge, String currency, String customerName, String responseText, long receiptNumber, String settlementDate,
+                          String cardSchemeName, String transactionTimeStamp, String status) {
+        super();
+        MerchantID = merchantID;
+        CardPAN = cardPAN;
+        CardExpiry = cardExpiry;
+        PrincipalAmount = principalAmount;
+        Surcharge = surcharge;
+        Currency = currency;
+        CustomerName = customerName;
+        ResponseText = responseText;
+        ReceiptNumber = receiptNumber;
+        SettlementDate = settlementDate;
+        CardSchemeName = cardSchemeName;
+        TransactionTimeStamp = transactionTimeStamp;
+        Status = status;
+    }
 
-	public String getCardPAN() {
-		return CardPAN;
-	}
+    public String getMerchantID() {
+        return MerchantID;
+    }
 
-	public void setCardPAN(String cardPAN) {
-		CardPAN = cardPAN;
-	}
+    public void setMerchantID(String merchantID) {
+        MerchantID = merchantID;
+    }
 
-	public String getCardExpiry() {
-		return CardExpiry;
-	}
+    public String getCardPAN() {
+        return CardPAN;
+    }
 
-	public void setCardExpiry(String cardExpiry) {
-		CardExpiry = cardExpiry;
-	}
+    public void setCardPAN(String cardPAN) {
+        CardPAN = cardPAN;
+    }
 
-	public double getPrincipalAmount() {
-		return PrincipalAmount;
-	}
+    public String getCardExpiry() {
+        return CardExpiry;
+    }
 
-	public void setPrincipalAmount(double principalAmount) {
-		PrincipalAmount = principalAmount;
-	}
+    public void setCardExpiry(String cardExpiry) {
+        CardExpiry = cardExpiry;
+    }
 
-	public double getSurcharge() {
-		return Surcharge;
-	}
+    public double getPrincipalAmount() {
+        return PrincipalAmount;
+    }
 
-	public void setSurcharge(double surcharge) {
-		Surcharge = surcharge;
-	}
+    public void setPrincipalAmount(double principalAmount) {
+        PrincipalAmount = principalAmount;
+    }
 
-	public String getCurrency() {
-		return Currency;
-	}
+    public double getSurcharge() {
+        return Surcharge;
+    }
 
-	public void setCurrency(String currency) {
-		Currency = currency;
-	}
+    public void setSurcharge(double surcharge) {
+        Surcharge = surcharge;
+    }
 
-	public String getResponseText() {
-		return ResponseText;
-	}
+    public String getCurrency() {
+        return Currency;
+    }
 
-	public void setResponseText(String responseText) {
-		ResponseText = responseText;
-	}
+    public void setCurrency(String currency) {
+        Currency = currency;
+    }
 
-	public long getReceiptNumber() {
-		return ReceiptNumber;
-	}
+    public String getResponseText() {
+        return ResponseText;
+    }
 
-	public void setReceiptNumber(long receiptNumber) {
-		ReceiptNumber = receiptNumber;
-	}
+    public void setResponseText(String responseText) {
+        ResponseText = responseText;
+    }
 
-	public String getSettlementDate() {
-		return SettlementDate;
-	}
+    public long getReceiptNumber() {
+        return ReceiptNumber;
+    }
 
-	public void setSettlementDate(String settlementDate) {
-		SettlementDate = settlementDate;
-	}
+    public void setReceiptNumber(long receiptNumber) {
+        ReceiptNumber = receiptNumber;
+    }
 
-	public String getCardSchemeName() {
-		return CardSchemeName;
-	}
+    public String getSettlementDate() {
+        return SettlementDate;
+    }
 
-	public void setCardSchemeName(String cardSchemeName) {
-		CardSchemeName = cardSchemeName;
-	}
+    public void setSettlementDate(String settlementDate) {
+        SettlementDate = settlementDate;
+    }
 
-	public String getTransactionTimeStamp() {
-		return TransactionTimeStamp;
-	}
+    public String getCardSchemeName() {
+        return CardSchemeName;
+    }
 
-	public void setTransactionTimeStamp(String transactionTimeStamp) {
-		TransactionTimeStamp = transactionTimeStamp;
-	}
+    public void setCardSchemeName(String cardSchemeName) {
+        CardSchemeName = cardSchemeName;
+    }
 
-	public String getStatus() {
-		return Status;
-	}
+    public String getTransactionTimeStamp() {
+        return TransactionTimeStamp;
+    }
 
-	public void setStatus(String status) {
-		Status = status;
-	}
+    public void setTransactionTimeStamp(String transactionTimeStamp) {
+        TransactionTimeStamp = transactionTimeStamp;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getStatus() {
+        return Status;
+    }
 
-	public String getCustomerName() {
-		return CustomerName;
-	}
+    public void setStatus(String status) {
+        Status = status;
+    }
 
-	public void setCustomerName(String customerName) {
-		CustomerName = customerName;
-	}
-	
-	
-	
+    public String getId() {
+        return id;
+    }
+
+    public String getCustomerName() {
+        return CustomerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        CustomerName = customerName;
+    }
+
+
 }
