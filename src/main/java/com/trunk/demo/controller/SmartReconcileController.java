@@ -64,6 +64,12 @@ public class SmartReconcileController {
 	public void reconcile() {
 		reconcileFiles.reconcile();
 	}
+	
+	//For testing only
+	@RequestMapping(method = RequestMethod.GET, path = "/api/reset")
+	public void reset() {
+		reconcileFiles.reset();
+	}
 
 	/*
 	 * Upload File to S3 (No Longer Using. But Useful to Have)

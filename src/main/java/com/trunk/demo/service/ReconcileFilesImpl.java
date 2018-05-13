@@ -24,11 +24,10 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	@Autowired
 	private SettlementRepository settlementStmtRepo;
 	
-	private List<SettlementStmt> settlementDocument;
-	private List<BankStmt> bankStatement;
-	
 	@Override
 	public void reconcile() {
+		List<SettlementStmt> settlementDocument;
+		List<BankStmt> bankStatement;
 		String month = "201803";
 		
 		//Grabs the records it wants to work with from MongoDB
@@ -83,13 +82,13 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		return items;
 	}
 	
-	private ArrayList<String> reconcileItems(Map<String, Double> totals, List<BankStmt> bankStatement2) {
+	private ArrayList<String> reconcileItems(Map<String, Double> totals, List<BankStmt> bankStatement) {
 		ArrayList<String> response = new ArrayList<String>();
 		
 		for (Map.Entry<String, Double> entry : totals.entrySet()) {
-			for (int i = 0; i < bankStatement2.size(); i++) {
-				if (bankStatement2.get(i).getDate().equals(entry.getKey())) {
-					response.add(bankStatement2.get(i).getDate());
+			for (int i = 0; i < bankStatement.size(); i++) {
+				if (bankStatement.get(i).getDate().equals(entry.getKey()) && bankStatement.get(i).getCredits() == entry.getValue()) {
+					response.add(bankStatement.get(i).getDate());
 					break;
 				}
 			}
@@ -112,48 +111,16 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		
 		return transactionAmountsByDate;
 	}
-	
-/*
 
-	public JSONObject reconcileDocuments() {
-		JSONObject response = new JSONObject();
+	@Override
+	public void reset() {
+		List<SettlementStmt> settlementDocument = settlementStmtRepo.findAllBySettlementDateLike("^2018\\d*");
 		
-		this.bankStatement.extractBankTransferItems(this.settlementDocument.getBankStatementStrings());
-		
-		Map<String, Float> amexTotals = this.addUpSameDayTransactions(settlementDocument.getAmexTransactions());
-		Map<String, Float> visaMastercardTotals = this.addUpSameDayTransactions(settlementDocument.getVisaMastercardTransactions());
-		//Don't need this
-		Map<String, Float> bankTransferTotals = this.addUpSameDayTransactions(settlementDocument.getBankTransferTransactions());
-		
-		ArrayList<String> reconciledAmex = this.reconcileItems(amexTotals, bankStatement.getCreditCardTransactions());
-		ArrayList<String> reconciledVisa = this.reconcileItems(visaMastercardTotals, bankStatement.getCreditCardTransactions());
-		ArrayList<String> reconciledBankTransfer = this.reconcileItems(bankTransferTotals, bankStatement.getBankTransferTransactions());
-		
-		settlementDocument.setAmexTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledAmex, settlementDocument.getAmexTransactions()));
-		settlementDocument.setVisaTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledVisa, settlementDocument.getVisaMastercardTransactions()));		
-		settlementDocument.setBankTransferTransactions((BankTransferTransaction[]) this.matchReconciledWithSettlementItems(reconciledBankTransfer, settlementDocument.getBankTransferTransactions()));
-		
-		try {
-			response.put("Amex", settlementDocument.getAmexTransactionsJSON());
-			response.put("VisaMastercard", settlementDocument.getVisaMastercardTransactionsJSON());
-			response.put("BankTransfer", settlementDocument.getBankTransactionsJSON());
-		} catch (JSONException e) {
-			e.printStackTrace();
+		for (int i = 0; i < settlementDocument.size(); i++) {
+			settlementDocument.get(i).setIsReconciled(false);
+			settlementDocument.get(i).setReconciledDateTime(null);
 		}
 		
-		return response;
+		this.settlementStmtRepo.saveAll(settlementDocument);
 	}
-	
-	private TransactionItem[] matchReconciledWithSettlementItems(ArrayList<String> dates, TransactionItem[] transactionItems) {
-		for (int i = 0; i < transactionItems.length; i++) {
-			for (int x = 0; x < dates.size(); x++) {
-				if (transactionItems[i].getReversedDate().equals(dates.get(x))) {
-					transactionItems[i].setIsReconciled(true);
-					break;
-				}
-			}
-		}
-		
-		return transactionItems;
-	}*/
 }
