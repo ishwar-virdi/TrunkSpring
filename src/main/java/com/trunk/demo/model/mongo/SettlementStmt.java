@@ -1,5 +1,7 @@
 package com.trunk.demo.model.mongo;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,6 +11,7 @@ public class SettlementStmt {
 	@Id
 	private String id;
 	
+	private Date createDate;
 	private String merchantID;
 	private String cardPAN;
 	private String cardExpiry;
@@ -23,11 +26,14 @@ public class SettlementStmt {
 	private String cardSchemeName;
 	private String transactionTimeStamp;
 	private String status;
+	private boolean isReconciled;
+	private Date reconciledDateTime;
 	
 	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, String bankReference, double principalAmount,
 			double surcharge, String currency, String customerName, String responseText, long receiptNumber, String settlementDate,
 			String cardSchemeName, String transactionTimeStamp, String status) {
 		super();
+		this.createDate = new Date();
 		this.merchantID = merchantID;
 		this.cardPAN = cardPAN;
 		this.cardExpiry = cardExpiry;
@@ -42,6 +48,12 @@ public class SettlementStmt {
 		this.cardSchemeName = cardSchemeName;
 		this.transactionTimeStamp = transactionTimeStamp;
 		this.status = status;
+		this.isReconciled = false;
+		this.reconciledDateTime = null;
+	}
+	
+	public Date getCreateDate() {
+		return this.createDate;
 	}
 
 	public String getMerchantID() {
@@ -160,6 +172,19 @@ public class SettlementStmt {
 		this.customerName = customerName;
 	}
 	
+	public boolean getIsReconciled() {
+		return this.isReconciled;
+	}
 	
+	public void setIsReconciled(boolean isReconciled) {
+		this.isReconciled = isReconciled;
+	}
 	
+	public Date getReconciledDateTime() {
+		return this.reconciledDateTime;
+	}
+	
+	public void setReconciledDateTime(Date dateTime) {
+		this.reconciledDateTime = dateTime;
+	}
 }

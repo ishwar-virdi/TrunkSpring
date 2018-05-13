@@ -1,6 +1,7 @@
 package com.trunk.demo.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,28 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		
 		System.out.println(reconciledAmex);
 		System.out.println(reconciledVisaMastercard);
+		
+		ArrayList<SettlementStmt> finalAmex = this.matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
+		ArrayList<SettlementStmt> finalVisaMastercard = this.matchReconciledWithSettlementItems(reconciledVisaMastercard, visaMastercardTransactions);	
+		
+		
+		//Save the results to the db
+		this.settlementStmtRepo.saveAll(finalAmex);
+		this.settlementStmtRepo.saveAll(finalVisaMastercard);
+	}
+	
+	private ArrayList<SettlementStmt> matchReconciledWithSettlementItems(ArrayList<String> dates, ArrayList<SettlementStmt> items) {
+		for (int i = 0; i < items.size(); i++) {
+			for (int x = 0; x < dates.size(); x++) {
+				if (items.get(i).getSettlementDate().equals(dates.get(x))) {
+					items.get(i).setIsReconciled(true);
+					items.get(i).setReconciledDateTime(new Date());
+					break;
+				}
+			}
+		}
+		
+		return items;
 	}
 	
 	private ArrayList<String> reconcileItems(Map<String, Double> totals, List<BankStmt> bankStatement2) {
@@ -122,7 +145,8 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		ArrayList<String> reconciledBankTransfer = this.reconcileItems(bankTransferTotals, bankStatement.getBankTransferTransactions());
 		
 		settlementDocument.setAmexTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledAmex, settlementDocument.getAmexTransactions()));
-		settlementDocument.setVisaTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledVisa, settlementDocument.getVisaMastercardTransactions()));		settlementDocument.setBankTransferTransactions((BankTransferTransaction[]) this.matchReconciledWithSettlementItems(reconciledBankTransfer, settlementDocument.getBankTransferTransactions()));
+		settlementDocument.setVisaTransactions((CreditCardTransaction[]) this.matchReconciledWithSettlementItems(reconciledVisa, settlementDocument.getVisaMastercardTransactions()));		
+		settlementDocument.setBankTransferTransactions((BankTransferTransaction[]) this.matchReconciledWithSettlementItems(reconciledBankTransfer, settlementDocument.getBankTransferTransactions()));
 		
 		try {
 			response.put("Amex", settlementDocument.getAmexTransactionsJSON());

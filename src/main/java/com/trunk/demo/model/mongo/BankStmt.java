@@ -1,5 +1,7 @@
 package com.trunk.demo.model.mongo;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,6 +11,7 @@ public class BankStmt {
 	@Id
 	private String id;
 	
+	private Date createDate;
 	private String accountDescription;
 	private long accountNumber;
 	private String currency;
@@ -21,6 +24,7 @@ public class BankStmt {
 	public BankStmt(String accountDescription, long accountNumber, String currency, String date,
 			String transactionDescription, double debits, double credits, double balance) {
 		super();
+		this.createDate = new Date();
 		this.accountDescription = accountDescription;
 		this.accountNumber = accountNumber;
 		this.currency = currency;
@@ -29,6 +33,10 @@ public class BankStmt {
 		this.debits = debits;
 		this.credits = credits;
 		this.balance = balance;
+	}
+	
+	public Date getCreateDate() {
+		return this.createDate;
 	}
 
 	public String getAccountDescription() {
