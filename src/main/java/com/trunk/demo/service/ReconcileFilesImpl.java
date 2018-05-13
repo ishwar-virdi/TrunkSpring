@@ -1,12 +1,11 @@
 package com.trunk.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Service;
@@ -29,34 +28,26 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	private List<BankStmt> bankStatement;
 	
 	@Override
-	public void reconcileDocuments() {
+	public void reconcile() {
 		String month = "201803";
-		JSONObject response = new JSONObject();
 		
 		//Grabs the records it wants to work with from MongoDB
-		System.out.println("Bank Statement");
 		bankStatement = bankStmtRepo.findAllByDateLike("^" + month + "\\d*");
-		for (int i = 0; i < bankStatement.size(); i++)
-			System.out.println(bankStatement.get(i).getTransactionDescription());
-		
-		System.out.println("Settlement Document");
 		settlementDocument = settlementStmtRepo.findAllBySettlementDateLike("^" + month + "\\d*");
-		for (int i = 0; i < settlementDocument.size(); i++)
-			System.out.println(settlementDocument.get(i).getPrincipalAmount());
 		
 		ArrayList<SettlementStmt> amexTransactions = new ArrayList<SettlementStmt>();
 		ArrayList<SettlementStmt> visaMastercardTransactions = new ArrayList<SettlementStmt>();
+		ArrayList<SettlementStmt> directDebitTransactions = new ArrayList<SettlementStmt>();
 		
 		
-		//Separates the amex and visa/mastercard transactions from each other
+		//Separates the amex, visa/mastercard and direct debit transactions from each other
 		for (int i = 0; i < settlementDocument.size(); i++) {
 			if (settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("Amex"))
 				amexTransactions.add(settlementDocument.get(i));
-		}
-		
-		for (int i = 0; i < settlementDocument.size(); i++) {
-			if (settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("Visa") || settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("Mastercard"))
+			else if (settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("Visa") || settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("Mastercard"))
 				visaMastercardTransactions.add(settlementDocument.get(i));
+			else if (settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("") && !settlementDocument.get(i).getBankReference().equalsIgnoreCase(""))
+				directDebitTransactions.add(settlementDocument.get(i));
 		}
 		
 		
@@ -64,16 +55,10 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		Map<String, Double> amexTotals = this.addUpSameDayTransactions(amexTransactions);
 		Map<String, Double> visaMastercardTotals = this.addUpSameDayTransactions(visaMastercardTransactions);
 		
-		System.out.println(amexTotals);
-		System.out.println(visaMastercardTotals);
-		
 		
 		//Reconciles the items
 		ArrayList<String> reconciledAmex = this.reconcileItems(amexTotals, bankStatement);
 		ArrayList<String> reconciledVisaMastercard = this.reconcileItems(visaMastercardTotals, bankStatement);
-		
-		System.out.println(reconciledAmex);
-		System.out.println(reconciledVisaMastercard);
 		
 		ArrayList<SettlementStmt> finalAmex = this.matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
 		ArrayList<SettlementStmt> finalVisaMastercard = this.matchReconciledWithSettlementItems(reconciledVisaMastercard, visaMastercardTransactions);	
@@ -89,7 +74,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 			for (int x = 0; x < dates.size(); x++) {
 				if (items.get(i).getSettlementDate().equals(dates.get(x))) {
 					items.get(i).setIsReconciled(true);
-					items.get(i).setReconciledDateTime(new Date());
+					items.get(i).setReconciledDateTime(LocalDateTime.now());
 					break;
 				}
 			}
@@ -171,16 +156,4 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		
 		return transactionItems;
 	}*/
-
-	@Override
-	public void setBankStatement(BankStmt bankStatement) {
-		
-	}
-
-	@Override
-	public void setSettlementDocument(SettlementStmt settlementDocument) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 }
