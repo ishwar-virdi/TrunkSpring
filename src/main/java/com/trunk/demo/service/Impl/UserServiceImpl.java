@@ -95,7 +95,6 @@ public class UserServiceImpl implements UsersService {
     public String logOut() {
         JSONObject json = new JSONObject();
         try {
-            System.out.println(session.getAttribute(userSession));
             session.removeAttribute(userSession);
             if(session.getAttribute(userSession) == null){
                 json.put("result", true);
