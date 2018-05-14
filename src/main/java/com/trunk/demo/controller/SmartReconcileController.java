@@ -23,8 +23,8 @@ import com.trunk.demo.service.mongo.UserManager;
 
 @RestController
 // Use 2nd one for Local Testing. Do Not commit the 2nd active.
-//@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
- @CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
+//@CrossOrigin(origins = "http://localhost:3000")
 public class SmartReconcileController {
 
 	@Autowired
