@@ -47,7 +47,7 @@ public class UploadManagerImpl implements UploadManager {
 				if (line != "") {
 					line = line.replaceAll("\"", "");
 					String elements[] = line.split(",");
-					SettlementStmt newStmt = new SettlementStmt(elements[1], elements[2], elements[4],
+					SettlementStmt newStmt = new SettlementStmt(elements[1], elements[2], elements[4], elements[7],
 							Double.parseDouble(elements[10].isEmpty() ? "0" : elements[10]),
 							Double.parseDouble(elements[11].isEmpty() ? "0" : elements[11]), elements[13], elements[16],
 							elements[24], Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]), elements[26],
@@ -72,14 +72,16 @@ public class UploadManagerImpl implements UploadManager {
 			br.readLine();
 
 			while ((line = br.readLine()) != null) {
-				if (line != "") {
-					line = line.replaceAll("\"", "");
-					String elements[] = line.split(",");
+				if (line.trim().length() > 0) {
+					String elements[] = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 					if (!(elements[0].equalsIgnoreCase("Total value of transactions:")
 							|| elements[0].equalsIgnoreCase("Number of transactions:"))) {
-
+						
+						for (int i = 0; i < elements.length; i++)
+							elements[i] = elements[i].replaceAll("\"", "");
+						
 						BankStmt newStmt = new BankStmt(elements[0],
-								Long.parseLong(elements[1].isEmpty() ? "0" : elements[1]), elements[2], elements[3],
+								Long.parseLong(elements[1].isEmpty() ? "0" : elements[1]), elements[2], reverseDate(elements[3]),
 								elements[4], Double.parseDouble(elements[5].isEmpty() ? "0" : elements[5]),
 								Double.parseDouble(elements[6].isEmpty() ? "0" : elements[6]),
 								Double.parseDouble(elements[7].isEmpty() ? "0" : elements[7]));
@@ -94,6 +96,13 @@ public class UploadManagerImpl implements UploadManager {
 			System.out.println(e.getMessage());
 
 		}
+	}
+	
+	private String reverseDate(String date) {
+		if (date.length() < 8)
+			date = "0" + date;
+		
+		return date.substring(4, 8) + date.substring(2, 4) + date.substring(0, 2);
 	}
 
 }

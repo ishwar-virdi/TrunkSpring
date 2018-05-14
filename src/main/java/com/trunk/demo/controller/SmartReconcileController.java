@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.trunk.demo.model.LoginDetails;
 import com.trunk.demo.model.MatchFiles;
 import com.trunk.demo.service.FileMatcher;
+import com.trunk.demo.service.ReconcileFiles;
 import com.trunk.demo.service.TokenGenerator;
 import com.trunk.demo.service.mongo.UploadManager;
 import com.trunk.demo.service.mongo.UserManager;
@@ -23,13 +24,15 @@ import com.trunk.demo.service.mongo.UserManager;
 @RestController
 // Use 2nd one for Local Testing. Do Not commit the 2nd active.
 @CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
-// @CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
 public class SmartReconcileController {
 
 	@Autowired
 	private UserManager userManager;
 	@Autowired
 	private UploadManager uploadManager;
+	@Autowired
+	private ReconcileFiles reconcileFiles;
 
 	@RequestMapping("/api/token")
 	public String tokenCreator() {
@@ -55,6 +58,17 @@ public class SmartReconcileController {
 	public void uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file)
 			throws IOException {
 		uploadManager.newUploadFile(type, file.getInputStream());
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, path = "/api/reconcile")
+	public void reconcile() {
+		reconcileFiles.reconcile();
+	}
+	
+	//For testing only
+	@RequestMapping(method = RequestMethod.GET, path = "/api/reset")
+	public void reset() {
+		reconcileFiles.reset();
 	}
 
 	/*
