@@ -1,154 +1,190 @@
 package com.trunk.demo.model.mongo;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "SettlementStatements")
 public class SettlementStmt {
 
-    @Id
-    private String id;
+	@Id
+	private String id;
+	
+	private LocalDateTime createDateTime;
+	private String merchantID;
+	private String cardPAN;
+	private String cardExpiry;
+	private String bankReference;
+	private double principalAmount;
+	private double surcharge;
+	private String currency;
+	private String customerName;
+	private String responseText;
+	private long receiptNumber;
+	private String settlementDate;
+	private String cardSchemeName;
+	private String transactionTimeStamp;
+	private String status;
+	private boolean isReconciled;
+	private LocalDateTime reconciledDateTime;
+	
+	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, String bankReference, double principalAmount,
+			double surcharge, String currency, String customerName, String responseText, long receiptNumber, String settlementDate,
+			String cardSchemeName, String transactionTimeStamp, String status) {
+		super();
+		this.createDateTime = LocalDateTime.now();
+		this.merchantID = merchantID;
+		this.cardPAN = cardPAN;
+		this.cardExpiry = cardExpiry;
+		this.bankReference = bankReference;
+		this.principalAmount = principalAmount;
+		this.surcharge = surcharge;
+		this.currency = currency;
+		this.customerName = customerName;
+		this.responseText = responseText;
+		this.receiptNumber = receiptNumber;
+		this.settlementDate = settlementDate;
+		this.cardSchemeName = cardSchemeName;
+		this.transactionTimeStamp = transactionTimeStamp;
+		this.status = status;
+		this.isReconciled = false;
+		this.reconciledDateTime = null;
+	}
+	
+	public LocalDateTime getCreateDate() {
+		return this.createDateTime;
+	}
 
-    private String MerchantID;
-    private String CardPAN;
-    private String CardExpiry;
-    private double PrincipalAmount;
-    private double Surcharge;
-    private String Currency;
-    private String CustomerName;
-    private String ResponseText;
-    private long ReceiptNumber;
-    private String SettlementDate;
-    private String CardSchemeName;
-    private String TransactionTimeStamp;
-    private String Status;
+	public String getMerchantID() {
+		return this.merchantID;
+	}
 
-    public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, double principalAmount,
-                          double surcharge, String currency, String customerName, String responseText, long receiptNumber, String settlementDate,
-                          String cardSchemeName, String transactionTimeStamp, String status) {
-        super();
-        MerchantID = merchantID;
-        CardPAN = cardPAN;
-        CardExpiry = cardExpiry;
-        PrincipalAmount = principalAmount;
-        Surcharge = surcharge;
-        Currency = currency;
-        CustomerName = customerName;
-        ResponseText = responseText;
-        ReceiptNumber = receiptNumber;
-        SettlementDate = settlementDate;
-        CardSchemeName = cardSchemeName;
-        TransactionTimeStamp = transactionTimeStamp;
-        Status = status;
-    }
+	public void setMerchantID(String merchantID) {
+		this.merchantID = merchantID;
+	}
 
-    public String getMerchantID() {
-        return MerchantID;
-    }
+	public String getCardPAN() {
+		return this.cardPAN;
+	}
 
-    public void setMerchantID(String merchantID) {
-        MerchantID = merchantID;
-    }
+	public void setCardPAN(String cardPAN) {
+		this.cardPAN = cardPAN;
+	}
 
-    public String getCardPAN() {
-        return CardPAN;
-    }
+	public String getCardExpiry() {
+		return this.cardExpiry;
+	}
 
-    public void setCardPAN(String cardPAN) {
-        CardPAN = cardPAN;
-    }
+	public void setCardExpiry(String cardExpiry) {
+		this.cardExpiry = cardExpiry;
+	}
+	
+	public String getBankReference() {
+		return this.bankReference;
+	}
+	
+	public void setBankReference(String bankReference) {
+		this.bankReference = bankReference;
+	}
 
-    public String getCardExpiry() {
-        return CardExpiry;
-    }
+	public double getPrincipalAmount() {
+		return this.principalAmount;
+	}
 
-    public void setCardExpiry(String cardExpiry) {
-        CardExpiry = cardExpiry;
-    }
+	public void setPrincipalAmount(double principalAmount) {
+		this.principalAmount = principalAmount;
+	}
 
-    public double getPrincipalAmount() {
-        return PrincipalAmount;
-    }
+	public double getSurcharge() {
+		return this.surcharge;
+	}
 
-    public void setPrincipalAmount(double principalAmount) {
-        PrincipalAmount = principalAmount;
-    }
+	public void setSurcharge(double surcharge) {
+		this.surcharge = surcharge;
+	}
 
-    public double getSurcharge() {
-        return Surcharge;
-    }
+	public String getCurrency() {
+		return this.currency;
+	}
 
-    public void setSurcharge(double surcharge) {
-        Surcharge = surcharge;
-    }
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
 
-    public String getCurrency() {
-        return Currency;
-    }
+	public String getResponseText() {
+		return this.responseText;
+	}
 
-    public void setCurrency(String currency) {
-        Currency = currency;
-    }
+	public void setResponseText(String responseText) {
+		this.responseText = responseText;
+	}
 
-    public String getResponseText() {
-        return ResponseText;
-    }
+	public long getReceiptNumber() {
+		return this.receiptNumber;
+	}
 
-    public void setResponseText(String responseText) {
-        ResponseText = responseText;
-    }
+	public void setReceiptNumber(long receiptNumber) {
+		this.receiptNumber = receiptNumber;
+	}
 
-    public long getReceiptNumber() {
-        return ReceiptNumber;
-    }
+	public String getSettlementDate() {
+		return this.settlementDate;
+	}
 
-    public void setReceiptNumber(long receiptNumber) {
-        ReceiptNumber = receiptNumber;
-    }
+	public void setSettlementDate(String settlementDate) {
+		this.settlementDate = settlementDate;
+	}
 
-    public String getSettlementDate() {
-        return SettlementDate;
-    }
+	public String getCardSchemeName() {
+		return this.cardSchemeName;
+	}
 
-    public void setSettlementDate(String settlementDate) {
-        SettlementDate = settlementDate;
-    }
+	public void setCardSchemeName(String cardSchemeName) {
+		this.cardSchemeName = cardSchemeName;
+	}
 
-    public String getCardSchemeName() {
-        return CardSchemeName;
-    }
+	public String getTransactionTimeStamp() {
+		return this.transactionTimeStamp;
+	}
 
-    public void setCardSchemeName(String cardSchemeName) {
-        CardSchemeName = cardSchemeName;
-    }
+	public void setTransactionTimeStamp(String transactionTimeStamp) {
+		this.transactionTimeStamp = transactionTimeStamp;
+	}
 
-    public String getTransactionTimeStamp() {
-        return TransactionTimeStamp;
-    }
+	public String getStatus() {
+		return this.status;
+	}
 
-    public void setTransactionTimeStamp(String transactionTimeStamp) {
-        TransactionTimeStamp = transactionTimeStamp;
-    }
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
-    public String getStatus() {
-        return Status;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setStatus(String status) {
-        Status = status;
-    }
+	public String getCustomerName() {
+		return this.customerName;
+	}
 
-    public String getId() {
-        return id;
-    }
-
-    public String getCustomerName() {
-        return CustomerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        CustomerName = customerName;
-    }
-
-
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+	
+	public boolean getIsReconciled() {
+		return this.isReconciled;
+	}
+	
+	public void setIsReconciled(boolean isReconciled) {
+		this.isReconciled = isReconciled;
+	}
+	
+	public LocalDateTime getReconciledDateTime() {
+		return this.reconciledDateTime;
+	}
+	
+	public void setReconciledDateTime(LocalDateTime dateTime) {
+		this.reconciledDateTime = dateTime;
+	}
 }

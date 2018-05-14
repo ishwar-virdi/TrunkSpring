@@ -1,103 +1,111 @@
 package com.trunk.demo.model.mongo;
 
+import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "BankStatements")
 public class BankStmt {
 
-    @Id
-    private String id;
+	@Id
+	private String id;
+	
+	private LocalDateTime createDateTime;
+	private String accountDescription;
+	private long accountNumber;
+	private String currency;
+	private String date;
+	private String transactionDescription;
+	private double debits;
+	private double credits;
+	private double balance;
+	
+	public BankStmt(String accountDescription, long accountNumber, String currency, String date,
+			String transactionDescription, double debits, double credits, double balance) {
+		super();
+		this.createDateTime = LocalDateTime.now();
+		this.accountDescription = accountDescription;
+		this.accountNumber = accountNumber;
+		this.currency = currency;
+		this.date = date;
+		this.transactionDescription = transactionDescription;
+		this.debits = debits;
+		this.credits = credits;
+		this.balance = balance;
+	}
+	
+	public LocalDateTime getCreateDate() {
+		return this.createDateTime;
+	}
 
-    private String AccountDescription;
-    private long AccountNumber;
-    private String Currency;
-    private String Date;
-    private String TransactionDescription;
-    private double Debits;
-    private double Credits;
-    private double Balance;
+	public String getAccountDescription() {
+		return this.accountDescription;
+	}
 
-    public BankStmt(String accountDescription, long accountNumber, String currency, String date,
-                    String transactionDescription, double debits, double credits, double balance) {
-        super();
-        AccountDescription = accountDescription;
-        AccountNumber = accountNumber;
-        Currency = currency;
-        Date = date;
-        TransactionDescription = transactionDescription;
-        Debits = debits;
-        Credits = credits;
-        Balance = balance;
-    }
+	public void setAccountDescription(String accountDescription) {
+		this.accountDescription = accountDescription;
+	}
 
-    public String getAccountDescription() {
-        return AccountDescription;
-    }
+	public long getAccountNumber() {
+		return this.accountNumber;
+	}
 
-    public void setAccountDescription(String accountDescription) {
-        AccountDescription = accountDescription;
-    }
+	public void setAccountNumber(long accountNumber) {
+		this.accountNumber = accountNumber;
+	}
 
-    public long getAccountNumber() {
-        return AccountNumber;
-    }
+	public String getCurrency() {
+		return this.currency;
+	}
 
-    public void setAccountNumber(long accountNumber) {
-        AccountNumber = accountNumber;
-    }
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
 
-    public String getCurrency() {
-        return Currency;
-    }
+	public String getDate() {
+		return this.date;
+	}
 
-    public void setCurrency(String currency) {
-        Currency = currency;
-    }
+	public void setDate(String date) {
+		this.date = date;
+	}
 
-    public String getDate() {
-        return Date;
-    }
+	public String getTransactionDescription() {
+		return this.transactionDescription;
+	}
 
-    public void setDate(String date) {
-        Date = date;
-    }
+	public void setTransactionDescription(String transactionDescription) {
+		this.transactionDescription = transactionDescription;
+	}
 
-    public String getTransactionDescription() {
-        return TransactionDescription;
-    }
+	public double getDebits() {
+		return this.debits;
+	}
 
-    public void setTransactionDescription(String transactionDescription) {
-        TransactionDescription = transactionDescription;
-    }
+	public void setDebits(double debits) {
+		this.debits = debits;
+	}
 
-    public double getDebits() {
-        return Debits;
-    }
+	public double getCredits() {
+		return this.credits;
+	}
 
-    public void setDebits(double debits) {
-        Debits = debits;
-    }
+	public void setCredits(double credits) {
+		this.credits = credits;
+	}
 
-    public double getCredits() {
-        return Credits;
-    }
+	public double getBalance() {
+		return this.balance;
+	}
 
-    public void setCredits(double credits) {
-        Credits = credits;
-    }
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
 
-    public double getBalance() {
-        return Balance;
-    }
-
-    public void setBalance(double balance) {
-        Balance = balance;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-
+	public String getId() {
+		return id;
+	}
+	
+	
+	
 }
