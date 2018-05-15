@@ -1,12 +1,14 @@
 package com.trunk.demo.controller;
 
 import com.trunk.demo.model.viewModel.ViewLoginModel;
-import com.trunk.demo.service.mongo.UsersService;
+import com.trunk.demo.service.mongo.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+
+import static java.lang.Thread.sleep;
 
 @RestController
 //@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
@@ -14,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
 
     @Autowired
-    private UsersService usersService;
+    private UserManager userManager;
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/login")
     public String loginValidation(@RequestBody ViewLoginModel viewLoginModel, HttpServletRequest request) {
@@ -24,22 +26,21 @@ public class UserController {
 //            String value = request.getHeader(key);
 //            System.out.println(key + " " + value);
 //        }
-
-        return usersService.loginValidator(viewLoginModel);
+        return userManager.loginValidator(viewLoginModel);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/register")
 	public String registerUser(@RequestBody ViewLoginModel viewLoginModel) {
-		return usersService.register(viewLoginModel);
+		return userManager.register(viewLoginModel);
 	}
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/userLogin")
     public String userIsLogin() {
-        return usersService.userIsLogin();
+        return userManager.userIsLogin();
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/userLogout")
     public String logout() {
-        return usersService.logOut();
+        return userManager.logOut();
     }
 }
