@@ -1,7 +1,6 @@
 package com.trunk.demo.model.mongo;
 
 import java.time.LocalDateTime;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class SettlementStmt {
 
 	@Id
-	private String id;
+	private Long receiptNumber;
 	
 	private LocalDateTime createDateTime;
 	private String merchantID;
@@ -21,7 +20,6 @@ public class SettlementStmt {
 	private String currency;
 	private String customerName;
 	private String responseText;
-	private long receiptNumber;
 	private String settlementDate;
 	private String cardSchemeName;
 	private String transactionTimeStamp;
@@ -49,15 +47,35 @@ public class SettlementStmt {
 		this.transactionTimeStamp = transactionTimeStamp;
 		this.status = status;
 		this.isReconciled = false;
-		this.reconciledDateTime = null;
+		this.reconciledDateTime = LocalDateTime.of(1900, 1, 1, 0, 0);
 	}
-	
-	public LocalDateTime getCreateDate() {
-		return this.createDateTime;
+
+	public String getTransactionDate() {
+		return transactionTimeStamp.substring(0, 10);
+	}
+
+	public String getTransactionTime() {
+		return transactionTimeStamp.substring(11, transactionTimeStamp.length());
+	}
+
+	public Long getReceiptNumber() {
+		return receiptNumber;
+	}
+
+	public void setReceiptNumber(Long receiptNumber) {
+		this.receiptNumber = receiptNumber;
+	}
+
+	public String getCreateDateTime() {
+		return createDateTime.toString();
+	}
+
+	public void setCreateDateTime(LocalDateTime createDateTime) {
+		this.createDateTime = createDateTime;
 	}
 
 	public String getMerchantID() {
-		return this.merchantID;
+		return merchantID;
 	}
 
 	public void setMerchantID(String merchantID) {
@@ -65,7 +83,7 @@ public class SettlementStmt {
 	}
 
 	public String getCardPAN() {
-		return this.cardPAN;
+		return cardPAN;
 	}
 
 	public void setCardPAN(String cardPAN) {
@@ -73,23 +91,23 @@ public class SettlementStmt {
 	}
 
 	public String getCardExpiry() {
-		return this.cardExpiry;
+		return cardExpiry;
 	}
 
 	public void setCardExpiry(String cardExpiry) {
 		this.cardExpiry = cardExpiry;
 	}
-	
+
 	public String getBankReference() {
-		return this.bankReference;
+		return bankReference;
 	}
-	
+
 	public void setBankReference(String bankReference) {
 		this.bankReference = bankReference;
 	}
 
 	public double getPrincipalAmount() {
-		return this.principalAmount;
+		return principalAmount;
 	}
 
 	public void setPrincipalAmount(double principalAmount) {
@@ -97,7 +115,7 @@ public class SettlementStmt {
 	}
 
 	public double getSurcharge() {
-		return this.surcharge;
+		return surcharge;
 	}
 
 	public void setSurcharge(double surcharge) {
@@ -105,31 +123,31 @@ public class SettlementStmt {
 	}
 
 	public String getCurrency() {
-		return this.currency;
+		return currency;
 	}
 
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
 
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
 	public String getResponseText() {
-		return this.responseText;
+		return responseText;
 	}
 
 	public void setResponseText(String responseText) {
 		this.responseText = responseText;
 	}
 
-	public long getReceiptNumber() {
-		return this.receiptNumber;
-	}
-
-	public void setReceiptNumber(long receiptNumber) {
-		this.receiptNumber = receiptNumber;
-	}
-
 	public String getSettlementDate() {
-		return this.settlementDate;
+		return settlementDate;
 	}
 
 	public void setSettlementDate(String settlementDate) {
@@ -137,7 +155,7 @@ public class SettlementStmt {
 	}
 
 	public String getCardSchemeName() {
-		return this.cardSchemeName;
+		return cardSchemeName;
 	}
 
 	public void setCardSchemeName(String cardSchemeName) {
@@ -145,7 +163,7 @@ public class SettlementStmt {
 	}
 
 	public String getTransactionTimeStamp() {
-		return this.transactionTimeStamp;
+		return transactionTimeStamp;
 	}
 
 	public void setTransactionTimeStamp(String transactionTimeStamp) {
@@ -153,38 +171,30 @@ public class SettlementStmt {
 	}
 
 	public String getStatus() {
-		return this.status;
+		return status;
 	}
 
 	public void setStatus(String status) {
 		this.status = status;
 	}
 
-	public String getId() {
-		return id;
+	public boolean isReconciled() {
+		return isReconciled;
 	}
 
-	public String getCustomerName() {
-		return this.customerName;
-	}
-
-	public void setCustomerName(String customerName) {
-		this.customerName = customerName;
-	}
-	
-	public boolean getIsReconciled() {
-		return this.isReconciled;
-	}
-	
-	public void setIsReconciled(boolean isReconciled) {
+	public void setReconciled(boolean isReconciled) {
 		this.isReconciled = isReconciled;
 	}
-	
-	public LocalDateTime getReconciledDateTime() {
-		return this.reconciledDateTime;
+
+	public String getReconciledDateTime() {
+		return reconciledDateTime.toString();
 	}
-	
-	public void setReconciledDateTime(LocalDateTime dateTime) {
-		this.reconciledDateTime = dateTime;
+
+	public void setReconciledDateTime(LocalDateTime reconciledDateTime) {
+		this.reconciledDateTime = reconciledDateTime;
 	}
+
+	
+	
+	
 }
