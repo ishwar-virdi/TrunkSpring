@@ -18,6 +18,7 @@ import com.trunk.demo.model.MatchFiles;
 import com.trunk.demo.service.FileMatcher;
 import com.trunk.demo.service.ReconcileFiles;
 import com.trunk.demo.service.TokenGenerator;
+import com.trunk.demo.service.mongo.ReceiptManager;
 import com.trunk.demo.service.mongo.UploadManager;
 import com.trunk.demo.service.mongo.UserManager;
 
@@ -33,6 +34,8 @@ public class SmartReconcileController {
 	private UploadManager uploadManager;
 	@Autowired
 	private ReconcileFiles reconcileFiles;
+	@Autowired
+	private ReceiptManager receiptManager;
 
 	@RequestMapping("/api/token")
 	public String tokenCreator() {
@@ -71,6 +74,12 @@ public class SmartReconcileController {
 		reconcileFiles.reset();
 	}
 
+	@RequestMapping(path = "/receipt/{id}", method = RequestMethod.GET)
+	public String getReceipt(@PathVariable("id") String id) {
+		return receiptManager.getReceipt(id);
+	}
+
+	
 	/*
 	 * Upload File to S3 (No Longer Using. But Useful to Have)
 	 * 

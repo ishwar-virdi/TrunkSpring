@@ -1,6 +1,8 @@
 package com.trunk.demo.model.mongo;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,6 +25,7 @@ public class BankStmt {
 	public BankStmt(String accountDescription, long accountNumber, String currency, String date,
 			String transactionDescription, double debits, double credits, double balance) {
 		super();
+		this.id = UUID.randomUUID().toString();
 		this.createDateTime = LocalDateTime.now();
 		this.accountDescription = accountDescription;
 		this.accountNumber = accountNumber;
@@ -105,7 +108,5 @@ public class BankStmt {
 	public String getId() {
 		return id;
 	}
-	
-	
 	
 }

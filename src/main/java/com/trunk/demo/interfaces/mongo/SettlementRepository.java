@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.trunk.demo.model.mongo.SettlementStmt;
 
 @Repository
-public interface SettlementRepository extends MongoRepository<SettlementStmt, String> {
+public interface SettlementRepository extends MongoRepository<SettlementStmt, Long> {
 	@Query("{ 'SettlementDate' : {$regex:?0 }}")
 	List<SettlementStmt> findAllBySettlementDateLike(String SettlementDate);
 }
