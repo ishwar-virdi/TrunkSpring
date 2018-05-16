@@ -1,14 +1,21 @@
 package com.trunk.demo.model.mongo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "BankStatements")
 public class BankStmt {
 
+	@Value("${zone}")
+	private String zone;
+	
 	@Id
 	private String id;
 	
@@ -16,7 +23,7 @@ public class BankStmt {
 	private String accountDescription;
 	private long accountNumber;
 	private String currency;
-	private String date;
+	private LocalDate date;
 	private String transactionDescription;
 	private double debits;
 	private double credits;
@@ -30,7 +37,9 @@ public class BankStmt {
 		this.accountDescription = accountDescription;
 		this.accountNumber = accountNumber;
 		this.currency = currency;
-		this.date = date;
+		date = date + " 00:00";
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm").withZone(ZoneId.of(zone));
+		this.date = LocalDate.parse(date, formatter);
 		this.transactionDescription = transactionDescription;
 		this.debits = debits;
 		this.credits = credits;
@@ -64,12 +73,20 @@ public class BankStmt {
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
-
-	public String getDate() {
-		return this.date;
+	
+	public LocalDateTime getCreateDateTime() {
+		return createDateTime;
 	}
 
-	public void setDate(String date) {
+	public void setCreateDateTime(LocalDateTime createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 

@@ -26,21 +26,38 @@ public class ReceiptManagerImpl implements ReceiptManager {
 			SettlementStmt stmtFound = stmt.get();
 			JSONObject result = new JSONObject();
 
-			result.put("TransactionDate", stmtFound.getTransactionDate());
-			result.put("TransactionTime", stmtFound.getTransactionTime());
+			result.put("TransactionDate", stmtFound.getTransactionTimeStamp().getDayOfMonth()+"-"+stmtFound.getTransactionTimeStamp().getMonthValue()+"-"+stmtFound.getTransactionTimeStamp().getYear());
+			result.put("TransactionTime", stmtFound.getTransactionTimeStamp().getHour()+":"+stmtFound.getTransactionTimeStamp().getMinute());
 			result.put("CustomerName", stmtFound.getCustomerName());
 			result.put("MerchantID", stmtFound.getMerchantID());
 			result.put("BankReference", stmtFound.getBankReference());
 
 			result.put("Status", stmtFound.getStatus());
-			result.put("SettlementDate", stmtFound.getSettlementDate());
-			if(stmtFound.isReconciled()) {
-				result.put("IfReconciled", "Yes");
-				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
-			}else {
-				result.put("IfReconciled", "No");
+			result.put("SettlementDate", stmtFound.getSettlementDate().toString());
+			
+			switch(stmtFound.getReconcileStatus()) {
+			case 3: 
+				result.put("ReconcileStatus", "AutoReconciled");
+				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());				
+				break;
+			case 2: 
+				result.put("ReconcileStatus", "Manually Reconciled");
+				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());								
+				break;
+			case 1: 
+				result.put("ReconcileStatus", "AutoReconciler attempted but failed");
+				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());				
+				break;
+			case 0: 
+				result.put("ReconcileStatus", "Not Reconciled by AutoReconciler");
 				result.put("ReconciledDate", "");
+				break;
+			default: 
+				result.put("ReconcileStatus", "Reconcile Status Incorrectly Set");
+				result.put("ReconciledDate", "");
+				break;
 			}
+			
 			result.put("CardPAN", stmtFound.getCardPAN());
 			result.put("CardScheme", stmtFound.getCardSchemeName());
 			result.put("CardExpiry", stmtFound.getCardExpiry());

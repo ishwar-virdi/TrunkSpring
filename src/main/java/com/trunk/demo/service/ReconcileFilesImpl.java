@@ -1,5 +1,6 @@
 package com.trunk.demo.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,8 +53,8 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		}
 
 		// Work out transaction totals for different card types for each day
-		Map<String, Double> amexTotals = this.addUpSameDayTransactions(amexTransactions);
-		Map<String, Double> visaMastercardTotals = this.addUpSameDayTransactions(visaMastercardTransactions);
+		Map<LocalDate, Double> amexTotals = this.addUpSameDayTransactions(amexTransactions);
+		Map<LocalDate, Double> visaMastercardTotals = this.addUpSameDayTransactions(visaMastercardTransactions);
 
 		// Reconciles the items
 		ArrayList<String> reconciledAmex = this.reconcileItems(amexTotals, bankStatement);
@@ -73,7 +74,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		for (int i = 0; i < items.size(); i++) {
 			for (int x = 0; x < dates.size(); x++) {
 				if (items.get(i).getSettlementDate().equals(dates.get(x))) {
-					items.get(i).setReconciled(true);
+					items.get(i).setReconcileStatus(3);
 					items.get(i).setReconciledDateTime(LocalDateTime.now());
 					break;
 				}
@@ -83,14 +84,14 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		return items;
 	}
 
-	private ArrayList<String> reconcileItems(Map<String, Double> totals, List<BankStmt> bankStatement) {
+	private ArrayList<String> reconcileItems(Map<LocalDate, Double> totals, List<BankStmt> bankStatement) {
 		ArrayList<String> response = new ArrayList<String>();
 
-		for (Map.Entry<String, Double> entry : totals.entrySet()) {
+		for (Map.Entry<LocalDate, Double> entry : totals.entrySet()) {
 			for (int i = 0; i < bankStatement.size(); i++) {
 				if (bankStatement.get(i).getDate().equals(entry.getKey())
 						&& bankStatement.get(i).getCredits() == entry.getValue()) {
-					response.add(bankStatement.get(i).getDate());
+					response.add(bankStatement.get(i).getDate().toString());
 					break;
 				}
 			}
@@ -99,8 +100,8 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		return response;
 	}
 
-	private Map<String, Double> addUpSameDayTransactions(ArrayList<SettlementStmt> transactions) {
-		Map<String, Double> transactionAmountsByDate = new HashMap<String, Double>();
+	private Map<LocalDate, Double> addUpSameDayTransactions(ArrayList<SettlementStmt> transactions) {
+		Map<LocalDate, Double> transactionAmountsByDate = new HashMap<LocalDate, Double>();
 
 		for (int i = 0; i < transactions.size(); i++) {
 			Double amount = transactionAmountsByDate.get(transactions.get(i).getSettlementDate());
@@ -121,8 +122,8 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		List<SettlementStmt> settlementDocument = settlementStmtRepo.findAllBySettlementDateLike("^2018\\d*");
 
 		for (int i = 0; i < settlementDocument.size(); i++) {
-			settlementDocument.get(i).setReconciled(false);
-			settlementDocument.get(i).setReconciledDateTime(null);
+			settlementDocument.get(i).setReconcileStatus(0);
+			settlementDocument.get(i).setReconciledDateTime(LocalDateTime.of(1900, 1, 1, 0, 0));
 		}
 
 		this.settlementStmtRepo.saveAll(settlementDocument);
