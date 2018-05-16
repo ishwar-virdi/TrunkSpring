@@ -1,16 +1,23 @@
 package com.trunk.demo.model.mongo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "SettlementStatements")
 public class SettlementStmt {
 
+	@Value("${zone}")
+	private String zone;
+
 	@Id
 	private Long receiptNumber;
-	
-	private LocalDateTime createDateTime;
+
 	private String merchantID;
 	private String cardPAN;
 	private String cardExpiry;
@@ -20,18 +27,19 @@ public class SettlementStmt {
 	private String currency;
 	private String customerName;
 	private String responseText;
-	private String settlementDate;
+	private LocalDate settlementDate;
 	private String cardSchemeName;
-	private String transactionTimeStamp;
+	private LocalDateTime transactionTimeStamp;
 	private String status;
-	private boolean isReconciled;
+	private int reconcileStatus;
 	private LocalDateTime reconciledDateTime;
-	
-	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, String bankReference, double principalAmount,
-			double surcharge, String currency, String customerName, String responseText, long receiptNumber, String settlementDate,
-			String cardSchemeName, String transactionTimeStamp, String status) {
+
+	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, String bankReference,
+			double principalAmount, double surcharge, String currency, String customerName, String responseText,
+			long receiptNumber, String settlementDate, String cardSchemeName, String transactionTimeStamp,
+			String status) {
 		super();
-		this.createDateTime = LocalDateTime.now();
+
 		this.merchantID = merchantID;
 		this.cardPAN = cardPAN;
 		this.cardExpiry = cardExpiry;
@@ -42,20 +50,20 @@ public class SettlementStmt {
 		this.customerName = customerName;
 		this.responseText = responseText;
 		this.receiptNumber = receiptNumber;
-		this.settlementDate = settlementDate;
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(ZoneId.of(zone));
+		this.transactionTimeStamp = LocalDateTime.parse(transactionTimeStamp, formatter);
+
+		settlementDate = settlementDate + " 00:00";
+		formatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm").withZone(ZoneId.of(zone));
+		this.settlementDate = LocalDate.parse(settlementDate, formatter);
+
 		this.cardSchemeName = cardSchemeName;
-		this.transactionTimeStamp = transactionTimeStamp;
 		this.status = status;
-		this.isReconciled = false;
-		this.reconciledDateTime = LocalDateTime.of(1900, 1, 1, 0, 0);
-	}
+		this.reconcileStatus = 0;
 
-	public String getTransactionDate() {
-		return transactionTimeStamp.substring(0, 10);
-	}
-
-	public String getTransactionTime() {
-		return transactionTimeStamp.substring(11, transactionTimeStamp.length());
+		String tmpDate = new String("19900101 00:00");
+		this.reconciledDateTime = LocalDateTime.parse(tmpDate, formatter);
 	}
 
 	public Long getReceiptNumber() {
@@ -64,14 +72,6 @@ public class SettlementStmt {
 
 	public void setReceiptNumber(Long receiptNumber) {
 		this.receiptNumber = receiptNumber;
-	}
-
-	public String getCreateDateTime() {
-		return createDateTime.toString();
-	}
-
-	public void setCreateDateTime(LocalDateTime createDateTime) {
-		this.createDateTime = createDateTime;
 	}
 
 	public String getMerchantID() {
@@ -146,28 +146,12 @@ public class SettlementStmt {
 		this.responseText = responseText;
 	}
 
-	public String getSettlementDate() {
-		return settlementDate;
-	}
-
-	public void setSettlementDate(String settlementDate) {
-		this.settlementDate = settlementDate;
-	}
-
 	public String getCardSchemeName() {
 		return cardSchemeName;
 	}
 
 	public void setCardSchemeName(String cardSchemeName) {
 		this.cardSchemeName = cardSchemeName;
-	}
-
-	public String getTransactionTimeStamp() {
-		return transactionTimeStamp;
-	}
-
-	public void setTransactionTimeStamp(String transactionTimeStamp) {
-		this.transactionTimeStamp = transactionTimeStamp;
 	}
 
 	public String getStatus() {
@@ -178,14 +162,6 @@ public class SettlementStmt {
 		this.status = status;
 	}
 
-	public boolean isReconciled() {
-		return isReconciled;
-	}
-
-	public void setReconciled(boolean isReconciled) {
-		this.isReconciled = isReconciled;
-	}
-
 	public String getReconciledDateTime() {
 		return reconciledDateTime.toString();
 	}
@@ -194,7 +170,28 @@ public class SettlementStmt {
 		this.reconciledDateTime = reconciledDateTime;
 	}
 
-	
-	
-	
+	public LocalDate getSettlementDate() {
+		return settlementDate;
+	}
+
+	public void setSettlementDate(LocalDate settlementDate) {
+		this.settlementDate = settlementDate;
+	}
+
+	public LocalDateTime getTransactionTimeStamp() {
+		return transactionTimeStamp;
+	}
+
+	public void setTransactionTimeStamp(LocalDateTime transactionTimeStamp) {
+		this.transactionTimeStamp = transactionTimeStamp;
+	}
+
+	public int getReconcileStatus() {
+		return reconcileStatus;
+	}
+
+	public void setReconcileStatus(int reconcileStatus) {
+		this.reconcileStatus = reconcileStatus;
+	}
+
 }
