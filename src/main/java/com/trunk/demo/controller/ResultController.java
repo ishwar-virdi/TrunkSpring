@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpSession;
+
 @RestController
 // Use 2nd one for Local Testing. Do Not commit the 2nd active.
 @CrossOrigin(origins = "http://localhost:3000")
@@ -18,12 +20,12 @@ public class ResultController {
     private ResultService resultService;
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/v1/results")
-    public String Results() {
-        return resultService.retrieveResults();
+    public String Results(HttpSession session) {
+        return resultService.retrieveResults(session);
     }
 
     @RequestMapping("/api/v1/seedResults")
-    public String saveSeedData() {
-        return resultService.saveSeedData();
+    public String saveSeedData(HttpSession session) {
+        return resultService.saveSeedData(session);
     }
 }

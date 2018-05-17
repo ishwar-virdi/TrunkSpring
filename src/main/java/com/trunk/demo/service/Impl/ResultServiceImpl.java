@@ -1,64 +1,70 @@
 package com.trunk.demo.service.Impl;
 
 import com.google.gson.Gson;
+import com.trunk.demo.Util.DateUtil;
 import com.trunk.demo.model.mongo.ReconcileResult;
-import com.trunk.demo.model.mongo.User;
+import com.trunk.demo.vo.ListReconcileResultVO;
 import com.trunk.demo.repository.ResultsRepository;
-import com.trunk.demo.repository.UsersRepository;
 import com.trunk.demo.service.mongo.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Service("resultServiceImpl")
 public class ResultServiceImpl implements ResultService {
 
-    @Autowired
-    private UsersRepository usersRepository;
+//    @Autowired
+//    private UsersRepository usersRepository;
     @Autowired
     private ResultsRepository resultsRepository;
+
+    @Autowired
+    private Gson gson;
+    @Autowired
+    private DateUtil dateUtil;
+
     private ReconcileResult result;
 
     @Override
-    public String retrieveResults() {
-        Gson gson = new Gson();
-        List<User> user = usersRepository.findByUsername("test@test.com");
-        String uid = user.get(0).getId();
-        List<ReconcileResult> results = resultsRepository.findByUid(uid,new Sort(Sort.Direction.DESC, "reconcileDate"));
-        return gson.toJson(results);
+    public String retrieveResults(HttpSession session) {
+        gson = new Gson();
+        Object userSession = session.getAttribute(session.getId());
+        if(userSession == null){
+            return gson.toJson("");
+        }
+        List<ReconcileResult> results = resultsRepository.findByUserIdOrderByReconcileDateDesc(userSession.toString());
+        ListReconcileResultVO resultsPO = new ListReconcileResultVO(results);
+
+        System.out.println(gson.toJson(resultsPO.getList()));
+        return gson.toJson(resultsPO.getList());
     }
 
     @Override
-    public String saveSeedData() {
-        List<User> user = usersRepository.findByUsername("test@test.com");
-        String uid = user.get(0).getId();
-        result = new ReconcileResult(uid,20180410,"17:10",20180310,20180410,80);
+    public String saveSeedData(HttpSession session) {
+        Object userSession = session.getAttribute(session.getId());
+        if(userSession == null){
+            return gson.toJson("");
+        }
+        String userId = userSession.toString();
+        result = new ReconcileResult(userId,dateUtil.convSettleToDate("20180401"),dateUtil.convSettleToDate("20180501"),10,0,0,0);
         resultsRepository.save(result);
-        result = new ReconcileResult(uid,20180310,"17:10",20180210,20180310,100);
+        result = new ReconcileResult(userId,dateUtil.convSettleToDate("20180301"),dateUtil.convSettleToDate("20180401"),100,0,0,0);
         resultsRepository.save(result);
-        result = new ReconcileResult(uid,20180210,"17:10",20180110,20180210,70);
+        result = new ReconcileResult(userId,dateUtil.convSettleToDate("20180201"),dateUtil.convSettleToDate("20180301"),60,0,0,0);
         resultsRepository.save(result);
-        result = new ReconcileResult(uid,20180210,"17:10",20180105,20180210,100);
+        result = new ReconcileResult(userId,dateUtil.convSettleToDate("20180101"),dateUtil.convSettleToDate("20180201"),67,0,0,0);
         resultsRepository.save(result);
-        result = new ReconcileResult(uid,20180208,"17:10",20180104,20180210,60);
+        result = new ReconcileResult(userId,dateUtil.convSettleToDate("20171101"),dateUtil.convSettleToDate("20171201"),78,0,0,0);
         resultsRepository.save(result);
-        result = new ReconcileResult(uid,20180110,"17:10",20171105,20171210,55);
+        result = new ReconcileResult(userId,dateUtil.convSettleToDate("20171001"),dateUtil.convSettleToDate("20171101"),45,0,0,0);
         resultsRepository.save(result);
-        result = new ReconcileResult(uid,20180101,"17:10",20171105,20171210,67);
+        result = new ReconcileResult(userId,dateUtil.convSettleToDate("20170901"),dateUtil.convSettleToDate("20171001"),40,0,0,0);
         resultsRepository.save(result);
-        result = new ReconcileResult(uid,20170416,"17:10",20171105,20171210,20);
+        result = new ReconcileResult(userId,dateUtil.convSettleToDate("20170801"),dateUtil.convSettleToDate("20170901"),20,0,0,0);
         resultsRepository.save(result);
-        result = new ReconcileResult(uid,20160216,"17:10",20171105,20171210,50);
-        resultsRepository.save(result);
-        result = new ReconcileResult(uid,20160215,"17:10",20171105,20171210,30);
-        resultsRepository.save(result);
-        result = new ReconcileResult(uid,20160214,"17:10",20171105,20171210,60);
-        resultsRepository.save(result);
-        result = new ReconcileResult(uid,20150216,"17:10",20171105,20171210,76);
-        resultsRepository.save(result);
-        result = new ReconcileResult(uid,20140216,"17:10",20171105,20171210,100);
+        result = new ReconcileResult(userId,dateUtil.convSettleToDate("20170701"),dateUtil.convSettleToDate("20170801"),50,0,0,0);
         resultsRepository.save(result);
         return "aaaa";
     }

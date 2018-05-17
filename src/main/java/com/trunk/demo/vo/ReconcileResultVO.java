@@ -1,43 +1,34 @@
-package com.trunk.demo.model.mongo;
+package com.trunk.demo.vo;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.trunk.demo.Util.DateUtil;
+import com.trunk.demo.model.mongo.ReconcileResult;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.Date;
+public class ReconcileResultVO {
 
-@Document(collection = "ReconcileResults")
-
-public class ReconcileResult {
-    @Id
-    private String id;
     private String userId;
-    private Date reconcileDate;
-    private Date startDate;
-    private Date endDate;
+    private String reconcileDate;
+    private String startDate;
+    private String endDate;
     private int percentage;
     private int totalTransaction;
     private int reconciledTransaction;
     private int notReconciled;
-    public ReconcileResult(String userId, Date startDate, Date endDate, int percentage, int totalTransaction, int reconciledTransaction,int notReconciled) {
+
+    public ReconcileResultVO(String userId, String reconcileDate, String startDate, String endDate, int percentage) {
         this.userId = userId;
-        this.reconcileDate = new Date();
+        this.reconcileDate = reconcileDate;
         this.startDate = startDate;
         this.endDate = endDate;
         this.percentage = percentage;
-        this.totalTransaction = totalTransaction;
-        this.reconciledTransaction = reconciledTransaction;
-        this.notReconciled = notReconciled;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public ReconcileResultVO(ReconcileResult result) {
+        DateUtil dateUtil = new DateUtil();
+        this.userId = result.getUserId();
+        this.reconcileDate = dateUtil.convCurrentToString(result.getReconcileDate());
+        this.startDate =  dateUtil.convSettleToString(result.getStartDate());
+        this.endDate = dateUtil.convSettleToString(result.getEndDate());
+        this.percentage = result.getPercentage();
     }
 
     public String getUserId() {
@@ -48,27 +39,27 @@ public class ReconcileResult {
         this.userId = userId;
     }
 
-    public Date getReconcileDate() {
+    public String getReconcileDate() {
         return reconcileDate;
     }
 
-    public void setReconcileDate(Date reconcileDate) {
+    public void setReconcileDate(String reconcileDate) {
         this.reconcileDate = reconcileDate;
     }
 
-    public Date getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 

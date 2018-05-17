@@ -2,5 +2,7 @@ package com.trunk.demo.service;
 
 public interface SearchService {
 
-    public String search(String page,String value);
+    public String resultSearch(String userId,String value);
+
+    public String detailSearch(String userId,String value);
 }

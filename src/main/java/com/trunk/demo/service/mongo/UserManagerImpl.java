@@ -4,12 +4,10 @@ package com.trunk.demo.service.mongo;
 import com.google.gson.JsonObject;
 import com.trunk.demo.Util.BCryptText;
 import com.trunk.demo.model.mongo.User;
-import com.trunk.demo.model.viewModel.ViewLoginModel;
+import com.trunk.demo.vo.LoginModelVO;
 import com.trunk.demo.repository.TokenRepository;
 
 import com.trunk.demo.repository.UsersRepository;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,24 +23,25 @@ public class UserManagerImpl implements UserManager {
     private UsersRepository usersRepository;
     @Autowired
     private BCryptText bCryptText;
-    @Autowired
-    private HttpSession session;
 
-    private final String userSession = "user";
     @Override
-    public String register(ViewLoginModel viewLoginModel) {
+    public String register(LoginModelVO loginModelVO, HttpSession session) {
         JsonObject json = new JsonObject();
-        if (!tokenRepository.isEquals(viewLoginModel.getToken())) {
+        List<User> users = usersRepository.findByUsername(loginModelVO.getUsername());
+
+        Object sessionToken = tokenRepository.getToken();
+        if (sessionToken == null
+                || !loginModelVO.getToken().equals(sessionToken.toString())) {
+            tokenRepository.destoryToken();
             json.addProperty("result", "expired");
             return json.toString();
         }
-        List<User> users = usersRepository.findByUsername(viewLoginModel.getUsername());
         if (users.size() != 0) {
             json.addProperty("result", "fail");
             return json.toString();
         }
-        String cipherText = bCryptText.getCipherText(viewLoginModel.getPassword());
-        User user = new User(viewLoginModel.getUsername(),cipherText);
+        String cipherText = bCryptText.getCipherText(loginModelVO.getPassword());
+        User user = new User(loginModelVO.getUsername(),cipherText);
         usersRepository.save(user);
         json.addProperty("result", "success");
 
@@ -50,17 +49,19 @@ public class UserManagerImpl implements UserManager {
     }
 
     @Override
-    public String loginValidator(ViewLoginModel viewLoginModel) {
+    public String loginValidator(LoginModelVO loginModelVO, HttpSession session) {
         JsonObject json = new JsonObject();
-
-        if (!tokenRepository.isEquals(viewLoginModel.getToken())) {
+        Object sessionToken = tokenRepository.getToken();
+        if (sessionToken == null
+                || !loginModelVO.getToken().equals(sessionToken.toString())) {
+            tokenRepository.destoryToken();
             json.addProperty("result", "expired");
             return json.toString();
         }
-        List<User> users = usersRepository.findByUsername(viewLoginModel.getUsername());
+        List<User> users = usersRepository.findByUsername(loginModelVO.getUsername());
         if (users.size() > 0
-                &&bCryptText.isEquals(viewLoginModel.getPassword(),users.get(0).getPassword())){
-            session.setAttribute(userSession,session.getId());
+                &&bCryptText.isEquals(loginModelVO.getPassword(),users.get(0).getPassword())){
+            session.setAttribute(session.getId(),users.get(0).getId());
             json.addProperty("result", "success");
             return json.toString();
         }
@@ -70,26 +71,24 @@ public class UserManagerImpl implements UserManager {
     }
 
     @Override
-    public String userIsLogin() {
+    public String userIsLogin(HttpSession session) {
         JsonObject json = new JsonObject();
-
-        Object user = session.getAttribute(userSession);
+        Object user = session.getAttribute(session.getId());
         if(user != null){
-            session.setAttribute(userSession,session.getId());
+            session.setAttribute(session.getId(),user.toString());
             json.addProperty("result", true);
         }else{
             json.addProperty("result", false);
         }
-
         return json.toString();
     }
 
     @Override
-    public String logOut() {
+    public String logOut(HttpSession session) {
         JsonObject json = new JsonObject();
 
-        session.removeAttribute(userSession);
-        if(session.getAttribute(userSession) == null){
+        session.removeAttribute(session.getId());
+        if(session.getAttribute(session.getId()) == null){
             json.addProperty("result", true);
         }else{
             json.addProperty("result", false);

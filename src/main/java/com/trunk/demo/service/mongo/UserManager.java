@@ -1,16 +1,18 @@
 package com.trunk.demo.service.mongo;
 
-import com.trunk.demo.model.viewModel.ViewLoginModel;
+import com.trunk.demo.vo.LoginModelVO;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpSession;
 
 @Service
 public interface UserManager {
-    public String register(ViewLoginModel viewLoginModel);
+    public String register(LoginModelVO loginModelVO, HttpSession session);
 
-    public String loginValidator(ViewLoginModel viewLoginModel);
+    public String loginValidator(LoginModelVO loginModelVO, HttpSession session);
 
-    public String userIsLogin();
+    public String userIsLogin(HttpSession session);
 
-    public String logOut();
+    public String logOut(HttpSession session);
 
 }

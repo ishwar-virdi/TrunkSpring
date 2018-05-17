@@ -3,16 +3,21 @@ package com.trunk.demo.service.Impl;
 import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.trunk.demo.Util.DateUtil;
 import com.trunk.demo.model.mongo.ReconcileResult;
 import com.trunk.demo.model.mongo.User;
 import com.trunk.demo.repository.ResultsRepository;
 import com.trunk.demo.repository.UsersRepository;
 import com.trunk.demo.service.SearchService;
+import com.trunk.demo.vo.ListReconcileResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 @Service("searchServiceImpl")
@@ -20,55 +25,40 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     private ResultsRepository resultsRepository;
-    @Autowired
-    private UsersRepository usersRepository;
 
     @Autowired
     private Gson gson;
+    @Autowired
+    private DateUtil dateUtil;
     @Override
-    public String search(String page, String value) {
+    public String resultSearch(String userId,String value){
         String json = "";
-        switch (page){
-            case "result":
-                json = resultSearch(value);
-                break;
-            case "detail":
-                System.out.println(value);
-                break;
-        }
-
-        if("fail".equals(json)){
-            JsonObject innerObject = new JsonObject();
-            innerObject.addProperty("result", "fail");
-            json = innerObject.toString();
-        }
-        return json;
-    }
-
-    private String resultSearch(String value){
-        String json = "";
-        List<ReconcileResult> resutls;
+        ListReconcileResultVO results;
         int lessSignIndex = value.indexOf("<");
         int largeSignIndex = value.indexOf(">");
+        int hyphenIndex = value.indexOf("-");
+        int slashIndex = value.indexOf("/");
+        int secondSlash = value.indexOf("/", slashIndex + 1);
         try{
             //date
-            if(value.length()== 8
-                    && largeSignIndex == -1
-                    && lessSignIndex == -1){
-                int date = Integer.parseInt(value);
-                resutls = resultsRepository.findByUidAndReconcileDate(getUid(),date);
-                json = gson.toJson(resutls);
+            if(value.length()>= 10
+                    && secondSlash-slashIndex == 3
+                    && hyphenIndex == -1){
+                Date date = dateUtil.stringToDate(value);
+                Date nextDate = dateUtil.getNextDate(value);
+                results = new ListReconcileResultVO(resultsRepository.findByUserIdAndReconcileDateBetween(userId,date,nextDate));
+                json = gson.toJson(results.getList());
+                //System.out.println(json);
             }
             //dateRange
-            else if(value.length()== 16){
-                int startDate = Integer.parseInt(value.substring(0,8));
-                int endDate = Integer.parseInt(value.substring(8,16));
-                if(endDate < startDate){
-                    return "fail";
-                }
-                resutls = resultsRepository.findByUidAndStartDateGreaterThanEqualAndEndDateLessThanEqual(getUid(),startDate,endDate);
-                json = gson.toJson(resutls);
-                System.out.println(json);
+            else if(value.length()>= 21
+                    && secondSlash-slashIndex == 3
+                    && hyphenIndex != -1){
+                String dates[] = value.split("-");
+                Date startDate = dateUtil.stringToDate(dates[0]);
+                Date endDate = dateUtil.getNextDate(dates[1]);
+                results = new ListReconcileResultVO(resultsRepository.findByUserIdAndReconcileDateBetween(userId,startDate,endDate));
+                json = gson.toJson(results.getList());
             }
             //percentage
             else if(value.length()<= 3
@@ -79,27 +69,33 @@ public class SearchServiceImpl implements SearchService {
                 if(percentage > 100 || percentage < 0){
                     return "fail";
                 }
-                resutls = resultsRepository.findByUidAndPercentage(getUid(),percentage);
-                json = gson.toJson(resutls);
-            }else if(value.length()<= 4
+                results = new ListReconcileResultVO(resultsRepository.findByUserIdAndPercentage(userId,percentage));
+                json = gson.toJson(results.getList());
+            }
+            //Retrieve percentage by greater than
+            else if(value.length()<= 4
                     && largeSignIndex != -1
                     && lessSignIndex == -1){
                 int percentage = Integer.parseInt(value.replace(">",""));
                 if(percentage > 100 || percentage < 0){
                     return "fail";
                 }
-                resutls = resultsRepository.findByUidAndPercentageGreaterThanEqual(getUid(),percentage);
-                json = gson.toJson(resutls);
-            }else if(value.length()<= 4
+                results = new ListReconcileResultVO(resultsRepository.findByUserIdAndPercentageGreaterThanEqual(userId,percentage));
+                json = gson.toJson(results.getList());
+            }
+            //Retrieve percentage by less than
+            else if(value.length()<= 4
                     && largeSignIndex == -1
                     && lessSignIndex != -1){
                 int percentage = Integer.parseInt(value.replace("<",""));
                 if(percentage > 100 || percentage < 0){
                     return "fail";
                 }
-                resutls = resultsRepository.findByUidAndPercentageLessThanEqual(getUid(),percentage);
-                json = gson.toJson(resutls);
-            }else if(value.length() <= 8
+                results = new ListReconcileResultVO(resultsRepository.findByUserIdAndPercentageLessThanEqual(userId,percentage));
+                json = gson.toJson(results.getList());
+            }
+            //Retrieve percentage by greater than and less than
+            else if(value.length() <= 8
                     && largeSignIndex != -1
                     && lessSignIndex != -1){
                 int lessThanValue = 0;
@@ -112,34 +108,35 @@ public class SearchServiceImpl implements SearchService {
                     lessThanValue = Integer.parseInt(value.substring(lessSignIndex+1));
                     largerThanValue = Integer.parseInt(value.substring(largeSignIndex+1,lessSignIndex));
                 }
-                System.out.println(lessThanValue);
-                System.out.println(largerThanValue);
                 if(largerThanValue > lessThanValue|| lessThanValue > 100 || largerThanValue < 0){
                     return "fail";
                 }
                 lessThanValue++;
                 largerThanValue--;
-                resutls = resultsRepository.findByUidAndPercentageBetween(getUid(),largerThanValue,lessThanValue);
-                json = gson.toJson(resutls);
-            }else if(value.length() == 24){
+                results = new ListReconcileResultVO(resultsRepository.findByUserIdAndPercentageBetween(userId,largerThanValue,lessThanValue));
+                json = gson.toJson(results.getList());
+            }
+            //Retrieve by ID
+            else if(value.length() == 24){
                 Optional<ReconcileResult> id = resultsRepository.findById(value);
                 if(!id.isPresent()){
                     return "fail";
                 }
-                List<ReconcileResult> results = new ArrayList<>();
-                results.add(id.get());
-                json = gson.toJson(results);
+                List<ReconcileResult> result = new ArrayList<>();
+                result.add(id.get());
+                json = gson.toJson(result);
             }else{
                 return "fail";
             }
-        }catch(NumberFormatException e){
+        }catch(Exception e){
             return "fail";
         }
         return json;
     }
 
-    private String getUid(){
-        List<User> user = usersRepository.findByUsername("test@test.com");
-        return user.get(0).getId();
+    @Override
+    public String detailSearch(String userId,String value){
+        return "aa";
     }
+
 }

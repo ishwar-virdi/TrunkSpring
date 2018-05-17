@@ -1,17 +1,17 @@
-package com.trunk.demo.model.viewModel;
+package com.trunk.demo.vo;
 
 import com.trunk.demo.model.mongo.User;
 
-public class ViewLoginModel extends User {
+public class LoginModelVO extends User {
 
     private String token;
 
-    public ViewLoginModel(String username, String password, String token) {
+    public LoginModelVO(String username, String password, String token) {
         super(username, password);
         this.token = token;
     }
 
-    public ViewLoginModel() {
+    public LoginModelVO() {
     }
 
     public String getToken() {

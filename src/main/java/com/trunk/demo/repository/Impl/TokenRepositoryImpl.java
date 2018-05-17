@@ -15,28 +15,30 @@ public class TokenRepositoryImpl implements TokenRepository {
     @Autowired
     private HttpSession session;
 
-    private Token token;
 
     @Override
-    public String getToken() {
+    public String generateToken() {
         String random = UUID.randomUUID().toString();
-        token = new Token(random);
+        Token token = new Token(random);
         session.setAttribute(token.getName(), token.getToken());
         return token.getToken();
     }
 
     @Override
-    public boolean isEquals(String inputToken) {
-        token = new Token();
-        Object sessionToken = session.getAttribute(token.getName());
-        if (sessionToken != null && sessionToken.toString().equals(inputToken)) {
-            this.removeToken();
+    public boolean destoryToken(){
+        Token token = new Token();
+        Object tokenSession = session.getAttribute(token.getName());
+        if(tokenSession == null){
+            return false;
+        }else{
+            session.removeAttribute(token.getName());
             return true;
         }
-        return false;
     }
 
-    public void removeToken() {
-        session.removeAttribute(token.getName());
+    @Override
+    public Object getToken(){
+        Token token = new Token();
+        return session.getAttribute(token.getName());
     }
 }

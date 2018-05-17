@@ -5,30 +5,23 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 public interface ResultsRepository extends MongoRepository<ReconcileResult, String> {
-    public List<ReconcileResult> findByUid(String uid,Sort sort);
+    public List<ReconcileResult> findByUserIdOrderByReconcileDateDesc(String uid);
 
-    @Query(fields = "{'_id':0,'reconcileDate':1,'reconcileTime':1,'startDate':1,'endDate':1,'percentage':1}")
-    public List<ReconcileResult> findByUidAndReconcileDate(String uid,int date);
+    public List<ReconcileResult> findByUserIdAndReconcileDateBetween(String uid,Date date,Date nextDate);
 
-    @Query(fields = "{'_id':0,'reconcileDate':1,'reconcileTime':1,'startDate':1,'endDate':1,'percentage':1}")
-    public List<ReconcileResult> findByUidAndStartDateGreaterThanEqualAndEndDateLessThanEqual(String uid,int from,int to);
 
-    @Query(fields = "{'_id':0,'reconcileDate':1,'reconcileTime':1,'startDate':1,'endDate':1,'percentage':1}")
-    public List<ReconcileResult> findByUidAndPercentage(String uid,int percentage);
+    public List<ReconcileResult> findByUserIdAndPercentage(String uid,int percentage);
 
-    @Query(fields = "{'_id':0,'reconcileDate':1,'reconcileTime':1,'startDate':1,'endDate':1,'percentage':1}")
-    public List<ReconcileResult> findByUidAndPercentageGreaterThanEqual(String uid,int percentage);
+    public List<ReconcileResult> findByUserIdAndPercentageGreaterThanEqual(String uid,int percentage);
 
-    @Query(fields = "{'_id':0,'reconcileDate':1,'reconcileTime':1,'startDate':1,'endDate':1,'percentage':1}")
-    public List<ReconcileResult> findByUidAndPercentageLessThanEqual(String uid,int percentage);
+    public List<ReconcileResult> findByUserIdAndPercentageLessThanEqual(String uid,int percentage);
 
-    @Query(fields = "{'_id':0,'reconcileDate':1,'reconcileTime':1,'startDate':1,'endDate':1,'percentage':1}")
-    public List<ReconcileResult> findByUidAndPercentageBetween(String uid,int lessThanValue,int largerThanValue);
+    public List<ReconcileResult> findByUserIdAndPercentageBetween(String uid,int lessThanValue,int largerThanValue);
 
-    @Query(fields = "{'_id':0,'reconcileDate':1,'reconcileTime':1,'startDate':1,'endDate':1,'percentage':1}")
     public Optional<ReconcileResult> findById(String _id);
 }

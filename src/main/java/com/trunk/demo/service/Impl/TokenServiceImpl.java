@@ -17,9 +17,8 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken() {
-        Token token = new Token(tokenRepository.getToken());
         JsonObject json = new JsonObject();
-        json.addProperty("token", token.getToken());
+        json.addProperty("token", tokenRepository.generateToken());
         return json.toString();
     }
 

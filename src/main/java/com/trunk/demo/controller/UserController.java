@@ -1,12 +1,12 @@
 package com.trunk.demo.controller;
 
-import com.trunk.demo.model.viewModel.ViewLoginModel;
+import com.trunk.demo.vo.LoginModelVO;
 import com.trunk.demo.service.mongo.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import static java.lang.Thread.sleep;
 
@@ -19,28 +19,22 @@ public class UserController {
     private UserManager userManager;
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/login")
-    public String loginValidation(@RequestBody ViewLoginModel viewLoginModel, HttpServletRequest request) {
-//        Enumeration headerNames = request.getHeaderNames();
-//        while (headerNames.hasMoreElements()) {
-//            String key = (String) headerNames.nextElement();
-//            String value = request.getHeader(key);
-//            System.out.println(key + " " + value);
-//        }
-        return userManager.loginValidator(viewLoginModel);
+    public String loginValidation(@RequestBody LoginModelVO loginModelVO, HttpSession session) {
+        return userManager.loginValidator(loginModelVO, session);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/register")
-	public String registerUser(@RequestBody ViewLoginModel viewLoginModel) {
-		return userManager.register(viewLoginModel);
-	}
+    public String registerUser(@RequestBody LoginModelVO loginModelVO, HttpSession session) {
+        return userManager.register(loginModelVO,session);
+    }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/userLogin")
-    public String userIsLogin() {
-        return userManager.userIsLogin();
+    public String userIsLogin(HttpSession session) {
+        return userManager.userIsLogin(session);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/userLogout")
-    public String logout() {
-        return userManager.logOut();
+    public String logout(HttpSession session) {
+        return userManager.logOut(session);
     }
 }
