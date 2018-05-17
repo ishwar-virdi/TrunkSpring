@@ -7,6 +7,9 @@ import com.trunk.demo.vo.ListReconcileResultVO;
 import com.trunk.demo.repository.ResultsRepository;
 import com.trunk.demo.service.mongo.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -28,16 +31,19 @@ public class ResultServiceImpl implements ResultService {
     private ReconcileResult result;
 
     @Override
-    public String retrieveResults(HttpSession session) {
+    public String retrieveResults(HttpSession session,int pageIndex) {
         gson = new Gson();
-        Object userSession = session.getAttribute(session.getId());
+        Object userSession;
+        userSession = session.getAttribute(session.getId());
+        List<ReconcileResult> results;
+        ListReconcileResultVO resultsPO;
         if(userSession == null){
             return gson.toJson("");
         }
-        List<ReconcileResult> results = resultsRepository.findByUserIdOrderByReconcileDateDesc(userSession.toString());
-        ListReconcileResultVO resultsPO = new ListReconcileResultVO(results);
+        Pageable page = PageRequest.of(pageIndex,13,new Sort(Sort.Direction.DESC,"reconcileDate"));
+        results = resultsRepository.findByUserId(userSession.toString(),page);
+        resultsPO = new ListReconcileResultVO(results);
 
-        System.out.println(gson.toJson(resultsPO.getList()));
         return gson.toJson(resultsPO.getList());
     }
 

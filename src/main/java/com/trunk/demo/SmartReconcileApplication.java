@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan
 @EnableCaching
 @EnableTransactionManagement
-@EnableMongoRepositories(basePackageClasses = UsersRepository.class)
+@EnableMongoRepositories(basePackages = "com.trunk.demo.repository")
 public class SmartReconcileApplication {
 
     public static void main(String[] args) {

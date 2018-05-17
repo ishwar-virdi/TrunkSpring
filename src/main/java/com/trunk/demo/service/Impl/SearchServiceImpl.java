@@ -1,21 +1,14 @@
 package com.trunk.demo.service.Impl;
 
-import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.trunk.demo.Util.DateUtil;
 import com.trunk.demo.model.mongo.ReconcileResult;
-import com.trunk.demo.model.mongo.User;
 import com.trunk.demo.repository.ResultsRepository;
-import com.trunk.demo.repository.UsersRepository;
 import com.trunk.demo.service.SearchService;
 import com.trunk.demo.vo.ListReconcileResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +41,6 @@ public class SearchServiceImpl implements SearchService {
                 Date nextDate = dateUtil.getNextDate(value);
                 results = new ListReconcileResultVO(resultsRepository.findByUserIdAndReconcileDateBetween(userId,date,nextDate));
                 json = gson.toJson(results.getList());
-                //System.out.println(json);
             }
             //dateRange
             else if(value.length()>= 21

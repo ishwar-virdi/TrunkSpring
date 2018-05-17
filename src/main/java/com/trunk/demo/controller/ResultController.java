@@ -3,10 +3,7 @@ package com.trunk.demo.controller;
 
 import com.trunk.demo.service.mongo.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
@@ -20,12 +17,18 @@ public class ResultController {
     private ResultService resultService;
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/v1/results")
-    public String Results(HttpSession session) {
-        return resultService.retrieveResults(session);
+    public String Results(@RequestParam String page, HttpSession session) {
+        try{
+            int pageIndex = Integer.parseInt(page);
+            return resultService.retrieveResults(session,pageIndex);
+        }catch (Exception e){
+            return "";
+        }
     }
 
     @RequestMapping("/api/v1/seedResults")
     public String saveSeedData(HttpSession session) {
+
         return resultService.saveSeedData(session);
     }
 }

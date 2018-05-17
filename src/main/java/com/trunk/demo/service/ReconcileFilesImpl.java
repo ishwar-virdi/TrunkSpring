@@ -61,8 +61,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		
 		ArrayList<SettlementStmt> finalAmex = this.matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
 		ArrayList<SettlementStmt> finalVisaMastercard = this.matchReconciledWithSettlementItems(reconciledVisaMastercard, visaMastercardTransactions);	
-		
-		
+
 		//Save the results to the db
 		this.settlementStmtRepo.saveAll(finalAmex);
 		this.settlementStmtRepo.saveAll(finalVisaMastercard);
