@@ -187,4 +187,29 @@ public class SettlementStmt {
 	public void setReconciledDateTime(LocalDateTime dateTime) {
 		this.reconciledDateTime = dateTime;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("SettlementStmt{");
+		sb.append("id='").append(id).append('\'');
+		sb.append(", createDateTime=").append(createDateTime);
+		sb.append(", merchantID='").append(merchantID).append('\'');
+		sb.append(", cardPAN='").append(cardPAN).append('\'');
+		sb.append(", cardExpiry='").append(cardExpiry).append('\'');
+		sb.append(", bankReference='").append(bankReference).append('\'');
+		sb.append(", principalAmount=").append(principalAmount);
+		sb.append(", surcharge=").append(surcharge);
+		sb.append(", currency='").append(currency).append('\'');
+		sb.append(", customerName='").append(customerName).append('\'');
+		sb.append(", responseText='").append(responseText).append('\'');
+		sb.append(", receiptNumber=").append(receiptNumber);
+		sb.append(", settlementDate='").append(settlementDate).append('\'');
+		sb.append(", cardSchemeName='").append(cardSchemeName).append('\'');
+		sb.append(", transactionTimeStamp='").append(transactionTimeStamp).append('\'');
+		sb.append(", status='").append(status).append('\'');
+		sb.append(", isReconciled=").append(isReconciled);
+		sb.append(", reconciledDateTime=").append(reconciledDateTime);
+		sb.append('}');
+		return sb.toString();
+	}
 }

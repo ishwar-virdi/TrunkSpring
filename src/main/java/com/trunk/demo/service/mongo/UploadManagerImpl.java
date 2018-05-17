@@ -33,7 +33,6 @@ public class UploadManagerImpl implements UploadManager {
 			uploadSettlementCSV(br);
 		else
 			System.out.println("Invalid Type");
-
 	}
 
 	private void uploadSettlementCSV(BufferedReader br) {
@@ -56,11 +55,9 @@ public class UploadManagerImpl implements UploadManager {
 				}
 			}
 			br.close();
-
 		} catch (Exception e) {
 			System.out.println("ERROR IN MONGO INSERT OF SETTLEMENT STMT");
 			System.out.println(e.getMessage());
-
 		}
 
 	}
