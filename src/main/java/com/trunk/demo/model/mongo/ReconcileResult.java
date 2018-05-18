@@ -21,7 +21,8 @@ public class ReconcileResult {
     private int totalTransaction;
     private int reconciledTransaction;
     private int notReconciled;
-    public ReconcileResult(String userId, Date startDate, Date endDate, int percentage, int totalTransaction, int reconciledTransaction,int notReconciled) {
+
+    public ReconcileResult(String userId, Date startDate, Date endDate, int percentage, int totalTransaction, int reconciledTransaction, int notReconciled) {
         this.userId = userId;
         this.reconcileDate = new Date();
         this.startDate = startDate;
@@ -31,6 +32,18 @@ public class ReconcileResult {
         this.reconciledTransaction = reconciledTransaction;
         this.notReconciled = notReconciled;
     }
+
+//        public ReconcileResult(String id, String userId, Date startDate, Date endDate, int percentage, int totalTransaction, int reconciledTransaction, int notReconciled) {
+//        this.id = id;
+//        this.userId = userId;
+//        this.reconcileDate = new Date();
+//        this.startDate = startDate;
+//        this.endDate = endDate;
+//        this.percentage = percentage;
+//        this.totalTransaction = totalTransaction;
+//        this.reconciledTransaction = reconciledTransaction;
+//        this.notReconciled = notReconciled;
+//    }
 
     public String getId() {
         return id;

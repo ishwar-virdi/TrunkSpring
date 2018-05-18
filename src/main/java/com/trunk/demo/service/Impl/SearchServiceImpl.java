@@ -49,7 +49,7 @@ public class SearchServiceImpl implements SearchService {
                 String dates[] = value.split("-");
                 Date startDate = dateUtil.stringToDate(dates[0]);
                 Date endDate = dateUtil.getNextDate(dates[1]);
-                results = new ListReconcileResultVO(resultsRepository.findByUserIdAndReconcileDateBetween(userId,startDate,endDate));
+                results = new ListReconcileResultVO(resultsRepository.findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(userId,startDate,endDate));
                 json = gson.toJson(results.getList());
             }
             //percentage

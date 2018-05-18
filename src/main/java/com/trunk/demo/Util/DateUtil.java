@@ -82,4 +82,59 @@ public class DateUtil {
         date = sdf.parse(sb.toString());
         return date;
     }
+
+    public Date getNextMonthDate(String str){
+        Date date = null;
+        try {
+            str = str.replaceAll(" ","");
+            StringBuffer sb = new StringBuffer(str);
+            int month = Integer.parseInt(sb.substring(4,6))+1;
+            StringBuffer nextDay = new StringBuffer();
+            if(month < 10){
+                nextDay.append("0");
+            }
+            nextDay.append(String.valueOf(month));
+            sb.replace(4,6,nextDay.toString()).replace(6,8,"01");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            date = sdf.parse(sb.toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    public Date getCurrMonthDate(String str){
+        Date date = null;
+
+        try {
+            str = str.replaceAll(" ","");
+            StringBuffer sb = new StringBuffer(str);
+            sb.replace(6,8,"01");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            date = sdf.parse(sb.toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    public String getDetailID(String str){
+        str = str.replaceAll(" ","");
+        int nextMonth = Integer.parseInt(str.substring(4,6))+1;
+        int nextYear = Integer.parseInt(str.substring(0,4));
+        if(nextMonth > 12){
+            nextYear+=1;
+            nextMonth = 1;
+        }
+        StringBuffer sb = new StringBuffer();
+        sb.append(str, 0, 6);
+        sb.append("01");
+        sb.append(nextYear);
+        if(nextMonth < 10){
+            sb.append("0");
+        }
+        sb.append(nextMonth);
+        sb.append("01");
+        return sb.toString();
+    }
 }

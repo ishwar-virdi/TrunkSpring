@@ -22,7 +22,7 @@ public class BankStmt {
 	
 	public BankStmt(String accountDescription, long accountNumber, String currency, String date,
 			String transactionDescription, double debits, double credits, double balance) {
-		super();
+		//super();
 		this.createDateTime = LocalDateTime.now();
 		this.accountDescription = accountDescription;
 		this.accountNumber = accountNumber;
@@ -105,7 +105,22 @@ public class BankStmt {
 	public String getId() {
 		return id;
 	}
-	
-	
-	
+
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("BankStmt{");
+		sb.append("id='").append(id).append('\'');
+		sb.append(", createDateTime=").append(createDateTime);
+		sb.append(", accountDescription='").append(accountDescription).append('\'');
+		sb.append(", accountNumber=").append(accountNumber);
+		sb.append(", currency='").append(currency).append('\'');
+		sb.append(", date='").append(date).append('\'');
+		sb.append(", transactionDescription='").append(transactionDescription).append('\'');
+		sb.append(", debits=").append(debits);
+		sb.append(", credits=").append(credits);
+		sb.append(", balance=").append(balance);
+		sb.append('}');
+		return sb.toString();
+	}
 }

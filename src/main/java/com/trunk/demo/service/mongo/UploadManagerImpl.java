@@ -24,7 +24,6 @@ public class UploadManagerImpl implements UploadManager {
 
 	@Override
 	public void newUploadFile(String type, InputStream inputStream) {
-
 		BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
 		if (type.equalsIgnoreCase("Bank"))
@@ -36,7 +35,6 @@ public class UploadManagerImpl implements UploadManager {
 	}
 
 	private void uploadSettlementCSV(BufferedReader br) {
-
 		String line = new String();
 		try {
 			// Skipping Header Row
@@ -73,10 +71,10 @@ public class UploadManagerImpl implements UploadManager {
 					String elements[] = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 					if (!(elements[0].equalsIgnoreCase("Total value of transactions:")
 							|| elements[0].equalsIgnoreCase("Number of transactions:"))) {
-						
+
 						for (int i = 0; i < elements.length; i++)
 							elements[i] = elements[i].replaceAll("\"", "");
-						
+
 						BankStmt newStmt = new BankStmt(elements[0],
 								Long.parseLong(elements[1].isEmpty() ? "0" : elements[1]), elements[2], reverseDate(elements[3]),
 								elements[4], Double.parseDouble(elements[5].isEmpty() ? "0" : elements[5]),
@@ -87,7 +85,6 @@ public class UploadManagerImpl implements UploadManager {
 				}
 			}
 			br.close();
-
 		} catch (Exception e) {
 			System.out.println("ERROR IN MONGO INSERT OF BANK STMT");
 			System.out.println(e.getMessage());
