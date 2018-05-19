@@ -125,6 +125,10 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 						}
 					}
 				}
+			}else{
+				for(int i= 0,length=setttleList.size();i<length;i++){
+					setttleList.get(i).setIsReconciled(true);
+				}
 			}
 
 			//set Detail list
