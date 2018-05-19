@@ -33,7 +33,6 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercard();
 		List<SettlementStmt> directDebitTransactions = settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
 		List<BankStmt> bankStatement = bankStmtRepo.findAll();
-		System.out.println(directDebitTransactions.toString());
 
 		// Work out transaction totals for different card types for each day
 		Map<Date, Double> amexTotals = addUpSameDayTransactions(amexTransactions);
@@ -43,13 +42,11 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		List<Date> reconciledAmex = reconcileItems(amexTotals, bankStatement);
 		List<Date> reconciledVisaMastercard = reconcileItems(visaMastercardTotals, bankStatement);
 		List<Date> reconciledDirectDebit = reconcileDirectDebitItems(directDebitTransactions, bankStatement);
-		System.out.println(reconciledDirectDebit.toString());
 
 		List<SettlementStmt> finalAmex = matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
 		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
 				visaMastercardTransactions);
 		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit, directDebitTransactions);
-		System.out.println(finalDirectDebit.toString());
 		
 		// Save the results to the db
 		settlementStmtRepo.saveAll(finalAmex);
