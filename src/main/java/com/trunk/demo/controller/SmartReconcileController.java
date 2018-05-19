@@ -1,6 +1,7 @@
 package com.trunk.demo.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class SmartReconcileController {
 	
 	//For testing only
 	@RequestMapping(method = RequestMethod.GET, path = "/api/reset")
-	public void reset() {
+	public void reset() throws ParseException {
 		reconcileFiles.reset();
 	}
 
