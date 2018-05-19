@@ -1,8 +1,9 @@
 package com.trunk.demo.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,103 +28,110 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 
 	@Override
 	public void reconcile() {
-		List<SettlementStmt> settlementDocument;
-		List<BankStmt> bankStatement;
-		String month = "201803";
-
 		// Grabs the records it wants to work with from MongoDB
-		bankStatement = bankStmtRepo.findAllByDateLike("^" + month + "\\d*");
-		settlementDocument = settlementStmtRepo.findAllBySettlementDateLike("^" + month + "\\d*");
-
-		ArrayList<SettlementStmt> amexTransactions = new ArrayList<SettlementStmt>();
-		ArrayList<SettlementStmt> visaMastercardTransactions = new ArrayList<SettlementStmt>();
-		ArrayList<SettlementStmt> directDebitTransactions = new ArrayList<SettlementStmt>();
-
-		// Separates the amex, visa/mastercard and direct debit transactions from each
-		// other
-		for (int i = 0; i < settlementDocument.size(); i++) {
-			if (settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("Amex"))
-				amexTransactions.add(settlementDocument.get(i));
-			else if (settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("Visa")
-					|| settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("Mastercard"))
-				visaMastercardTransactions.add(settlementDocument.get(i));
-			else if (settlementDocument.get(i).getCardSchemeName().equalsIgnoreCase("")
-					&& !settlementDocument.get(i).getBankReference().equalsIgnoreCase(""))
-				directDebitTransactions.add(settlementDocument.get(i));
-		}
+		List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex();
+		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercard();
+		List<SettlementStmt> directDebitTransactions = settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
+		List<BankStmt> bankStatement = bankStmtRepo.findAll();
+		System.out.println(directDebitTransactions.toString());
 
 		// Work out transaction totals for different card types for each day
-		Map<LocalDate, Double> amexTotals = this.addUpSameDayTransactions(amexTransactions);
-		Map<LocalDate, Double> visaMastercardTotals = this.addUpSameDayTransactions(visaMastercardTransactions);
+		Map<Date, Double> amexTotals = addUpSameDayTransactions(amexTransactions);
+		Map<Date, Double> visaMastercardTotals = addUpSameDayTransactions(visaMastercardTransactions);
 
 		// Reconciles the items
-		ArrayList<String> reconciledAmex = this.reconcileItems(amexTotals, bankStatement);
-		ArrayList<String> reconciledVisaMastercard = this.reconcileItems(visaMastercardTotals, bankStatement);
+		List<Date> reconciledAmex = reconcileItems(amexTotals, bankStatement);
+		List<Date> reconciledVisaMastercard = reconcileItems(visaMastercardTotals, bankStatement);
+		List<Date> reconciledDirectDebit = reconcileDirectDebitItems(directDebitTransactions, bankStatement);
+		System.out.println(reconciledDirectDebit.toString());
 
-		ArrayList<SettlementStmt> finalAmex = this.matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
-		ArrayList<SettlementStmt> finalVisaMastercard = this
-				.matchReconciledWithSettlementItems(reconciledVisaMastercard, visaMastercardTransactions);
-
+		List<SettlementStmt> finalAmex = matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
+		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
+				visaMastercardTransactions);
+		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit, directDebitTransactions);
+		System.out.println(finalDirectDebit.toString());
+		
 		// Save the results to the db
-		this.settlementStmtRepo.saveAll(finalAmex);
-		this.settlementStmtRepo.saveAll(finalVisaMastercard);
+		settlementStmtRepo.saveAll(finalAmex);
+		settlementStmtRepo.saveAll(finalVisaMastercard);
+		settlementStmtRepo.saveAll(finalDirectDebit);
 	}
 
-	private ArrayList<SettlementStmt> matchReconciledWithSettlementItems(ArrayList<String> dates,
-			ArrayList<SettlementStmt> items) {
-		for (int i = 0; i < items.size(); i++) {
-			for (int x = 0; x < dates.size(); x++) {
-				if (items.get(i).getSettlementDate().equals(dates.get(x))) {
-					items.get(i).setReconcileStatus(3);
-					items.get(i).setReconciledDateTime(LocalDateTime.now());
+	private List<Date> reconcileDirectDebitItems(List<SettlementStmt> directDebitTransactions,
+			List<BankStmt> bankStatement) {
+		List<Date> response = new ArrayList<Date>();
+
+		for (SettlementStmt eachDirectDebit : directDebitTransactions)
+			for (BankStmt eachStmt : bankStatement) {
+				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate())) {
+					System.out.println("MATCH");
+					System.out.println(eachDirectDebit.getBankReference().replaceAll("\\s+",""));
+					System.out.println(eachStmt.getTransactionDescription().replaceAll("\\s+",""));
+					System.out.println(eachStmt.getCredits());
+					System.out.println(eachDirectDebit.getPrincipalAmount());
+				}
+				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate()) && eachStmt.getCredits() == eachDirectDebit.getPrincipalAmount() && eachStmt.getTransactionDescription().replaceAll("\\s+","").contains(eachDirectDebit.getBankReference().replaceAll("\\s+",""))) {
+					response.add(eachStmt.getDate());
 					break;
 				}
 			}
-		}
-
-		return items;
-	}
-
-	private ArrayList<String> reconcileItems(Map<LocalDate, Double> totals, List<BankStmt> bankStatement) {
-		ArrayList<String> response = new ArrayList<String>();
-
-		for (Map.Entry<LocalDate, Double> entry : totals.entrySet()) {
-			for (int i = 0; i < bankStatement.size(); i++) {
-				if (bankStatement.get(i).getDate().equals(entry.getKey())
-						&& bankStatement.get(i).getCredits() == entry.getValue()) {
-					response.add(bankStatement.get(i).getDate().toString());
-					break;
-				}
-			}
-		}
-
 		return response;
 	}
 
-	private Map<LocalDate, Double> addUpSameDayTransactions(ArrayList<SettlementStmt> transactions) {
-		Map<LocalDate, Double> transactionAmountsByDate = new HashMap<LocalDate, Double>();
+	private List<SettlementStmt> matchReconciledWithSettlementItems(List<Date> reconciledDatesList,
+			List<SettlementStmt> filteredSettlementStmtList) {
 
-		for (int i = 0; i < transactions.size(); i++) {
-			Double amount = transactionAmountsByDate.get(transactions.get(i).getSettlementDate());
-			if (amount != null) {
-				transactionAmountsByDate.put(transactions.get(i).getSettlementDate(),
-						amount + transactions.get(i).getPrincipalAmount());
-			} else {
-				transactionAmountsByDate.put(transactions.get(i).getSettlementDate(),
-						transactions.get(i).getPrincipalAmount());
+		List<SettlementStmt> modifiedSettlementStmtList = new ArrayList<SettlementStmt>();
+
+		for (SettlementStmt eachStmt : filteredSettlementStmtList) {
+			for (Date eachReconciledDate : reconciledDatesList) {
+				if (eachStmt.getSettlementDate().equals(eachReconciledDate)) {
+					eachStmt.setReconcileStatus(3);
+					eachStmt.setReconciledDateTime(new Date());
+					break;
+				}
 			}
+			modifiedSettlementStmtList.add(eachStmt);
+		}
+
+		return modifiedSettlementStmtList;
+	}
+
+	private List<Date> reconcileItems(Map<Date, Double> totals, List<BankStmt> bankStatementList) {
+		List<Date> response = new ArrayList<Date>();
+
+		for (Date eachDate : totals.keySet())
+			for (BankStmt eachStmt : bankStatementList) {
+				if (eachStmt.getDate().equals(eachDate)
+						&& eachStmt.getCredits() == totals.get(eachDate).doubleValue()) {
+					response.add(eachStmt.getDate());
+					break;
+				}
+			}
+		return response;
+	}
+
+	private Map<Date, Double> addUpSameDayTransactions(List<SettlementStmt> filteredSettlementStmtList) {
+		Map<Date, Double> transactionAmountsByDate = new HashMap<Date, Double>();
+
+		for (SettlementStmt eachStmt : filteredSettlementStmtList) {
+			Double amount = transactionAmountsByDate.get(eachStmt.getSettlementDate());
+			if (amount != null)
+				transactionAmountsByDate.put(eachStmt.getSettlementDate(), amount + eachStmt.getPrincipalAmount());
+			else
+				transactionAmountsByDate.put(eachStmt.getSettlementDate(), eachStmt.getPrincipalAmount());
 		}
 
 		return transactionAmountsByDate;
 	}
 
 	@Override
-	public void reset() {
-		List<SettlementStmt> settlementDocument = settlementStmtRepo.findAllBySettlementDateLike("^2018\\d*");
+	public void reset() throws ParseException {
+		List<SettlementStmt> settlementDocument = settlementStmtRepo.findAll();
 
-		for (int i = 0; i < settlementDocument.size(); i++) {
-			settlementDocument.get(i).setReconcileStatus(0);
-			settlementDocument.get(i).setReconciledDateTime(LocalDateTime.of(1900, 1, 1, 0, 0));
+		for (SettlementStmt eachSettlementStmt : settlementDocument) {
+			eachSettlementStmt.setReconcileStatus(0);
+			eachSettlementStmt.setReconciledDateTime(new SimpleDateFormat("dd-MM-yyyy").parse("01-01-1990"));
 		}
 
 		this.settlementStmtRepo.saveAll(settlementDocument);

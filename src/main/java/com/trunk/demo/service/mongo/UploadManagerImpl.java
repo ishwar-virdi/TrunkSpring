@@ -12,6 +12,8 @@ import com.trunk.demo.interfaces.mongo.BankStmtRepository;
 import com.trunk.demo.interfaces.mongo.SettlementRepository;
 import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.model.mongo.SettlementStmt;
+import com.trunk.demo.service.ReconcileFiles;
+import com.trunk.demo.service.ReconcileFilesImpl;
 
 @EnableMongoRepositories(basePackages = "com.trunk.demo.interfaces")
 @Service
@@ -34,6 +36,9 @@ public class UploadManagerImpl implements UploadManager {
 		else
 			System.out.println("Invalid Type");
 
+		ReconcileFiles reconcile = new ReconcileFilesImpl();
+		
+		reconcile.reconcile();
 	}
 
 	private void uploadSettlementCSV(BufferedReader br) {
@@ -76,13 +81,14 @@ public class UploadManagerImpl implements UploadManager {
 					String elements[] = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 					if (!(elements[0].equalsIgnoreCase("Total value of transactions:")
 							|| elements[0].equalsIgnoreCase("Number of transactions:"))) {
-						
+
 						for (int i = 0; i < elements.length; i++)
 							elements[i] = elements[i].replaceAll("\"", "");
-						
+
 						BankStmt newStmt = new BankStmt(elements[0],
-								Long.parseLong(elements[1].isEmpty() ? "0" : elements[1]), elements[2], reverseDate(elements[3]),
-								elements[4], Double.parseDouble(elements[5].isEmpty() ? "0" : elements[5]),
+								Long.parseLong(elements[1].isEmpty() ? "0" : elements[1]), elements[2],
+								reverseDate(elements[3]), elements[4],
+								Double.parseDouble(elements[5].isEmpty() ? "0" : elements[5]),
 								Double.parseDouble(elements[6].isEmpty() ? "0" : elements[6]),
 								Double.parseDouble(elements[7].isEmpty() ? "0" : elements[7]));
 						bankStmtRepo.insert(newStmt);
@@ -97,11 +103,11 @@ public class UploadManagerImpl implements UploadManager {
 
 		}
 	}
-	
+
 	private String reverseDate(String date) {
 		if (date.length() < 8)
 			date = "0" + date;
-		
+
 		return date.substring(4, 8) + date.substring(2, 4) + date.substring(0, 2);
 	}
 
