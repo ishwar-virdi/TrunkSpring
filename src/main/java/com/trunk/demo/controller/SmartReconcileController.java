@@ -18,7 +18,6 @@ import com.trunk.demo.model.LoginDetails;
 import com.trunk.demo.model.MatchFiles;
 import com.trunk.demo.service.FileMatcher;
 import com.trunk.demo.service.ReconcileFiles;
-import com.trunk.demo.service.TokenGenerator;
 import com.trunk.demo.service.mongo.ReceiptManager;
 import com.trunk.demo.service.mongo.UploadManager;
 import com.trunk.demo.service.mongo.UserManager;
@@ -38,20 +37,20 @@ public class SmartReconcileController {
 	@Autowired
 	private ReceiptManager receiptManager;
 
-	@RequestMapping("/api/token")
-	public String tokenCreator() {
-		return TokenGenerator.generateUUID();
-	}
+//	@RequestMapping("/api/token")
+//	public String tokenCreator() {
+//		return TokenGenerator.generateUUID();
+//	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/api/register")
-	public String registerUser(@RequestBody LoginDetails ld) {
-		return userManager.register(ld.getUsername(), ld.getPassword());
-	}
+//	@RequestMapping(method = RequestMethod.POST, value = "/api/register")
+//	public String registerUser(@RequestBody LoginDetails ld) {
+//		return userManager.register(ld.getUsername(), ld.getPassword());
+//	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/api/login")
-	public String loginChecker(@RequestBody LoginDetails ld) {
-		return userManager.loginValidator(ld);
-	}
+//	@RequestMapping(method = RequestMethod.POST, value = "/api/login")
+//	public String loginChecker(@RequestBody LoginDetails ld) {
+//		return userManager.loginValidator(ld);
+//	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/matchFile")
 	public JSONObject matchFile(@RequestBody MatchFiles mf) {
