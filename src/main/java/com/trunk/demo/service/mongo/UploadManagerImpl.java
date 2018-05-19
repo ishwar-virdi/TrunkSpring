@@ -1,9 +1,11 @@
 package com.trunk.demo.service.mongo;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Service;
@@ -12,10 +14,14 @@ import com.trunk.demo.interfaces.mongo.BankStmtRepository;
 import com.trunk.demo.interfaces.mongo.SettlementRepository;
 import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.model.mongo.SettlementStmt;
+import com.trunk.demo.service.s3.S3Service;
 
 @EnableMongoRepositories(basePackages = "com.trunk.demo.interfaces")
 @Service
 public class UploadManagerImpl implements UploadManager {
+
+	@Autowired
+	private S3Service s3Service;
 
 	@Autowired
 	private BankStmtRepository bankStmtRepo;
@@ -23,20 +29,31 @@ public class UploadManagerImpl implements UploadManager {
 	private SettlementRepository settlementStmtRepo;
 
 	@Override
-	public void newUploadFile(String type, InputStream inputStream) {
+	public String newUploadFile(String type, String fileName, InputStream inputStream) {
+		InputStream streamForMongo;
+		try {
+			streamForMongo = IOUtils.toBufferedInputStream(inputStream);
 
-		BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+			String s3Reponse = s3Service.newUploadFile(type, fileName, inputStream);
 
-		if (type.equalsIgnoreCase("Bank"))
-			uploadBankCSV(br);
-		else if (type.equalsIgnoreCase("Settlement"))
-			uploadSettlementCSV(br);
-		else
-			System.out.println("Invalid Type");
+			if (s3Reponse.equalsIgnoreCase("SUCCESS")) {
+				BufferedReader br = new BufferedReader(new InputStreamReader(streamForMongo));
+				if (type.equalsIgnoreCase("Bank"))
+					return uploadBankCSV(br);
+				else if (type.equalsIgnoreCase("Settlement"))
+					return uploadSettlementCSV(br);
+				else
+					return "{\"result\":\"fail\",\"reason\":\"Invalid File Type\"}";
+			} else {
+				return s3Reponse;
+			}
+		} catch (IOException e) {
+			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+		}
 
 	}
 
-	private void uploadSettlementCSV(BufferedReader br) {
+	private String uploadSettlementCSV(BufferedReader br) {
 
 		String line = new String();
 		try {
@@ -56,16 +73,13 @@ public class UploadManagerImpl implements UploadManager {
 				}
 			}
 			br.close();
-
+			return "{\"result\":\"success\",\"reason\":\"Settlement File has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
-			System.out.println("ERROR IN MONGO INSERT OF SETTLEMENT STMT");
-			System.out.println(e.getMessage());
-
+			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
 		}
-
 	}
 
-	private void uploadBankCSV(BufferedReader br) {
+	private String uploadBankCSV(BufferedReader br) {
 		String line = new String();
 		try {
 			// Skipping Header Row
@@ -91,11 +105,9 @@ public class UploadManagerImpl implements UploadManager {
 				}
 			}
 			br.close();
-
+			return "{\"result\":\"success\",\"reason\":\"Bank Statement has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
-			System.out.println("ERROR IN MONGO INSERT OF BANK STMT");
-			System.out.println(e.getMessage());
-
+			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
 		}
 	}
 
