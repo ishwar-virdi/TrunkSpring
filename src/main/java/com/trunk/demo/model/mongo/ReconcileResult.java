@@ -1,9 +1,8 @@
 package com.trunk.demo.model.mongo;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
@@ -11,36 +10,33 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "ReconcileResults")
 public class ReconcileResult {
-	
+
 	@Value("${zone}")
 	private String zone;
-	
+
 	@Id
-    private String id;
-    
-    private String userId;
-    private LocalDateTime lastModified;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private int isReconciled;
-    private int notReconciled;
+	private String id;
 
-    public ReconcileResult(String userId,String lastModified, String startDate,String endDate, int isReconciled, int notReconciled) {
-        super();
-        this.userId = userId;
-		
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm").withZone(ZoneId.of(zone));
-        this.lastModified = LocalDateTime.parse(lastModified, formatter);;
+	private String userId;
+	private Date lastModified;
+	private Date startDate;
+	private Date endDate;
+	private int isReconciled;
+	private int notReconciled;
 
-        startDate = startDate + " 00:00";
-        endDate = endDate + " 00:00";
-		formatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm").withZone(ZoneId.of(zone));
-        this.startDate = LocalDate.parse(startDate, formatter);
-        this.endDate = LocalDate.parse(endDate, formatter);
-        
-        this.isReconciled = isReconciled;
-        this.notReconciled = notReconciled;
-    }
+	public ReconcileResult(String userId, String lastModified, String startDate, String endDate, int isReconciled,
+			int notReconciled) throws ParseException {
+		super();
+		this.userId = userId;
+
+		this.lastModified = new SimpleDateFormat("yyyyMMdd HH:mm").parse(lastModified);
+
+		this.startDate = new SimpleDateFormat("yyyyMMdd").parse(startDate);
+		this.endDate = new SimpleDateFormat("yyyyMMdd").parse(endDate);
+
+		this.isReconciled = isReconciled;
+		this.notReconciled = notReconciled;
+	}
 
 	public String getUserId() {
 		return userId;
@@ -50,27 +46,27 @@ public class ReconcileResult {
 		this.userId = userId;
 	}
 
-	public LocalDateTime getLastModified() {
+	public Date getLastModified() {
 		return lastModified;
 	}
 
-	public void setLastModified(LocalDateTime lastModified) {
+	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
 	}
 
-	public LocalDate getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(LocalDate startDate) {
+	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
-	public LocalDate getEndDate() {
+	public Date getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(LocalDate endDate) {
+	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
 
@@ -93,5 +89,5 @@ public class ReconcileResult {
 	public String getId() {
 		return id;
 	}
-    
+
 }

@@ -1,5 +1,6 @@
 package com.trunk.demo.service.mongo;
 
+import java.text.SimpleDateFormat;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -21,43 +22,46 @@ public class ReceiptManagerImpl implements ReceiptManager {
 
 	@Override
 	public String getReceipt(String id) {
-		Optional<SettlementStmt> stmt = settlementStmtRepo.findById(Long.parseLong(id));
+		Optional<SettlementStmt> stmt = settlementStmtRepo.findByReceiptNumber(Long.parseLong(id));
 		try {
 			SettlementStmt stmtFound = stmt.get();
 			JSONObject result = new JSONObject();
 
-			result.put("TransactionDate", stmtFound.getTransactionTimeStamp().getDayOfMonth()+"-"+stmtFound.getTransactionTimeStamp().getMonthValue()+"-"+stmtFound.getTransactionTimeStamp().getYear());
-			result.put("TransactionTime", stmtFound.getTransactionTimeStamp().getHour()+":"+stmtFound.getTransactionTimeStamp().getMinute());
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			result.put("TransactionDate", formatter.format(stmtFound.getTransactionTimeStamp()));
+			formatter = new SimpleDateFormat("HH:mm:ss");
+
+			result.put("TransactionTime", formatter.format(stmtFound.getTransactionTimeStamp()));
 			result.put("CustomerName", stmtFound.getCustomerName());
 			result.put("MerchantID", stmtFound.getMerchantID());
 			result.put("BankReference", stmtFound.getBankReference());
 
 			result.put("Status", stmtFound.getStatus());
 			result.put("SettlementDate", stmtFound.getSettlementDate().toString());
-			
-			switch(stmtFound.getReconcileStatus()) {
-			case 3: 
+
+			switch (stmtFound.getReconcileStatus()) {
+			case 3:
 				result.put("ReconcileStatus", "AutoReconciled");
-				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());				
+				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
 				break;
-			case 2: 
+			case 2:
 				result.put("ReconcileStatus", "Manually Reconciled");
-				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());								
+				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
 				break;
-			case 1: 
+			case 1:
 				result.put("ReconcileStatus", "AutoReconciler attempted but failed");
-				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());				
+				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
 				break;
-			case 0: 
+			case 0:
 				result.put("ReconcileStatus", "Not Reconciled by AutoReconciler");
 				result.put("ReconciledDate", "");
 				break;
-			default: 
+			default:
 				result.put("ReconcileStatus", "Reconcile Status Incorrectly Set");
 				result.put("ReconciledDate", "");
 				break;
 			}
-			
+
 			result.put("CardPAN", stmtFound.getCardPAN());
 			result.put("CardScheme", stmtFound.getCardSchemeName());
 			result.put("CardExpiry", stmtFound.getCardExpiry());

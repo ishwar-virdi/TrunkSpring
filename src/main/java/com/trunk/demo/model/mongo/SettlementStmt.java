@@ -1,23 +1,22 @@
 package com.trunk.demo.model.mongo;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "SettlementStatements")
 public class SettlementStmt {
 
-	@Value("${zone}")
-	private String zone;
-
 	@Id
+	private String id;
+	
+	@Indexed
 	private Long receiptNumber;
-
+	
 	private String merchantID;
 	private String cardPAN;
 	private String cardExpiry;
@@ -27,17 +26,17 @@ public class SettlementStmt {
 	private String currency;
 	private String customerName;
 	private String responseText;
-	private LocalDate settlementDate;
+	private Date settlementDate;
 	private String cardSchemeName;
-	private LocalDateTime transactionTimeStamp;
+	private Date transactionTimeStamp;
 	private String status;
 	private int reconcileStatus;
-	private LocalDateTime reconciledDateTime;
+	private Date reconciledDateTime;
 
 	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, String bankReference,
 			double principalAmount, double surcharge, String currency, String customerName, String responseText,
 			long receiptNumber, String settlementDate, String cardSchemeName, String transactionTimeStamp,
-			String status) {
+			String status) throws ParseException {
 		super();
 
 		this.merchantID = merchantID;
@@ -51,19 +50,14 @@ public class SettlementStmt {
 		this.responseText = responseText;
 		this.receiptNumber = receiptNumber;
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(ZoneId.of(zone));
-		this.transactionTimeStamp = LocalDateTime.parse(transactionTimeStamp, formatter);
-
-		settlementDate = settlementDate + " 00:00";
-		formatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm").withZone(ZoneId.of(zone));
-		this.settlementDate = LocalDate.parse(settlementDate, formatter);
+		this.transactionTimeStamp = new SimpleDateFormat("dd-MM-yyyy HH:mm").parse(transactionTimeStamp);
+		this.settlementDate = new SimpleDateFormat("yyyyMMdd").parse(settlementDate);
 
 		this.cardSchemeName = cardSchemeName;
 		this.status = status;
 		this.reconcileStatus = 0;
 
-		String tmpDate = new String("19900101 00:00");
-		this.reconciledDateTime = LocalDateTime.parse(tmpDate, formatter);
+		this.reconciledDateTime = new SimpleDateFormat("dd-MM-yyyy").parse("01-01-1990");
 	}
 
 	public Long getReceiptNumber() {
@@ -166,23 +160,23 @@ public class SettlementStmt {
 		return reconciledDateTime.toString();
 	}
 
-	public void setReconciledDateTime(LocalDateTime reconciledDateTime) {
+	public void setReconciledDateTime(Date reconciledDateTime) {
 		this.reconciledDateTime = reconciledDateTime;
 	}
 
-	public LocalDate getSettlementDate() {
+	public Date getSettlementDate() {
 		return settlementDate;
 	}
 
-	public void setSettlementDate(LocalDate settlementDate) {
+	public void setSettlementDate(Date settlementDate) {
 		this.settlementDate = settlementDate;
 	}
 
-	public LocalDateTime getTransactionTimeStamp() {
+	public Date getTransactionTimeStamp() {
 		return transactionTimeStamp;
 	}
 
-	public void setTransactionTimeStamp(LocalDateTime transactionTimeStamp) {
+	public void setTransactionTimeStamp(Date transactionTimeStamp) {
 		this.transactionTimeStamp = transactionTimeStamp;
 	}
 
@@ -194,4 +188,52 @@ public class SettlementStmt {
 		this.reconcileStatus = reconcileStatus;
 	}
 
+	public SettlementStmt(String id, Long receiptNumber, String merchantID, String cardPAN, String cardExpiry,
+			String bankReference, double principalAmount, double surcharge, String currency, String customerName,
+			String responseText, Date settlementDate, String cardSchemeName, Date transactionTimeStamp, String status,
+			int reconcileStatus, Date reconciledDateTime) {
+		super();
+		this.id = id;
+		this.receiptNumber = receiptNumber;
+		this.merchantID = merchantID;
+		this.cardPAN = cardPAN;
+		this.cardExpiry = cardExpiry;
+		this.bankReference = bankReference;
+		this.principalAmount = principalAmount;
+		this.surcharge = surcharge;
+		this.currency = currency;
+		this.customerName = customerName;
+		this.responseText = responseText;
+		this.settlementDate = settlementDate;
+		this.cardSchemeName = cardSchemeName;
+		this.transactionTimeStamp = transactionTimeStamp;
+		this.status = status;
+		this.reconcileStatus = reconcileStatus;
+		this.reconciledDateTime = reconciledDateTime;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public SettlementStmt() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public String toString() {
+		return "SettlementStmt [id=" + id + ", receiptNumber=" + receiptNumber + ", merchantID=" + merchantID
+				+ ", cardPAN=" + cardPAN + ", cardExpiry=" + cardExpiry + ", bankReference=" + bankReference
+				+ ", principalAmount=" + principalAmount + ", surcharge=" + surcharge + ", currency=" + currency
+				+ ", customerName=" + customerName + ", responseText=" + responseText + ", settlementDate="
+				+ settlementDate + ", cardSchemeName=" + cardSchemeName + ", transactionTimeStamp="
+				+ transactionTimeStamp + ", status=" + status + ", reconcileStatus=" + reconcileStatus
+				+ ", reconciledDateTime=" + reconciledDateTime + "]";
+	}
+	
 }
