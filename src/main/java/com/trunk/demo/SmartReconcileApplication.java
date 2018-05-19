@@ -1,5 +1,6 @@
 package com.trunk.demo;
 
+import com.trunk.demo.Interceptor.Interceptor;
 import com.trunk.demo.Util.DateUtil;
 import com.trunk.demo.repository.UsersRepository;
 import org.springframework.boot.SpringApplication;
@@ -9,6 +10,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @SpringBootApplication
 @ComponentScan
