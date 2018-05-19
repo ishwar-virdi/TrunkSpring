@@ -28,7 +28,7 @@ public class UserController {
         return userManager.register(loginModelVO,session);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/api/v1/userLogin")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/v1/userLogin")
     public String userIsLogin(HttpSession session) {
         return userManager.userIsLogin(session);
     }

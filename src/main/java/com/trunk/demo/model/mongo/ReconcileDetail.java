@@ -1,7 +1,9 @@
 package com.trunk.demo.model.mongo;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,17 +11,17 @@ import java.util.List;
 @Document(collection = "ReconcileDetails")
 public class ReconcileDetail {
 
+    @Id
+    @Field
     private String id;
-    private List<ReconcileDetailItem> list;
+    @Field
+    private List<ReconcileDetailItem> details;
 
-    public ReconcileDetail(String id, ArrayList<ReconcileDetailItem> list) {
+    public ReconcileDetail(String id, ArrayList<ReconcileDetailItem> details) {
         this.id = id;
-        this.list = list;
+        this.details = details;
     }
 
-    public ReconcileDetail() {
-
-    }
     public String getId() {
         return id;
     }
@@ -27,9 +29,9 @@ public class ReconcileDetail {
         this.id = id;
     }
     public List<ReconcileDetailItem> getList() {
-        return list;
+        return details;
     }
     public void setList(List<ReconcileDetailItem> list) {
-        this.list = list;
+        this.details = list;
     }
 }

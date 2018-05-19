@@ -100,8 +100,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 			//resultDetail
 			String resultDate = dateUtil.getDetailID(listBankStmtVO.getFilterVisaBankStmt().get(0).getDate());
 			Map<String,String> description = new HashMap<>();
-			ReconcileDetail detail = new ReconcileDetail();
-			detail.setId(resultDate);
+			ReconcileDetail detail = null;
 			ArrayList<ReconcileDetailItem> items = new ArrayList<>();
 			ArrayList<SettlementStmt> issuedStmt = new ArrayList<>();
 			if(visaMasterNotReconciled.size() != 0 || debitNotReconciled.size() != 0){  // not success
@@ -144,12 +143,15 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 				if(setttleList.get(i).getIsReconciled()){
 					reconcileDetailItem = new ReconcileDetailItem(setttleList.get(i),"",true);
 				}else{
+					/**
+					 * Test Output
+					 */
 					System.out.println(description.get(setttleList.get(i).getId()));
 					reconcileDetailItem = new ReconcileDetailItem(setttleList.get(i),description.get(setttleList.get(i).getId()),false);
 				}
 				items.add(reconcileDetailItem);
 			}
-			detail.setList(items);
+			detail = new ReconcileDetail(resultDate,items);
 
 			percentage = (reconciledTransaction/totalTransaction)*100;
 			ReconcileResult existResult = resultsRepository.findReconcileResultByUserIdAndStartDateAndEndDate("5af8786c1aad206af400a4b1",startDate,endDate);
@@ -171,7 +173,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	private boolean isIssuedStmt(Map<String,String> description,SettlementStmt settle, double mapValue, ArrayList<SettlementStmt> issuedStmt){
 		double amount = settle.getPrincipalAmount();
 		if(amount == mapValue){
-			description.put(settle.getId(),"Difference value is " + mapValue);
+			description.put(settle.getId(),settle.getCardSchemeName() + " difference value is " + mapValue);
 			issuedStmt.add(settle);
 			return true;
 		}

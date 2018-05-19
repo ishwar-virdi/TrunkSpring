@@ -1,5 +1,6 @@
 package com.trunk.demo.controller;
 
+import com.google.gson.JsonObject;
 import com.trunk.demo.service.DetailService;
 import com.trunk.demo.service.mongo.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,10 @@ public class DetailController {
     private DetailService detailService;
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/v1/details")
-    public String Results(@RequestParam String page, HttpSession session) {
-        System.out.println("aaa");
-        return "a";
+    public String Results(@RequestParam String id) {
+        System.out.println(id);
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("a","a");
+        return detailService.details(id);
     }
 }

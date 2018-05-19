@@ -1,16 +1,28 @@
 package com.trunk.demo.model.mongo;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+@Document(collection = "ReconcileDetails")
 public class ReconcileDetailItem {
 
+    @Id
     private String id;
+    @Field
     private String date;
+    @Field
     private String description;
+    @Field
     private double amount;
+    @Field
     private long reciptNumber;
+    @Field
     private String transactionType;
+    @Field
     private boolean successful;
+    @Field
     private int rule;
 
     public ReconcileDetailItem(SettlementStmt settlementStmt,String description,boolean successful){
@@ -27,6 +39,7 @@ public class ReconcileDetailItem {
         this.successful = successful;
         this.rule = 1;
     }
+    @PersistenceConstructor
     public ReconcileDetailItem(String id,String date, String description, double amount, long reciptNumber, String transactionType, boolean successful, int rule) {
         this.id = id;
         this.date = date;

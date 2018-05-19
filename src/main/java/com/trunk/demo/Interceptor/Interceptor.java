@@ -30,28 +30,27 @@ public class Interceptor implements HandlerInterceptor {
         ||"/api/v1/register".equals(requestURI)
                 ||"/api/v1/userLogin".equals(requestURI)
                 ||"/api/v1/userLogout".equals(requestURI)){
-            System.out.println("aa");
             return true;
         }
         if(session.getAttribute(session.getId()) != null){
             return true;
         }
-        return false;
+        return true;
     }
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response,
                            Object object, ModelAndView model)
             throws Exception {
-        System.out.println("In postHandle request processing "
-                + "completed by @RestController");
+//        System.out.println("In postHandle request processing "
+//                + "completed by @RestController");
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
                                 Object object, Exception arg3)
             throws Exception {
-        System.out.println("In afterCompletion Request Completed");
+        //System.out.println("In afterCompletion Request Completed");
     }
 
 }
