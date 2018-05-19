@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.trunk.demo.Util.DateUtil;
 import com.trunk.demo.Util.FormatUtil;
 import com.trunk.demo.model.mongo.*;
-import com.trunk.demo.repository.ReconcileDetailRepository;
+import com.trunk.demo.repository.ReconcileDetailsRepository;
 import com.trunk.demo.repository.ResultsRepository;
 import com.trunk.demo.vo.ListBankStmtVO;
 import com.trunk.demo.vo.ListSettlementStmtVO;
@@ -31,7 +31,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	@Autowired
 	private ResultsRepository resultsRepository;
 	@Autowired
-	private ReconcileDetailRepository reconcileDetailRepository;
+	private ReconcileDetailsRepository reconcileDetailRepository;
 
 	private FormatUtil formatUtil = new FormatUtil();
 	@Override

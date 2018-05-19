@@ -1,27 +1,57 @@
 package com.trunk.demo.Interceptor;
 
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+
+@Component
 public class Interceptor implements HandlerInterceptor {
 
-    @Override
-    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
-        System.out.printf("preHandle");
-        return true;
-    }
-
+    @Autowired
+    private HttpSession session;
 
     @Override
-    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
-        System.out.println("postHandle");
+    public boolean preHandle(HttpServletRequest request,
+                             HttpServletResponse response, Object objec0t) throws Exception {
+        String requestURI = request.getRequestURI();
+        System.out.println(requestURI);
+        if("/api/v1/login".equals(requestURI)
+        ||"/api/v1/token".equals(requestURI)
+        ||"/api/v1/register".equals(requestURI)
+                ||"/api/v1/userLogin".equals(requestURI)
+                ||"/api/v1/userLogout".equals(requestURI)){
+            System.out.println("aa");
+            return true;
+        }
+        if(session.getAttribute(session.getId()) != null){
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-        System.out.println("afterCompletion");
+    public void postHandle(HttpServletRequest request, HttpServletResponse response,
+                           Object object, ModelAndView model)
+            throws Exception {
+        System.out.println("In postHandle request processing "
+                + "completed by @RestController");
     }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
+                                Object object, Exception arg3)
+            throws Exception {
+        System.out.println("In afterCompletion Request Completed");
+    }
+
 }
