@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.JsonObject;
+import com.trunk.demo.Util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Service;
@@ -27,31 +29,50 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	private SettlementRepository settlementStmtRepo;
 
 	@Override
-	public void reconcile() {
+	public String reconcile(String year, String month) {
+		//date
+		DateUtil dateUtil = new DateUtil();
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty("result","success");
+		Date[] dates = null;
+		try {
+			dates = dateUtil.getReconcileDate(year,month);
+			if(dates == null){
+				throw new ParseException("month or year is not digit number",0);
+			}
+		} catch (ParseException e) {
+			jsonObject.addProperty("result","fail");
+			return jsonObject.toString();
+		}
+
 		// Grabs the records it wants to work with from MongoDB
-		List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex();
-		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercard();
-		List<SettlementStmt> directDebitTransactions = settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
-		List<BankStmt> bankStatement = bankStmtRepo.findAll();
+		List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmexAndDateBetween(dates[0],dates[1]);
+		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercardAndDateBetween(dates[0],dates[1]);
+		List<SettlementStmt> directDebitTransactions = settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmptyAndDateBetween(dates[0],dates[1]);
+		List<BankStmt> bankStatement = bankStmtRepo.findByDateBetween(dates[0],dates[1]);
 
-		// Work out transaction totals for different card types for each day
-		Map<Date, Double> amexTotals = addUpSameDayTransactions(amexTransactions);
-		Map<Date, Double> visaMastercardTotals = addUpSameDayTransactions(visaMastercardTransactions);
+//		// Work out transaction totals for different card types for each day
+//		// Return <Unique Date, total amount>
+//		Map<Date, Double> amexTotals = addUpSameDayTransactions(amexTransactions);
+//		Map<Date, Double> visaMastercardTotals = addUpSameDayTransactions(visaMastercardTransactions);
+//
+//		// Reconciles the items
+//		// Return reconciled Date
+//		List<Date> reconciledAmex = reconcileItems(amexTotals, bankStatement);
+//		List<Date> reconciledVisaMastercard = reconcileItems(visaMastercardTotals, bankStatement);
+//		List<Date> reconciledDirectDebit = reconcileDirectDebitItems(directDebitTransactions, bankStatement);
+//
+//		List<SettlementStmt> finalAmex = matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
+//		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
+//				visaMastercardTransactions);
+//		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit, directDebitTransactions);
+//
+//		// Save the results to the db
+//		settlementStmtRepo.saveAll(finalAmex);
+//		settlementStmtRepo.saveAll(finalVisaMastercard);
+//		settlementStmtRepo.saveAll(finalDirectDebit);
 
-		// Reconciles the items
-		List<Date> reconciledAmex = reconcileItems(amexTotals, bankStatement);
-		List<Date> reconciledVisaMastercard = reconcileItems(visaMastercardTotals, bankStatement);
-		List<Date> reconciledDirectDebit = reconcileDirectDebitItems(directDebitTransactions, bankStatement);
-
-		List<SettlementStmt> finalAmex = matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
-		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
-				visaMastercardTransactions);
-		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit, directDebitTransactions);
-		
-		// Save the results to the db
-		settlementStmtRepo.saveAll(finalAmex);
-		settlementStmtRepo.saveAll(finalVisaMastercard);
-		settlementStmtRepo.saveAll(finalDirectDebit);
+		return jsonObject.toString();
 	}
 
 	private List<Date> reconcileDirectDebitItems(List<SettlementStmt> directDebitTransactions,
@@ -96,9 +117,9 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	}
 
 	private List<Date> reconcileItems(Map<Date, Double> totals, List<BankStmt> bankStatementList) {
-		List<Date> response = new ArrayList<Date>();
-
-		for (Date eachDate : totals.keySet())
+		List<Date> response = new ArrayList<>();
+		for (Date eachDate : totals.keySet()){
+			//System.out.println(eachDate + " " + totals.get(eachDate).doubleValue());
 			for (BankStmt eachStmt : bankStatementList) {
 				if (eachStmt.getDate().equals(eachDate)
 						&& eachStmt.getCredits() == totals.get(eachDate).doubleValue()) {
@@ -106,6 +127,8 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 					break;
 				}
 			}
+		}
+
 		return response;
 	}
 

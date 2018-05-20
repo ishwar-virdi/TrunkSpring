@@ -8,7 +8,8 @@ import java.util.Date;
 
 @Component
 public class DateUtil {
-    public DateUtil(){}
+    private FormatUtil formatUtil;
+    public DateUtil(){formatUtil = new FormatUtil();}
 
     public Date convSettleToDate(String s){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -141,5 +142,37 @@ public class DateUtil {
     public String getCurrDateString(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm");
         return sdf.format(new Date());
+    }
+
+    public Date[] getReconcileDate(String year,String month) throws ParseException {
+        Date[] dates = new Date[2];
+        if(!formatUtil.isNum(year) || !formatUtil.isNum(month)){
+            return null;
+        }
+        Date currMonthDate = null;
+        Date nextMonthDate = null;
+        StringBuffer currMonthSb = new StringBuffer();
+        StringBuffer nextMonthSb = new StringBuffer();
+        currMonthSb.append(year);
+        nextMonthSb.append(year);
+        int nextMonth = Integer.parseInt(month) + 1;
+        //month
+        if(nextMonth < 10){
+            currMonthSb.append("0");
+            nextMonthSb.append("0");
+        }
+        currMonthSb.append(month);
+        nextMonthSb.append(nextMonth);
+        //day
+        currMonthSb.append("01");
+        nextMonthSb.append("01");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+        currMonthDate = sdf.parse(currMonthSb.toString());
+        nextMonthDate = sdf.parse(nextMonthSb.toString());
+        dates[0] = currMonthDate;
+        dates[1] = nextMonthDate;
+        return dates;
     }
 }

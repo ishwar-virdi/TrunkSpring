@@ -22,16 +22,16 @@ public class Interceptor implements HandlerInterceptor {
                              HttpServletResponse response, Object objec0t) throws Exception {
         String requestURI = request.getRequestURI();
         System.out.println(requestURI);
-        if("/api/v1/login".equals(requestURI)
-        ||"/api/v1/token".equals(requestURI)
-        ||"/api/v1/register".equals(requestURI)
-                ||"/api/v1/userLogin".equals(requestURI)
-                ||"/api/v1/userLogout".equals(requestURI)){
-            return true;
-        }
-        if(session.getAttribute(session.getId()) != null){
-            return true;
-        }
+//        if("/api/v1/login".equals(requestURI)
+//        ||"/api/v1/token".equals(requestURI)
+//        ||"/api/v1/register".equals(requestURI)
+//                ||"/api/v1/userLogin".equals(requestURI)
+//                ||"/api/v1/userLogout".equals(requestURI)){
+//            return true;
+//        }
+//        if(session.getAttribute(session.getId()) != null){
+//            return true;
+//        }
         return true;
     }
 

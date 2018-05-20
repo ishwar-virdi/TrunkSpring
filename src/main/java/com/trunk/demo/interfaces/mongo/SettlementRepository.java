@@ -1,5 +1,6 @@
 package com.trunk.demo.interfaces.mongo;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,13 +17,13 @@ public interface SettlementRepository extends MongoRepository<SettlementStmt, Lo
 	List<SettlementStmt> findAllBySettlementDateLike(String settlementDate);
 
 	@Query("{ 'cardSchemeName' : {$regex : '.*amex.*', $options : 'i' } }")
-	List<SettlementStmt> findAllByCardSchemeNameAmex();
+	List<SettlementStmt> findAllByCardSchemeNameAmexAndDateBetween(Date start, Date end);
 
 	@Query("{ $or : [ {'cardSchemeName' : {$regex: '.*visa.*', $options : 'i'}}, {'cardSchemeName' : {$regex: '.*mastercard.*', $options : 'i'}}  ]}")
-	List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercard();
+	List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercardAndDateBetween(Date start,Date end);
 
 	@Query("{ $and : [ {'cardSchemeName' : ''}, { 'bankReference' : { $ne: '' } } ] }")
-	List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
+	List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmptyAndDateBetween(Date start,Date end);
 
 	@Query("{ 'receiptNumber' : ?0 }")
 	Optional<SettlementStmt> findByReceiptNumber(Long receiptNumber);

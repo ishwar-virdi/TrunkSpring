@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface ReconcileFiles {
-	public void reconcile();
+	public String reconcile(String year,String month);
 	public void reset() throws ParseException;
 }

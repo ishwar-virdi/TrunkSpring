@@ -62,10 +62,10 @@ public class SmartReconcileController {
 			throws IOException {
 		return uploadManager.newUploadFile(type, file.getOriginalFilename(), file.getInputStream());
 	}
-	
+
 	@RequestMapping(method = RequestMethod.GET, path = "/api/reconcile")
-	public void reconcile() {
-		reconcileFiles.reconcile();
+	public String reconcile(@RequestParam String year,@RequestParam String month) {
+		return reconcileFiles.reconcile(year,month);
 	}
 	
 	//For testing only

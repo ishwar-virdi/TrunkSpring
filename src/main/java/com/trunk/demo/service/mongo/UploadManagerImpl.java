@@ -52,9 +52,7 @@ public class UploadManagerImpl implements UploadManager {
 		} catch (IOException e) {
 			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
 		}
-    ReconcileFiles reconcile = new ReconcileFilesImpl();
-		
-		reconcile.reconcile();
+
 	}
 
 	private String uploadSettlementCSV(BufferedReader br) {
