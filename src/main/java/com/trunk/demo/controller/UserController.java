@@ -1,11 +1,12 @@
 package com.trunk.demo.controller;
 
-import com.trunk.demo.service.mongo.UserManager;
-import com.trunk.demo.vo.LoginModelVO;
+import com.trunk.demo.model.viewModel.ViewLoginModel;
+import com.trunk.demo.service.mongo.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 //@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
@@ -13,25 +14,32 @@ import javax.servlet.http.HttpSession;
 public class UserController {
 
     @Autowired
-    private UserManager userManager;
+    private UsersService usersService;
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/login")
-    public String loginValidation(@RequestBody LoginModelVO loginModelVO, HttpSession session) {
-        return userManager.loginValidator(loginModelVO, session);
+    public String loginValidation(@RequestBody ViewLoginModel viewLoginModel, HttpServletRequest request) {
+//        Enumeration headerNames = request.getHeaderNames();
+//        while (headerNames.hasMoreElements()) {
+//            String key = (String) headerNames.nextElement();
+//            String value = request.getHeader(key);
+//            System.out.println(key + " " + value);
+//        }
+
+        return usersService.loginValidator(viewLoginModel);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/register")
-    public String registerUser(@RequestBody LoginModelVO loginModelVO, HttpSession session) {
-        return userManager.register(loginModelVO,session);
-    }
+	public String registerUser(@RequestBody ViewLoginModel viewLoginModel) {
+		return usersService.register(viewLoginModel);
+	}
 
-    @RequestMapping(method = RequestMethod.GET, value = "/api/v1/userLogin")
-    public String userIsLogin(HttpSession session) {
-        return userManager.userIsLogin(session);
+    @RequestMapping(method = RequestMethod.POST, value = "/api/v1/userLogin")
+    public String userIsLogin() {
+        return usersService.userIsLogin();
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/userLogout")
-    public String logout(HttpSession session) {
-        return userManager.logOut(session);
+    public String logout() {
+        return usersService.logOut();
     }
 }

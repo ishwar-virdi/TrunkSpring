@@ -1,128 +1,86 @@
 package com.trunk.demo.model.mongo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "ReconcileResults")
+
 public class ReconcileResult {
+    @Id
+    private String id;
+    private String uid;
+    private int reconcileDate;
+    private String reconcileTime;
+    private String dateRange;
+    private int percentage;
 
-	@Value("${zone}")
-	private String zone;
+    public ReconcileResult(String uid,int reconcileDate, String reconcileTime, String dateRange, int percentage) {
+        super();
+        this.uid = uid;
+        this.reconcileDate = reconcileDate;
+        this.reconcileTime = reconcileTime;
+        this.dateRange = dateRange;
+        this.percentage = percentage;
+    }
 
-	@Id
-	private String id;
+    public ReconcileResult() {
+        super();
+    }
 
-	@Field
-	private String userId;
-	@Field
-	private Date lastModified;
-	@Field
-	private Date startDate;
-	@Field
-	private Date endDate;
-	@Field
-	private int isReconciled;
-	@Field
-	private int notReconciled;
-	@Field
-	private int percentage;
+    public String getId() {
+        return id;
+    }
 
+    public String getReconcileTime() {
+        return reconcileTime;
+    }
 
-	public ReconcileResult(String userId, String lastModified, String startDate, String endDate, int isReconciled,
-			int notReconciled) throws ParseException {
-		super();
-		this.userId = userId;
+    public void setReconcileTime(String reconcileTime) {
+        this.reconcileTime = reconcileTime;
+    }
 
-		this.lastModified = new SimpleDateFormat("yyyyMMdd HH:mm").parse(lastModified);
+    public String getUid() {
+        return uid;
+    }
 
-		this.startDate = new SimpleDateFormat("yyyyMMdd").parse(startDate);
-		this.endDate = new SimpleDateFormat("yyyyMMdd").parse(endDate);
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
-		this.isReconciled = isReconciled;
-		this.notReconciled = notReconciled;
-		double isRecon = isReconciled;
-		double notRecon = notReconciled;
-		this.percentage = (int)((isRecon / (isRecon + notRecon) ) * 100);
-	}
+    public int getReconcileDate() {
+        return reconcileDate;
+    }
 
-	@PersistenceConstructor
-	public ReconcileResult(String userId, Date startDate, Date endDate, int isReconciled, int notReconciled) {
-		this.userId = userId;
-		this.lastModified = new Date();
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.isReconciled = isReconciled;
-		this.notReconciled = notReconciled;
-		double isRecon = isReconciled;
-		double notRecon = notReconciled;
-		this.percentage = (int)((isRecon / (isRecon + notRecon) ) * 100);
-	}
+    public void setReconcileDate(int reconcileDate) {
+        this.reconcileDate = reconcileDate;
+    }
 
-	public int getPercentage() {
-		return percentage;
-	}
+    public String getDateRange() {
+        return dateRange;
+    }
 
-	public void setPercentage(int percentage) {
-		this.percentage = percentage;
-	}
+    public void setDateRange(String dateRange) {
+        this.dateRange = dateRange;
+    }
 
-	public String getUserId() {
-		return userId;
-	}
+    public int getPercentage() {
+        return percentage;
+    }
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
+    public void setPercentage(int percentage) {
+        this.percentage = percentage;
+    }
 
-	public Date getLastModified() {
-		return lastModified;
-	}
-
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
-	}
-
-	public Date getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-	public int getIsReconciled() {
-		return isReconciled;
-	}
-
-	public void setIsReconciled(int isReconciled) {
-		this.isReconciled = isReconciled;
-	}
-
-	public int getNotReconciled() {
-		return notReconciled;
-	}
-
-	public void setNotReconciled(int notReconciled) {
-		this.notReconciled = notReconciled;
-	}
-
-	public String getId() {
-		return id;
-	}
-
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ReconcileResult{");
+        sb.append("id='").append(id).append('\'');
+        sb.append(", uid='").append(uid).append('\'');
+        sb.append(", reconcileDate=").append(reconcileDate);
+        sb.append(", reconcileTime='").append(reconcileTime).append('\'');
+        sb.append(", dateRange='").append(dateRange).append('\'');
+        sb.append(", percentage=").append(percentage);
+        sb.append('}');
+        return sb.toString();
+    }
 }

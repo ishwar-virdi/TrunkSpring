@@ -4,6 +4,6 @@ import java.io.InputStream;
 
 public interface UploadManager {
 
-	public void newUploadFile(String type, InputStream inputStream);
+    public void newUploadFile(String type, InputStream inputStream);
 
 }

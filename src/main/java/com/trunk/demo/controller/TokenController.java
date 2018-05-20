@@ -1,5 +1,6 @@
 package com.trunk.demo.controller;
 
+import com.trunk.demo.Util.BCryptText;
 import com.trunk.demo.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;

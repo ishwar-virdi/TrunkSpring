@@ -1,9 +1,9 @@
 package com.trunk.demo.repository;
 
 public interface TokenRepository {
-    public String generateToken();
+    public String getToken();
 
-    public boolean destoryToken();
+    public boolean isEquals(String inputToken);
 
-    public Object getToken();
+
 }

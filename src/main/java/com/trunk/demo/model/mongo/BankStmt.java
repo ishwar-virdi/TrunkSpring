@@ -1,159 +1,103 @@
 package com.trunk.demo.model.mongo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.UUID;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "BankStatements")
 public class BankStmt {
 
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	private Date createDateTime;
-	private String accountDescription;
-	private long accountNumber;
-	private String currency;
-	private Date date;
-	private String transactionDescription;
-	private double debits;
-	private double credits;
-	private double balance;
+    private String AccountDescription;
+    private long AccountNumber;
+    private String Currency;
+    private String Date;
+    private String TransactionDescription;
+    private double Debits;
+    private double Credits;
+    private double Balance;
 
-	public BankStmt(String accountDescription, long accountNumber, String currency, String date,
-			String transactionDescription, double debits, double credits, double balance) throws ParseException {
-		super();
-		this.id = UUID.randomUUID().toString();
-		this.createDateTime = new Date();
-		this.accountDescription = accountDescription;
-		this.accountNumber = accountNumber;
-		this.currency = currency;
-		this.date = new SimpleDateFormat("yyyyMMdd").parse(date);
-		this.transactionDescription = transactionDescription;
-		this.debits = debits;
-		this.credits = credits;
-		this.balance = balance;
-	}
+    public BankStmt(String accountDescription, long accountNumber, String currency, String date,
+                    String transactionDescription, double debits, double credits, double balance) {
+        super();
+        AccountDescription = accountDescription;
+        AccountNumber = accountNumber;
+        Currency = currency;
+        Date = date;
+        TransactionDescription = transactionDescription;
+        Debits = debits;
+        Credits = credits;
+        Balance = balance;
+    }
 
-	public Date getCreateDate() {
-		return this.createDateTime;
-	}
+    public String getAccountDescription() {
+        return AccountDescription;
+    }
 
-	public String getAccountDescription() {
-		return this.accountDescription;
-	}
+    public void setAccountDescription(String accountDescription) {
+        AccountDescription = accountDescription;
+    }
 
-	public void setAccountDescription(String accountDescription) {
-		this.accountDescription = accountDescription;
-	}
+    public long getAccountNumber() {
+        return AccountNumber;
+    }
 
-	public long getAccountNumber() {
-		return this.accountNumber;
-	}
+    public void setAccountNumber(long accountNumber) {
+        AccountNumber = accountNumber;
+    }
 
-	public void setAccountNumber(long accountNumber) {
-		this.accountNumber = accountNumber;
-	}
+    public String getCurrency() {
+        return Currency;
+    }
 
-	public String getCurrency() {
-		return this.currency;
-	}
+    public void setCurrency(String currency) {
+        Currency = currency;
+    }
 
-	public void setCurrency(String currency) {
-		this.currency = currency;
-	}
+    public String getDate() {
+        return Date;
+    }
 
-	public Date getCreateDateTime() {
-		return createDateTime;
-	}
+    public void setDate(String date) {
+        Date = date;
+    }
 
-	public void setCreateDateTime(Date createDateTime) {
-		this.createDateTime = createDateTime;
-	}
+    public String getTransactionDescription() {
+        return TransactionDescription;
+    }
 
-	public Date getDate() {
-		return date;
-	}
+    public void setTransactionDescription(String transactionDescription) {
+        TransactionDescription = transactionDescription;
+    }
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
+    public double getDebits() {
+        return Debits;
+    }
 
-	public String getTransactionDescription() {
-		return this.transactionDescription;
-	}
+    public void setDebits(double debits) {
+        Debits = debits;
+    }
 
-	public void setTransactionDescription(String transactionDescription) {
-		this.transactionDescription = transactionDescription;
-	}
+    public double getCredits() {
+        return Credits;
+    }
 
-	public double getDebits() {
-		return this.debits;
-	}
+    public void setCredits(double credits) {
+        Credits = credits;
+    }
 
-	public void setDebits(double debits) {
-		this.debits = debits;
-	}
+    public double getBalance() {
+        return Balance;
+    }
 
-	public double getCredits() {
-		return this.credits;
-	}
+    public void setBalance(double balance) {
+        Balance = balance;
+    }
 
-	public void setCredits(double credits) {
-		this.credits = credits;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public double getBalance() {
-		return this.balance;
-	}
 
-	public void setBalance(double balance) {
-		this.balance = balance;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	
-
-	public BankStmt() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public BankStmt(String id, Date createDateTime, String accountDescription, long accountNumber, String currency,
-			Date date, String transactionDescription, double debits, double credits, double balance) {
-		super();
-		this.id = id;
-		this.createDateTime = createDateTime;
-		this.accountDescription = accountDescription;
-		this.accountNumber = accountNumber;
-		this.currency = currency;
-		this.date = date;
-		this.transactionDescription = transactionDescription;
-		this.debits = debits;
-		this.credits = credits;
-		this.balance = balance;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	@Override
-	public String toString() {
-		return "BankStmt [id=" + id + ", createDateTime=" + createDateTime + ", accountDescription="
-				+ accountDescription + ", accountNumber=" + accountNumber + ", currency=" + currency + ", date=" + date
-				+ ", transactionDescription=" + transactionDescription + ", debits=" + debits + ", credits=" + credits
-				+ ", balance=" + balance + "]";
-	}
-
-	
-	
-	
 }

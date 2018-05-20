@@ -1,10 +1,11 @@
 package com.trunk.demo.controller;
 
-import com.trunk.demo.service.ResultService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
+import com.trunk.demo.service.mongo.ResultService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 // Use 2nd one for Local Testing. Do Not commit the 2nd active.
@@ -15,24 +16,13 @@ public class ResultController {
     @Autowired
     private ResultService resultService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/api/v1/results")
-    public String Results(@RequestParam String page, HttpSession session) {
-        try{
-            int pageIndex = Integer.parseInt(page);
-            return resultService.retrieveResults(session,pageIndex);
-        }catch (Exception e){
-            return "";
-        }
+    @RequestMapping("/api/v1/results")
+    public String Results() {
+        return resultService.retrieveResults();
     }
 
-//    @RequestMapping(method = RequestMethod.GET, value = "/api/v1/seedResults")
-//    public String Results(HttpSession session) {
-//        System.out.println("aaa");
-//        return "a";
-//    }
-    @RequestMapping(method = RequestMethod.GET,value="/api/v1/seedResults")
-    public String saveSeedData(HttpSession session) {
-        System.out.println("aa");
-        return resultService.saveSeedData(session);
+    @RequestMapping("/api/v1/seedResults")
+    public String saveSeedData() {
+        return resultService.saveSeedData();
     }
 }
