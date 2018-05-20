@@ -31,20 +31,6 @@ public class ReconcileResult {
 	@Field
 	private int percentage;
 
-	public ReconcileResult(String zone, String id, String userId, Date lastModified, Date startDate, Date endDate,
-			int isReconciled, int notReconciled, int percentage) {
-		super();
-		this.zone = zone;
-		this.id = id;
-		this.userId = userId;
-		this.lastModified = lastModified;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.isReconciled = isReconciled;
-		this.notReconciled = notReconciled;
-		this.percentage = percentage;
-	}
-
 	public ReconcileResult(String userId, Date startDate, Date endDate, int isReconciled, int notReconciled) {
 		this.userId = userId;
 		this.startDate = startDate;
@@ -117,4 +103,25 @@ public class ReconcileResult {
 		return id;
 	}
 
+	public ReconcileResult(String zone, String id, String userId, Date lastModified, Date startDate, Date endDate,
+			int isReconciled, int notReconciled, int percentage) {
+		super();
+		this.zone = zone;
+		this.id = id;
+		this.userId = userId;
+		this.lastModified = lastModified;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.isReconciled = isReconciled;
+		this.notReconciled = notReconciled;
+		this.percentage = percentage;
+	}
+
+	public ReconcileResult() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	
+	
 }
