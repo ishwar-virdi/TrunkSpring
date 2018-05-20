@@ -14,6 +14,8 @@ import com.trunk.demo.interfaces.mongo.BankStmtRepository;
 import com.trunk.demo.interfaces.mongo.SettlementRepository;
 import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.model.mongo.SettlementStmt;
+import com.trunk.demo.service.ReconcileFiles;
+import com.trunk.demo.service.ReconcileFilesImpl;
 import com.trunk.demo.service.s3.S3Service;
 
 @EnableMongoRepositories(basePackages = "com.trunk.demo.interfaces")
@@ -50,6 +52,9 @@ public class UploadManagerImpl implements UploadManager {
 		} catch (IOException e) {
 			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
 		}
+    ReconcileFiles reconcile = new ReconcileFilesImpl();
+		
+		reconcile.reconcile();
 	}
 
 	private String uploadSettlementCSV(BufferedReader br) {

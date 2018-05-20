@@ -28,15 +28,11 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 
 	@Override
 	public void reconcile() {
-		List<BankStmt> bankStatement;
-
 		// Grabs the records it wants to work with from MongoDB
-		bankStatement = bankStmtRepo.findAll();
-
 		List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex();
 		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercard();
-		// List<SettlementStmt> directDebitTransactions =
-		// settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
+		List<SettlementStmt> directDebitTransactions = settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
+		List<BankStmt> bankStatement = bankStmtRepo.findAll();
 
 		// Work out transaction totals for different card types for each day
 		Map<Date, Double> amexTotals = addUpSameDayTransactions(amexTransactions);
@@ -45,14 +41,39 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		// Reconciles the items
 		List<Date> reconciledAmex = reconcileItems(amexTotals, bankStatement);
 		List<Date> reconciledVisaMastercard = reconcileItems(visaMastercardTotals, bankStatement);
+		List<Date> reconciledDirectDebit = reconcileDirectDebitItems(directDebitTransactions, bankStatement);
 
 		List<SettlementStmt> finalAmex = matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
 		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
 				visaMastercardTransactions);
-
+		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit, directDebitTransactions);
+		
 		// Save the results to the db
 		settlementStmtRepo.saveAll(finalAmex);
 		settlementStmtRepo.saveAll(finalVisaMastercard);
+		settlementStmtRepo.saveAll(finalDirectDebit);
+	}
+
+	private List<Date> reconcileDirectDebitItems(List<SettlementStmt> directDebitTransactions,
+			List<BankStmt> bankStatement) {
+		List<Date> response = new ArrayList<Date>();
+
+		for (SettlementStmt eachDirectDebit : directDebitTransactions)
+			for (BankStmt eachStmt : bankStatement) {
+				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate())) {
+					System.out.println("MATCH");
+					System.out.println(eachDirectDebit.getBankReference().replaceAll("\\s+",""));
+					System.out.println(eachStmt.getTransactionDescription().replaceAll("\\s+",""));
+					System.out.println(eachStmt.getCredits());
+					System.out.println(eachDirectDebit.getPrincipalAmount());
+				}
+				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate()) && eachStmt.getCredits() == eachDirectDebit.getPrincipalAmount()
+						&& eachStmt.getTransactionDescription().replaceAll("\\s+","").contains(eachDirectDebit.getBankReference().replaceAll("\\s+",""))) {
+					response.add(eachStmt.getDate());
+					break;
+				}
+			}
+		return response;
 	}
 
 	private List<SettlementStmt> matchReconciledWithSettlementItems(List<Date> reconciledDatesList,
