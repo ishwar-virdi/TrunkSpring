@@ -75,7 +75,7 @@ public class UploadManagerImpl implements UploadManager {
 							Double.parseDouble(elements[10].isEmpty() ? "0" : elements[10]),
 							Double.parseDouble(elements[11].isEmpty() ? "0" : elements[11]), elements[13], elements[16],
 							elements[24], Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]), elements[26],
-							elements[27], elements[29], elements[30]);
+							elements[27], elements[29], elements[30], "");
 					settlementStmtRepo.insert(newStmt);
 				}
 			}
