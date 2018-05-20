@@ -1,76 +1,100 @@
 package com.trunk.demo.service.mongo;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.trunk.demo.Util.BCryptText;
+import com.trunk.demo.model.mongo.User;
+import com.trunk.demo.repository.TokenRepository;
+import com.trunk.demo.repository.UsersRepository;
+import com.trunk.demo.vo.LoginModelVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Service;
 
-import com.trunk.demo.interfaces.mongo.UsersRepository;
-import com.trunk.demo.model.LoginDetails;
-import com.trunk.demo.model.mongo.User;
+import javax.servlet.http.HttpSession;
+import java.util.List;
 
-@EnableMongoRepositories(basePackages = "com.trunk.demo.interfaces")
-@Service
-public class UserManagerImpl implements UserManager{
+@Service("userServiceImpl")
+public class UserManagerImpl implements UserManager {
 
-	@Autowired
-	private UsersRepository usersRepo;
+    @Autowired
+    private TokenRepository tokenRepository;
+    @Autowired
+    private UsersRepository usersRepository;
+    @Autowired
+    private BCryptText bCryptText;
 
-	public String loginValidator(LoginDetails details) {
+    @Override
+    public String register(LoginModelVO loginModelVO, HttpSession session) {
+        JsonObject json = new JsonObject();
+        List<User> users = usersRepository.findByUsername(loginModelVO.getUsername());
 
-		JSONObject response = new JSONObject();
-		boolean isResultBad = false;
-		List<User> searchList = new ArrayList<>(); 
+        Object sessionToken = tokenRepository.getToken();
+        if (sessionToken == null
+                || !loginModelVO.getToken().equals(sessionToken.toString())) {
+            tokenRepository.destoryToken();
+            json.addProperty("result", "expired");
+            return json.toString();
+        }
+        if (users.size() != 0) {
+            json.addProperty("result", "fail");
+            return json.toString();
+        }
+        String cipherText = bCryptText.getCipherText(loginModelVO.getPassword());
+        User user = new User(loginModelVO.getUsername(),cipherText);
+        usersRepository.save(user);
+        json.addProperty("result", "success");
 
-		searchList.addAll(usersRepo.findByUsername(details.getUsername()));
+        return json.toString();
+    }
 
-		if (searchList.size() != 0) {
-			if (!searchList.get(0).getPassword().equals(details.getPassword()))
-				isResultBad = true;
-		} else
-			isResultBad = true;
+    @Override
+    public String loginValidator(LoginModelVO loginModelVO, HttpSession session) {
+        JsonObject json = new JsonObject();
+        Object sessionToken = tokenRepository.getToken();
+        if (sessionToken == null
+                || !loginModelVO.getToken().equals(sessionToken.toString())) {
+            tokenRepository.destoryToken();
+            json.addProperty("result", "expired");
+            return json.toString();
+        }
+        List<User> users = usersRepository.findByUsername(loginModelVO.getUsername());
+        if (users.size() > 0
+                &&bCryptText.isEquals(loginModelVO.getPassword(),users.get(0).getPassword())){
+            session.setAttribute(session.getId(),users.get(0).getId());
+            json.addProperty("result", "success");
+            return json.toString();
+        }
+        json.addProperty("result", "fail");
 
-		try {
-			if (isResultBad)
-				response.put("result", "fail");
-			else
-				response.put("result", "success");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return response.toString();
-	}
+        return json.toString();
+    }
 
-	public String register(String username, String password) {
+    @Override
+    public String userIsLogin(HttpSession session) {
+        JsonObject json = new JsonObject();
+        Object user = session.getAttribute(session.getId());
+        if(user != null){
+            session.setAttribute(session.getId(),user.toString());
+            json.addProperty("result", true);
+        }else{
+            json.addProperty("result", false);
+        }
+        return json.toString();
+    }
 
-		JSONObject response = new JSONObject();
-		boolean isResultBad = false;
-		List<User> searchList = new ArrayList<>(); 
-		
-		
-		searchList.addAll(usersRepo.findByUsername(username));
+    @Override
+    public String logOut(HttpSession session) {
+        JsonObject json = new JsonObject();
 
-		if (searchList.size() != 0)
-			isResultBad = true;
-		else {
-			User newUser = new User(username, password);
-			usersRepo.insert(newUser);
-		}
-		try {
-			if (isResultBad)
-				response.put("result", "fail");
-			else
-				response.put("result", "success");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return response.toString();
-	}
+        session.removeAttribute(session.getId());
+        if(session.getAttribute(session.getId()) == null){
+            json.addProperty("result", true);
+        }else{
+            json.addProperty("result", false);
+        }
+
+        return json.toString();
+    }
+
 
 }

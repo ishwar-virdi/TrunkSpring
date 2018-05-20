@@ -33,7 +33,6 @@ public class UploadManagerImpl implements UploadManager {
 			uploadSettlementCSV(br);
 		else
 			System.out.println("Invalid Type");
-
 	}
 
 	private void uploadSettlementCSV(BufferedReader br) {
