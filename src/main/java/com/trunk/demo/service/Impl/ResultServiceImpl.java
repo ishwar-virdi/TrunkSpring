@@ -37,7 +37,7 @@ public class ResultServiceImpl implements ResultService {
         ListReconcileResultVO resultsVO;
 
         if(userSession == null){
-            return gson.toJson("");
+            return gson.toJson("UserSession is Null");
         }
 
         Pageable page = PageRequest.of(pageIndex,13,new Sort(Sort.Direction.DESC,"reconcileDate"));
