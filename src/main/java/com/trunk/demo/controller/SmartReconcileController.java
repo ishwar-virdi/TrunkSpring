@@ -47,4 +47,9 @@ public class SmartReconcileController {
 		return receiptManager.getReceipt(id);
 	}
 
+	@RequestMapping(path = "/manualReconcile/{id}", method = RequestMethod.PUT)
+	public String markAsReconciled(@PathVariable("id") String id) {
+		return receiptManager.markAsReconciled(id);
+	}
+	
 }

@@ -1,6 +1,7 @@
 package com.trunk.demo.service.mongo;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -68,6 +69,34 @@ public class ReceiptManagerImpl implements ReceiptManager {
 			result.put("Surcharge", stmtFound.getSurcharge());
 			result.put("Currency", stmtFound.getCurrency());
 
+			result.put("result", "success");
+			result.put("reason", "");
+			
+			return result.toString();
+		} catch (NoSuchElementException e) {
+			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+		} catch (JSONException e) {
+			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+		}
+	}
+
+	@Override
+	public String markAsReconciled(String id) {
+		Optional<SettlementStmt> stmt = settlementStmtRepo.findByReceiptNumber(Long.parseLong(id));
+		try {
+			SettlementStmt stmtFound = stmt.get();
+			JSONObject result = new JSONObject();
+
+			stmtFound.setReconcileStatus(2);
+			stmtFound.setReconciledDateTime(new Date());
+
+			settlementStmtRepo.save(stmtFound);
+
+			result.put("result", "success");
+			result.put("reason", "Receipt has been Manually marked as Reconciled");
+			result.put("ReconcileStatus", "Manually Reconciled");
+			result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
+			
 			return result.toString();
 		} catch (NoSuchElementException e) {
 			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";

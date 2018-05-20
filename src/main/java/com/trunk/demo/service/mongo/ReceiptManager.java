@@ -7,4 +7,6 @@ public interface ReceiptManager {
 
 	public String getReceipt(String id);
 
+	public String markAsReconciled(String id);
+
 }
