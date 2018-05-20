@@ -67,7 +67,8 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 					System.out.println(eachStmt.getCredits());
 					System.out.println(eachDirectDebit.getPrincipalAmount());
 				}
-				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate()) && eachStmt.getCredits() == eachDirectDebit.getPrincipalAmount() && eachStmt.getTransactionDescription().replaceAll("\\s+","").contains(eachDirectDebit.getBankReference().replaceAll("\\s+",""))) {
+				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate()) && eachStmt.getCredits() == eachDirectDebit.getPrincipalAmount()
+						&& eachStmt.getTransactionDescription().replaceAll("\\s+","").contains(eachDirectDebit.getBankReference().replaceAll("\\s+",""))) {
 					response.add(eachStmt.getDate());
 					break;
 				}
