@@ -33,6 +33,7 @@ public class ReconcileResult {
 
 	public ReconcileResult(String userId, Date startDate, Date endDate, int isReconciled, int notReconciled) {
 		this.userId = userId;
+		this.lastModified = new Date();
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.isReconciled = isReconciled;
