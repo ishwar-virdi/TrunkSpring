@@ -72,13 +72,9 @@ public class ReceiptManagerImpl implements ReceiptManager {
 
 			return result.toString();
 		} catch (NoSuchElementException e) {
-			e.printStackTrace();
-			System.out.println("ERROR : Recipt Not Found");
-			return "ERROR : Recipt Not Found";
+			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
 		} catch (JSONException e) {
-			e.printStackTrace();
-			System.out.println("ERROR : JSON Error");
-			return "ERROR : JSON Error";
+			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
 		}
 	}
 

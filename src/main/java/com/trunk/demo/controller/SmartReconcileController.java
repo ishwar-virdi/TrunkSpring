@@ -58,9 +58,9 @@ public class SmartReconcileController {
 	}
 
 	@RequestMapping(path = "/{type}/upload", method = RequestMethod.POST)
-	public void uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file)
+	public String uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file)
 			throws IOException {
-		uploadManager.newUploadFile(type, file.getInputStream());
+		return uploadManager.newUploadFile(type, file.getOriginalFilename(), file.getInputStream());
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, path = "/api/reconcile")
