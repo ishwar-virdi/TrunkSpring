@@ -17,7 +17,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 @Service
 public class S3RepositoryImpl implements S3Repository {
 
-	@Autowired
+	/*@Autowired
 	private static AmazonS3 s3Client;
 
 	@Value("${jsa.aws.access_key_id}")
@@ -46,6 +46,6 @@ public class S3RepositoryImpl implements S3Repository {
 		} catch (Exception e) {
 			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
 		}
-	}
+	}*/
 
 }

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface S3Service {
 
-	public String newUploadFile(String type, String originalFilename, InputStream inputStream);
+	//public String newUploadFile(String type, String originalFilename, InputStream inputStream);
 	
 }

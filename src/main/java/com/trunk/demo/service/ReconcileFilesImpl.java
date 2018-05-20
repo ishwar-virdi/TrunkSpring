@@ -13,18 +13,24 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.stereotype.Service;
 
 import com.trunk.demo.interfaces.mongo.BankStmtRepository;
+import com.trunk.demo.interfaces.mongo.ReconcileResultsRepository;
 import com.trunk.demo.interfaces.mongo.SettlementRepository;
 import com.trunk.demo.model.mongo.BankStmt;
+import com.trunk.demo.model.mongo.ReconcileResult;
 import com.trunk.demo.model.mongo.SettlementStmt;
 
 @EnableMongoRepositories(basePackages = "com.trunk.demo.interfaces")
 @Service
 public class ReconcileFilesImpl implements ReconcileFiles {
+	private int reconciledCount = 0;
+	private int transactionCount = 0;
 
 	@Autowired
 	private BankStmtRepository bankStmtRepo;
 	@Autowired
 	private SettlementRepository settlementStmtRepo;
+	@Autowired
+	private ReconcileResultsRepository reconcileResultsRepo;
 
 	@Override
 	public void reconcile() {
@@ -33,6 +39,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercard();
 		List<SettlementStmt> directDebitTransactions = settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
 		List<BankStmt> bankStatement = bankStmtRepo.findAll();
+		this.transactionCount = amexTransactions.size() + visaMastercardTransactions.size() + directDebitTransactions.size();
 
 		// Work out transaction totals for different card types for each day
 		Map<Date, Double> amexTotals = addUpSameDayTransactions(amexTransactions);
@@ -44,14 +51,93 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		List<Date> reconciledDirectDebit = reconcileDirectDebitItems(directDebitTransactions, bankStatement);
 
 		List<SettlementStmt> finalAmex = matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
-		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
-				visaMastercardTransactions);
+		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard, visaMastercardTransactions);
 		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit, directDebitTransactions);
+		
+		//Create the reconcile results object
+		ReconcileResult result = new ReconcileResult("", findEarliestDate(amexTransactions, visaMastercardTransactions, directDebitTransactions), findLatestDate(amexTransactions, visaMastercardTransactions, directDebitTransactions), 
+				this.reconciledCount, this.transactionCount - this.reconciledCount);
+		
+		//Get the id from the reconcile results object
+		String reconcileResultsId = result.getId();
+		
+		//Set each transaction item here with that reconcile result's object ID
+		setReconcileResultsId(finalAmex, reconcileResultsId);
+		setReconcileResultsId(finalVisaMastercard, reconcileResultsId);
+		setReconcileResultsId(finalDirectDebit, reconcileResultsId);
 		
 		// Save the results to the db
 		settlementStmtRepo.saveAll(finalAmex);
 		settlementStmtRepo.saveAll(finalVisaMastercard);
 		settlementStmtRepo.saveAll(finalDirectDebit);
+
+		reconcileResultsRepo.save(result);
+	}
+	
+	private void setReconcileResultsId(List<SettlementStmt> list, String id) {
+		for (SettlementStmt item : list) {
+			item.setReconcileResultsId(id);
+		}
+	}
+	
+	private Date findEarliestDate(List<SettlementStmt> amexTransactions, List<SettlementStmt> visaMastercardTransactions, List<SettlementStmt> directDebitTransactions) {
+		Date earliestDate;
+		
+		if (amexTransactions.size() != 0)
+			earliestDate = amexTransactions.get(0).getSettlementDate();
+		else if (visaMastercardTransactions.size() != 0)
+			earliestDate = visaMastercardTransactions.get(0).getSettlementDate();
+		else if (directDebitTransactions.size() != 0)
+			earliestDate = directDebitTransactions.get(0).getSettlementDate();
+		else 
+			return null;
+		
+		for (SettlementStmt item : amexTransactions) {
+			if (item.getSettlementDate().before(earliestDate))
+				earliestDate = item.getSettlementDate();
+		}
+		
+		for (SettlementStmt item : visaMastercardTransactions) {
+			if (item.getSettlementDate().before(earliestDate))
+				earliestDate = item.getSettlementDate();
+		}
+		
+		for (SettlementStmt item : directDebitTransactions) {
+			if (item.getSettlementDate().before(earliestDate))
+				earliestDate = item.getSettlementDate();
+		}
+		
+		return earliestDate;
+	}
+	
+	private Date findLatestDate(List<SettlementStmt> amexTransactions, List<SettlementStmt> visaMastercardTransactions, List<SettlementStmt> directDebitTransactions) {
+		Date earliestDate;
+		
+		if (amexTransactions.size() != 0)
+			earliestDate = amexTransactions.get(0).getSettlementDate();
+		else if (visaMastercardTransactions.size() != 0)
+			earliestDate = visaMastercardTransactions.get(0).getSettlementDate();
+		else if (directDebitTransactions.size() != 0)
+			earliestDate = directDebitTransactions.get(0).getSettlementDate();
+		else 
+			return null;
+		
+		for (SettlementStmt item : amexTransactions) {
+			if (item.getSettlementDate().after(earliestDate))
+				earliestDate = item.getSettlementDate();
+		}
+		
+		for (SettlementStmt item : visaMastercardTransactions) {
+			if (item.getSettlementDate().after(earliestDate))
+				earliestDate = item.getSettlementDate();
+		}
+		
+		for (SettlementStmt item : directDebitTransactions) {
+			if (item.getSettlementDate().after(earliestDate))
+				earliestDate = item.getSettlementDate();
+		}
+		
+		return earliestDate;
 	}
 
 	private List<Date> reconcileDirectDebitItems(List<SettlementStmt> directDebitTransactions,
@@ -60,16 +146,10 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 
 		for (SettlementStmt eachDirectDebit : directDebitTransactions)
 			for (BankStmt eachStmt : bankStatement) {
-				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate())) {
-					System.out.println("MATCH");
-					System.out.println(eachDirectDebit.getBankReference().replaceAll("\\s+",""));
-					System.out.println(eachStmt.getTransactionDescription().replaceAll("\\s+",""));
-					System.out.println(eachStmt.getCredits());
-					System.out.println(eachDirectDebit.getPrincipalAmount());
-				}
 				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate()) && eachStmt.getCredits() == eachDirectDebit.getPrincipalAmount()
 						&& eachStmt.getTransactionDescription().replaceAll("\\s+","").contains(eachDirectDebit.getBankReference().replaceAll("\\s+",""))) {
 					response.add(eachStmt.getDate());
+					this.reconciledCount++;
 					break;
 				}
 			}

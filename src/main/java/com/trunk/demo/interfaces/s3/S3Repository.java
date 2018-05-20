@@ -5,5 +5,5 @@ import java.io.InputStream;
 
 public interface S3Repository {
 
-	public String newUploadFile(String type, String originalFilename, InputStream inputStream);
+	//public String newUploadFile(String type, String originalFilename, InputStream inputStream);
 }

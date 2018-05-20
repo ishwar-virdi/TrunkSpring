@@ -13,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.text.ParseException;
 import java.util.List;
 
 @Service("resultServiceImpl")

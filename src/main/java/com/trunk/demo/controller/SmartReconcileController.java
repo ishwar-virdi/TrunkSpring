@@ -14,22 +14,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.trunk.demo.model.LoginDetails;
 import com.trunk.demo.model.MatchFiles;
 import com.trunk.demo.service.FileMatcher;
 import com.trunk.demo.service.ReconcileFiles;
 import com.trunk.demo.service.mongo.ReceiptManager;
 import com.trunk.demo.service.mongo.UploadManager;
-import com.trunk.demo.service.mongo.UserManager;
 
 @RestController
 // Use 2nd one for Local Testing. Do Not commit the 2nd active.
-@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
-//@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
+@CrossOrigin(origins = "http://localhost:3000")
 public class SmartReconcileController {
 
-	@Autowired
-	private UserManager userManager;
+//	@Autowired
+//	private UserManager userManager;
 	@Autowired
 	private UploadManager uploadManager;
 	@Autowired
