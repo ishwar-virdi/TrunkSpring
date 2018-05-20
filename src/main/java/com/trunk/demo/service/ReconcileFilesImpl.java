@@ -22,8 +22,8 @@ import com.trunk.demo.repository.UsersRepository;
 
 @Service
 public class ReconcileFilesImpl implements ReconcileFiles {
-	private int reconciledCount = 0;
-	private int transactionCount = 0;
+	private int reconciledCount;
+	private int transactionCount;
 	
 	@Autowired
 	private BankStmtRepository bankStmtRepo;
@@ -39,6 +39,10 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 
 	@Override
 	public void reconcile() {
+		
+		reconciledCount = 0;
+		transactionCount = 0;
+		
 		// Grabs the records it wants to work with from MongoDB
 		List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex();
 		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercard();
