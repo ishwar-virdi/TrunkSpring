@@ -20,7 +20,7 @@ public class ResultController {
             int pageIndex = Integer.parseInt(page);
             return resultService.retrieveResults(session,pageIndex);
         }catch (Exception e){
-            return "";
+            return e.getMessage();
         }
     }
 
