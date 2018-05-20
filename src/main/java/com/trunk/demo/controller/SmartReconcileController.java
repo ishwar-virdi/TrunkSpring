@@ -18,7 +18,6 @@ import com.trunk.demo.model.LoginDetails;
 import com.trunk.demo.model.MatchFiles;
 import com.trunk.demo.service.FileMatcher;
 import com.trunk.demo.service.ReconcileFiles;
-import com.trunk.demo.service.TokenGenerator;
 import com.trunk.demo.service.mongo.ReceiptManager;
 import com.trunk.demo.service.mongo.UploadManager;
 import com.trunk.demo.service.mongo.UserManager;
@@ -38,20 +37,20 @@ public class SmartReconcileController {
 	@Autowired
 	private ReceiptManager receiptManager;
 
-	@RequestMapping("/api/token")
-	public String tokenCreator() {
-		return TokenGenerator.generateUUID();
-	}
+//	@RequestMapping("/api/token")
+//	public String tokenCreator() {
+//		return TokenGenerator.generateUUID();
+//	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/api/register")
-	public String registerUser(@RequestBody LoginDetails ld) {
-		return userManager.register(ld.getUsername(), ld.getPassword());
-	}
+//	@RequestMapping(method = RequestMethod.POST, value = "/api/register")
+//	public String registerUser(@RequestBody LoginDetails ld) {
+//		return userManager.register(ld.getUsername(), ld.getPassword());
+//	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/api/login")
-	public String loginChecker(@RequestBody LoginDetails ld) {
-		return userManager.loginValidator(ld);
-	}
+//	@RequestMapping(method = RequestMethod.POST, value = "/api/login")
+//	public String loginChecker(@RequestBody LoginDetails ld) {
+//		return userManager.loginValidator(ld);
+//	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/matchFile")
 	public JSONObject matchFile(@RequestBody MatchFiles mf) {
@@ -59,9 +58,9 @@ public class SmartReconcileController {
 	}
 
 	@RequestMapping(path = "/{type}/upload", method = RequestMethod.POST)
-	public void uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file)
+	public String uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file)
 			throws IOException {
-		uploadManager.newUploadFile(type, file.getInputStream());
+		return uploadManager.newUploadFile(type, file.getOriginalFilename(), file.getInputStream());
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, path = "/api/reconcile")
