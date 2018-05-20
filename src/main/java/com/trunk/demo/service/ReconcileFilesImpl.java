@@ -89,6 +89,10 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 					break;
 				}
 			}
+			if (eachStmt.getReconcileStatus() != 3) {
+				eachStmt.setReconcileStatus(2);
+				eachStmt.setReconciledDateTime(new Date());
+			}
 			modifiedSettlementStmtList.add(eachStmt);
 		}
 
