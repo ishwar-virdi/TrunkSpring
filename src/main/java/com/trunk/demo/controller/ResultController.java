@@ -4,12 +4,11 @@ import com.trunk.demo.service.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+
 import javax.servlet.http.HttpSession;
 
 @RestController
-// Use 2nd one for Local Testing. Do Not commit the 2nd active.
-@CrossOrigin(origins = "http://localhost:3000")
-//@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
 public class ResultController {
 
     @Autowired
@@ -25,13 +24,8 @@ public class ResultController {
         }
     }
 
-//    @RequestMapping(method = RequestMethod.GET, value = "/api/v1/seedResults")
-//    public String Results(HttpSession session) {
-//        System.out.println("aaa");
-//        return "a";
-//    }
     @RequestMapping(method = RequestMethod.GET,value="/api/v1/seedResults")
-    public String saveSeedData(HttpSession session) {
+    public String saveSeedData(HttpSession session) throws ParseException {
         System.out.println("aa");
         return resultService.saveSeedData(session);
     }

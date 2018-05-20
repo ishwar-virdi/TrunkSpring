@@ -7,26 +7,29 @@ import java.io.InputStreamReader;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Service;
 
-import com.trunk.demo.interfaces.mongo.BankStmtRepository;
-import com.trunk.demo.interfaces.mongo.SettlementRepository;
 import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.model.mongo.SettlementStmt;
+import com.trunk.demo.repository.BankStmtRepository;
+import com.trunk.demo.repository.SettlementRepository;
 import com.trunk.demo.service.ReconcileFiles;
-import com.trunk.demo.service.ReconcileFilesImpl;
 import com.trunk.demo.service.s3.S3Service;
 
-@EnableMongoRepositories(basePackages = "com.trunk.demo.interfaces")
+
 @Service
 public class UploadManagerImpl implements UploadManager {
 
 	@Autowired
 	private S3Service s3Service;
 
+
+	@Autowired
+	private ReconcileFiles reconcileService;
+
 	@Autowired
 	private BankStmtRepository bankStmtRepo;
+	
 	@Autowired
 	private SettlementRepository settlementStmtRepo;
 
@@ -35,26 +38,26 @@ public class UploadManagerImpl implements UploadManager {
 		InputStream streamForMongo;
 		try {
 			streamForMongo = IOUtils.toBufferedInputStream(inputStream);
-
+			String result = new String();
 			String s3Reponse = s3Service.newUploadFile(type, fileName, inputStream);
 
 			if (s3Reponse.equalsIgnoreCase("SUCCESS")) {
 				BufferedReader br = new BufferedReader(new InputStreamReader(streamForMongo));
 				if (type.equalsIgnoreCase("Bank"))
-					return uploadBankCSV(br);
+					result = uploadBankCSV(br);
 				else if (type.equalsIgnoreCase("Settlement"))
-					return uploadSettlementCSV(br);
+					result = uploadSettlementCSV(br);
 				else
 					return "{\"result\":\"fail\",\"reason\":\"Invalid File Type\"}";
 			} else {
 				return s3Reponse;
 			}
+
+			reconcileService.reconcile();
+			return result;
 		} catch (IOException e) {
 			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
 		}
-    ReconcileFiles reconcile = new ReconcileFilesImpl();
-		
-		reconcile.reconcile();
 	}
 
 	private String uploadSettlementCSV(BufferedReader br) {

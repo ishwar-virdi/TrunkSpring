@@ -14,7 +14,7 @@ public class SettlementStmt {
 	@Id
 	private String id;
 	
-	@Indexed
+	@Indexed(unique = true)
 	private Long receiptNumber;
 	
 	private String merchantID;

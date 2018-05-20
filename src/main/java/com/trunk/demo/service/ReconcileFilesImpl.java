@@ -9,20 +9,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Service;
 
-import com.trunk.demo.interfaces.mongo.BankStmtRepository;
-import com.trunk.demo.interfaces.mongo.SettlementRepository;
 import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.model.mongo.SettlementStmt;
+import com.trunk.demo.repository.BankStmtRepository;
+import com.trunk.demo.repository.SettlementRepository;
 
-@EnableMongoRepositories(basePackages = "com.trunk.demo.interfaces")
 @Service
 public class ReconcileFilesImpl implements ReconcileFiles {
 
 	@Autowired
 	private BankStmtRepository bankStmtRepo;
+	
 	@Autowired
 	private SettlementRepository settlementStmtRepo;
 

@@ -1,4 +1,4 @@
-package com.trunk.demo.interfaces.mongo;
+package com.trunk.demo.repository;
 
 import java.util.List;
 import java.util.Optional;
