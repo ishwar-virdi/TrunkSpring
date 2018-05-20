@@ -26,5 +26,7 @@ public interface SettlementRepository extends MongoRepository<SettlementStmt, Lo
 
 	@Query("{ 'receiptNumber' : ?0 }")
 	Optional<SettlementStmt> findByReceiptNumber(Long receiptNumber);
+	
+	List<SettlementStmt> findAllByReconcileResultsId(String id);
 
 }
