@@ -50,7 +50,6 @@ public class UploadManagerImpl implements UploadManager {
 		} catch (IOException e) {
 			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
 		}
-
 	}
 
 	private String uploadSettlementCSV(BufferedReader br) {
