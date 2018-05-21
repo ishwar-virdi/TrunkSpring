@@ -1,12 +1,10 @@
 package com.trunk.demo.model.mongo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -34,35 +32,19 @@ public class ReconcileResult {
 	@Field
 	private int percentage;
 
-
-	public ReconcileResult(String userId, String lastModified, String startDate, String endDate, int isReconciled,
-			int notReconciled) throws ParseException {
-		super();
-		this.userId = userId;
-
-		this.lastModified = new SimpleDateFormat("yyyyMMdd HH:mm").parse(lastModified);
-
-		this.startDate = new SimpleDateFormat("yyyyMMdd").parse(startDate);
-		this.endDate = new SimpleDateFormat("yyyyMMdd").parse(endDate);
-
-		this.isReconciled = isReconciled;
-		this.notReconciled = notReconciled;
-		double isRecon = isReconciled;
-		double notRecon = notReconciled;
-		this.percentage = (int)((isRecon / (isRecon + notRecon) ) * 100);
-	}
-
-	@PersistenceConstructor
 	public ReconcileResult(String userId, Date startDate, Date endDate, int isReconciled, int notReconciled) {
+		super();
+		this.id = UUID.randomUUID().toString();
 		this.userId = userId;
 		this.lastModified = new Date();
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.isReconciled = isReconciled;
 		this.notReconciled = notReconciled;
-		double isRecon = isReconciled;
-		double notRecon = notReconciled;
-		this.percentage = (int)((isRecon / (isRecon + notRecon) ) * 100);
+		if (isReconciled + notReconciled > 0)
+			this.percentage = (int)((isReconciled / (double) (isReconciled + notReconciled) ) * 100);
+		else
+			this.percentage = 0;
 	}
 
 	public int getPercentage() {
@@ -125,4 +107,25 @@ public class ReconcileResult {
 		return id;
 	}
 
+	public ReconcileResult(String zone, String id, String userId, Date lastModified, Date startDate, Date endDate,
+			int isReconciled, int notReconciled, int percentage) {
+		super();
+		this.zone = zone;
+		this.id = id;
+		this.userId = userId;
+		this.lastModified = lastModified;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.isReconciled = isReconciled;
+		this.notReconciled = notReconciled;
+		this.percentage = percentage;
+	}
+
+	public ReconcileResult() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	
+	
 }

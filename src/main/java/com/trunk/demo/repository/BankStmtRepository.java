@@ -1,4 +1,4 @@
-package com.trunk.demo.interfaces.mongo;
+package com.trunk.demo.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 
 @RestController
-// Use 2nd one for Local Testing. Do Not commit the 2nd active.
-@CrossOrigin(origins = "http://localhost:3000")
-//@CrossOrigin(origins = "https://trunksmartreconcilereact.herokuapp.com")
 public class SearchController {
 
     @Autowired

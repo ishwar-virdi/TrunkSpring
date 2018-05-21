@@ -39,8 +39,7 @@ public class Interceptor implements HandlerInterceptor {
     public void postHandle(HttpServletRequest request, HttpServletResponse response,
                            Object object, ModelAndView model)
             throws Exception {
-//        System.out.println("In postHandle request processing "
-//                + "completed by @RestController");
+//        System.out.println("In postHandle request processing " + "completed by @RestController");
     }
 
     @Override

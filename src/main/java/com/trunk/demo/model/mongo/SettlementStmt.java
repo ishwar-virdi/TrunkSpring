@@ -32,11 +32,12 @@ public class SettlementStmt {
 	private String status;
 	private int reconcileStatus;
 	private Date reconciledDateTime;
+	private String reconcileResultsId;
 
 	public SettlementStmt(String merchantID, String cardPAN, String cardExpiry, String bankReference,
 			double principalAmount, double surcharge, String currency, String customerName, String responseText,
 			long receiptNumber, String settlementDate, String cardSchemeName, String transactionTimeStamp,
-			String status) throws ParseException {
+			String status, String reconcileResultsId) throws ParseException {
 		super();
 
 		this.merchantID = merchantID;
@@ -58,6 +59,7 @@ public class SettlementStmt {
 		this.reconcileStatus = 0;
 
 		this.reconciledDateTime = new SimpleDateFormat("dd-MM-yyyy").parse("01-01-1990");
+		this.reconcileResultsId = reconcileResultsId;
 	}
 
 	public Long getReceiptNumber() {
@@ -191,7 +193,7 @@ public class SettlementStmt {
 	public SettlementStmt(String id, Long receiptNumber, String merchantID, String cardPAN, String cardExpiry,
 			String bankReference, double principalAmount, double surcharge, String currency, String customerName,
 			String responseText, Date settlementDate, String cardSchemeName, Date transactionTimeStamp, String status,
-			int reconcileStatus, Date reconciledDateTime) {
+			int reconcileStatus, Date reconciledDateTime, String reconcileResultsId) {
 		super();
 		this.id = id;
 		this.receiptNumber = receiptNumber;
@@ -210,6 +212,7 @@ public class SettlementStmt {
 		this.status = status;
 		this.reconcileStatus = reconcileStatus;
 		this.reconciledDateTime = reconciledDateTime;
+		this.reconcileResultsId = reconcileResultsId;
 	}
 
 	public String getId() {
@@ -223,6 +226,14 @@ public class SettlementStmt {
 	public SettlementStmt() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+	
+	public String getReconcileResultsId() {
+		return this.reconcileResultsId;
+	}
+	
+	public void setReconcileResultsId(String reconcileResultsId) {
+		this.reconcileResultsId = reconcileResultsId;
 	}
 
 	@Override

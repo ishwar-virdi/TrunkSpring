@@ -1,4 +1,4 @@
-package com.trunk.demo.interfaces.mongo;
+package com.trunk.demo.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,5 +26,7 @@ public interface SettlementRepository extends MongoRepository<SettlementStmt, Lo
 
 	@Query("{ 'receiptNumber' : ?0 }")
 	Optional<SettlementStmt> findByReceiptNumber(Long receiptNumber);
+	
+	List<SettlementStmt> findAllByReconcileResultsId(String id);
 
 }
