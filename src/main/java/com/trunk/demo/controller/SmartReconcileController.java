@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.trunk.demo.service.ReconcileFiles;
 import com.trunk.demo.service.mongo.ReceiptManager;
+import com.trunk.demo.service.mongo.ResultDetailManager;
 import com.trunk.demo.service.mongo.UploadManager;
 
 @RestController
@@ -24,6 +25,8 @@ public class SmartReconcileController {
 	private ReconcileFiles reconcileFiles;
 	@Autowired
 	private ReceiptManager receiptManager;
+	@Autowired
+	private ResultDetailManager resultDetailManager;
 
 	@RequestMapping(path = "/{type}/upload", method = RequestMethod.POST)
 	public String uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file)
@@ -50,6 +53,11 @@ public class SmartReconcileController {
 	@RequestMapping(path = "/manualReconcile/{id}", method = RequestMethod.PUT)
 	public String markAsReconciled(@PathVariable("id") String id) {
 		return receiptManager.markAsReconciled(id);
+	}
+	
+	@RequestMapping(path = "/api/resultDetails/{id}", method = RequestMethod.GET)
+	public String getResultDetails(@PathVariable("id") String id) {
+		return resultDetailManager.getResultDetail(id);
 	}
 	
 }

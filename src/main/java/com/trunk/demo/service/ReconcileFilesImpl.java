@@ -39,7 +39,6 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 
 	@Override
 	public void reconcile() {
-		
 		reconciledCount = 0;
 		transactionCount = 0;
 		
@@ -48,7 +47,11 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercard();
 		List<SettlementStmt> directDebitTransactions = settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
 		List<BankStmt> bankStatement = bankStmtRepo.findAll();
-		this.transactionCount = amexTransactions.size() + visaMastercardTransactions.size() + directDebitTransactions.size();
+		
+		transactionCount = amexTransactions.size() + visaMastercardTransactions.size() + directDebitTransactions.size();
+		
+		if(transactionCount <= 0 || bankStatement.size() <= 0)
+			return;
 
 		// Work out transaction totals for different card types for each day
 		Map<Date, Double> amexTotals = addUpSameDayTransactions(amexTransactions);

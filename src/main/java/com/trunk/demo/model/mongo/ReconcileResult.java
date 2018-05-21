@@ -1,6 +1,7 @@
 package com.trunk.demo.model.mongo;
 
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
@@ -32,6 +33,8 @@ public class ReconcileResult {
 	private int percentage;
 
 	public ReconcileResult(String userId, Date startDate, Date endDate, int isReconciled, int notReconciled) {
+		super();
+		this.id = UUID.randomUUID().toString();
 		this.userId = userId;
 		this.lastModified = new Date();
 		this.startDate = startDate;
