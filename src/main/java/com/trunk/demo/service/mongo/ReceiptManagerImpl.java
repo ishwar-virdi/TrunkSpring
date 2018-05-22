@@ -2,10 +2,8 @@ package com.trunk.demo.service.mongo;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,12 +69,10 @@ public class ReceiptManagerImpl implements ReceiptManager {
 
 			result.put("result", "success");
 			result.put("reason", "");
-			
+
 			return result.toString();
-		} catch (NoSuchElementException e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
-		} catch (JSONException e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+		} catch (Exception e) {
+			return "{\"result\":\"fail\",\"reason\":\"" + e.getMessage() + "\"}";
 		}
 	}
 
@@ -96,12 +92,10 @@ public class ReceiptManagerImpl implements ReceiptManager {
 			result.put("reason", "Receipt has been Manually marked as Reconciled");
 			result.put("ReconcileStatus", "Manually Reconciled");
 			result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
-			
+
 			return result.toString();
-		} catch (NoSuchElementException e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
-		} catch (JSONException e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+		} catch (Exception e) {
+			return "{\"result\":\"fail\",\"reason\":\"" + e.getMessage() + "\"}";
 		}
 	}
 

@@ -56,7 +56,7 @@ public class UploadManagerImpl implements UploadManager {
 			reconcileService.reconcile();
 			return result;
 		} catch (IOException e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + "\"}";
 		}
 	}
 
@@ -82,7 +82,7 @@ public class UploadManagerImpl implements UploadManager {
 			br.close();
 			return "{\"result\":\"success\",\"reason\":\"Settlement File has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + ". File is Incorrect.\"}";
 		}
 	}
 
@@ -114,7 +114,7 @@ public class UploadManagerImpl implements UploadManager {
 			br.close();
 			return "{\"result\":\"success\",\"reason\":\"Bank Statement has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + ". File is Incorrect.\"}";
 		}
 	}
 
