@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.trunk.demo.model.mongo.BankStmt;
@@ -20,6 +21,7 @@ import com.trunk.demo.repository.ResultsRepository;
 import com.trunk.demo.repository.SettlementRepository;
 import com.trunk.demo.repository.UsersRepository;
 
+@Async
 @Service
 public class ReconcileFilesImpl implements ReconcileFiles {
 	private int reconciledCount;

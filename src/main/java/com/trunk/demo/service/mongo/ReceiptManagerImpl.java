@@ -91,6 +91,7 @@ public class ReceiptManagerImpl implements ReceiptManager {
 			result.put("result", "success");
 			result.put("reason", "Receipt has been Manually marked as Reconciled");
 			result.put("ReconcileStatus", "Manually Reconciled");
+
 			result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
 
 			return result.toString();
