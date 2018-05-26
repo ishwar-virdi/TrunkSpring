@@ -44,7 +44,7 @@ public class S3RepositoryImpl implements S3Repository {
 			s3Client.putObject(bucketName, fileLocation, inputStream, null);
 			return "SUCCESS";
 		} catch (Exception e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+			return "{\"result\":\"fail\",\"reason\":\"" + e.getMessage() + "\"}";
 		}
 	}
 

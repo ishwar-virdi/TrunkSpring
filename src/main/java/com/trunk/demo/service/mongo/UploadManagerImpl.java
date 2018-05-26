@@ -16,20 +16,18 @@ import com.trunk.demo.repository.SettlementRepository;
 import com.trunk.demo.service.ReconcileFiles;
 import com.trunk.demo.service.s3.S3Service;
 
-
 @Service
 public class UploadManagerImpl implements UploadManager {
 
 	@Autowired
 	private S3Service s3Service;
 
-
 	@Autowired
 	private ReconcileFiles reconcileService;
 
 	@Autowired
 	private BankStmtRepository bankStmtRepo;
-	
+
 	@Autowired
 	private SettlementRepository settlementStmtRepo;
 
@@ -52,11 +50,11 @@ public class UploadManagerImpl implements UploadManager {
 			} else {
 				return s3Reponse;
 			}
-
-			reconcileService.reconcile();
+			if (result.contains("success"))
+				reconcileService.reconcile();
 			return result;
 		} catch (IOException e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + "\"}";
 		}
 	}
 
@@ -82,7 +80,7 @@ public class UploadManagerImpl implements UploadManager {
 			br.close();
 			return "{\"result\":\"success\",\"reason\":\"Settlement File has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + ". File is Incorrect.\"}";
 		}
 	}
 
@@ -114,7 +112,7 @@ public class UploadManagerImpl implements UploadManager {
 			br.close();
 			return "{\"result\":\"success\",\"reason\":\"Bank Statement has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
-			return "{\"result\":\"fail\",\"reason\":" + e.getMessage() + "}";
+			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + ". File is Incorrect.\"}";
 		}
 	}
 
