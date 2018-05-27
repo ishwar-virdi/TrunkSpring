@@ -1,4 +1,4 @@
-package com.trunk.demo.service.mongo;
+package com.trunk.demo.service.Impl;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.trunk.demo.model.mongo.SettlementStmt;
 import com.trunk.demo.repository.SettlementRepository;
+import com.trunk.demo.service.mongo.ReceiptManager;
 
 @Service
 public class ReceiptManagerImpl implements ReceiptManager {
