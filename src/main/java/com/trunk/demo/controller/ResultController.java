@@ -26,7 +26,6 @@ public class ResultController {
 
     @RequestMapping(method = RequestMethod.GET,value="/api/v1/seedResults")
     public String saveSeedData(HttpSession session) throws ParseException {
-        System.out.println("aa");
         return resultService.saveSeedData(session);
     }
 }
