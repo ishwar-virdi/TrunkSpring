@@ -32,7 +32,7 @@ public class Interceptor implements HandlerInterceptor {
         if(session.getAttribute(session.getId()) != null){
             return true;
         }
-        return true;
+        return false;
     }
 
     @Override

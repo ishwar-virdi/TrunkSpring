@@ -2,6 +2,7 @@ package com.trunk.demo.controller;
 
 import java.io.IOException;
 
+import com.trunk.demo.service.mongo.DashboardManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.trunk.demo.service.mongo.DashboardManager;
 import com.trunk.demo.service.mongo.ReceiptManager;
 import com.trunk.demo.service.mongo.ResultDetailManager;
 import com.trunk.demo.service.mongo.UploadManager;
@@ -47,10 +47,32 @@ public class SmartReconcileController {
 	public String getResultDetails(@PathVariable("id") String id) {
 		return resultDetailManager.getResultDetail(id);
 	}
-	
+
 	@RequestMapping(path = "/api/getChartData", method = RequestMethod.GET)
 	public String getChartData() {
 		return dashboardManager.getReconcileData();
 	}
-	
+
+	@RequestMapping(path = "/api/v1/monthTotalAmount", method = RequestMethod.GET)
+	public String getMonthTotal(@RequestParam String page) {
+		int pageIndex;
+		try{
+			pageIndex = Integer.parseInt(page);
+		}catch (Exception e){
+			pageIndex = 0;
+		}
+		return dashboardManager.getMonthTotal(pageIndex);
+	}
+
+	@RequestMapping(path = "/api/v1/getDailyTransaction", method = RequestMethod.GET)
+	public String getDailyTransaction(@RequestParam String page) {
+		int pageIndex;
+		try{
+			pageIndex = Integer.parseInt(page);
+		}catch (Exception e){
+			pageIndex = 0;
+		}
+		return dashboardManager.getDailyTransaction(pageIndex);
+	}
+
 }

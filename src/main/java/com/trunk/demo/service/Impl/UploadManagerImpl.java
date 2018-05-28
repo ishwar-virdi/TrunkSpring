@@ -38,21 +38,21 @@ public class UploadManagerImpl implements UploadManager {
 		try {
 			streamForMongo = IOUtils.toBufferedInputStream(inputStream);
 			String result = new String();
-			String s3Reponse = s3Service.newUploadFile(type, fileName, inputStream);
-
-			if (s3Reponse.equalsIgnoreCase("SUCCESS")) {
+//			String s3Reponse = s3Service.newUploadFile(type, fileName, inputStream);
+//
+//			if (s3Reponse.equalsIgnoreCase("SUCCESS")) {
 				BufferedReader br = new BufferedReader(new InputStreamReader(streamForMongo));
-				if (type.equalsIgnoreCase("Bank"))
+//				if (type.equalsIgnoreCase("Bank"))
 					result = uploadBankCSV(br);
-				else if (type.equalsIgnoreCase("Settlement"))
-					result = uploadSettlementCSV(br);
-				else
-					return "{\"result\":\"fail\",\"reason\":\"Invalid File Type\"}";
-			} else {
-				return s3Reponse;
-			}
-			if (result.contains("success"))
-				reconcileService.reconcile();
+//				else if (type.equalsIgnoreCase("Settlement"))
+//					result = uploadSettlementCSV(br);
+//				else
+//					return "{\"result\":\"fail\",\"reason\":\"Invalid File Type\"}";
+//			} else {
+//				return s3Reponse;
+//			}
+//			if (result.contains("success"))
+//				reconcileService.reconcile();
 			return result;
 		} catch (IOException e) {
 			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + "\"}";
