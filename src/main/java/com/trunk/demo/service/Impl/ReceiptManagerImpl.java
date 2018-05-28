@@ -101,4 +101,28 @@ public class ReceiptManagerImpl implements ReceiptManager {
 		}
 	}
 
+	@Override
+	public String performBulkReconcile(boolean option, String[] allReciptNums) {
+
+		for (String eachId : allReciptNums) {
+			Optional<SettlementStmt> stmt = settlementStmtRepo.findByReceiptNumber(Long.parseLong(eachId));
+			try {
+				SettlementStmt stmtFound = stmt.get();
+
+				if (option) {
+					stmtFound.setReconcileStatus(2);
+					stmtFound.setReconciledDateTime(new Date());
+				} else {
+					stmtFound.setReconcileStatus(0);
+					stmtFound.setReconciledDateTime(new Date());
+				}
+				settlementStmtRepo.save(stmtFound);
+			} catch (Exception e) {
+				return "{\"result\":\"fail\",\"reason\":\"" + e.getMessage() + "\"}";
+			}
+		}
+
+		return "{\"result\":\"success\",\"reason\":\"Done\"}";
+	}
+
 }
