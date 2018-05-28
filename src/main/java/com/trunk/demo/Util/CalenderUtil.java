@@ -68,6 +68,16 @@ public class CalenderUtil {
         cal.set(Calendar.MILLISECOND, 0);
         return cal;
     }
+
+    public Date setDateToInit(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
     public int getDateYear(Date date){
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);

@@ -1,5 +1,6 @@
 package com.trunk.demo.bo;
 
+import com.trunk.demo.Util.CalenderUtil;
 import com.trunk.demo.model.mongo.BankStmt;
 
 import java.util.*;
@@ -15,6 +16,7 @@ public class ListBankStatementBO {
     private Map<Date,Double> visaMap;
     private Map<Date,Double> debitMap;
     private Map<Date,Double> amexMap;
+    private CalenderUtil cal = new CalenderUtil();
     public ListBankStatementBO(List<BankStmt> bankList) {
         this.list = bankList;
         this.visas = new ArrayList<>();
@@ -24,6 +26,8 @@ public class ListBankStatementBO {
         this.visaMap = this.addUpSameDayTransactions(visas);
         this.debitMap = this.addUpSameDayTransactions(debits);
         this.amexMap = this.addUpSameDayTransactions(amexs);
+
+
     }
 
     public void separateDocuemtns(){
@@ -50,12 +54,13 @@ public class ListBankStatementBO {
 
     private Map<Date, Double> addUpSameDayTransactions(List<BankStmt> list){
         Map<Date, Double> map = new HashMap<Date, Double>();
+
         for (int i = 0; i < list.size(); i++) {
             Double amount = map.get(list.get(i).getDate());
             if (amount != null) {
-                map.put(list.get(i).getDate(), amount + list.get(i).getCredits());
+                map.put(cal.setDateToInit(list.get(i).getDate()), amount + list.get(i).getCredits());
             } else {
-                map.put(list.get(i).getDate(), list.get(i).getCredits());
+                map.put(cal.setDateToInit(list.get(i).getDate()), list.get(i).getCredits());
             }
         }
         return map;

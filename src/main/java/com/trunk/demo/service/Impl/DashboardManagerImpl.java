@@ -125,8 +125,6 @@ public class DashboardManagerImpl implements DashboardManager {
 		Double amexSettTotal;
 
 		List<DashDaliyTransaction> dashDaliyTransactions = new ArrayList<>();
-//		startOfDate = cal.getPrevMonth();
-//		endOfDate = new Date();
 		startOfDate = cal.calcPrevDayFromCurr(-30 * (page + 1)).getTime();
 		endOfDate = cal.calcPrevDayFromCurr(-30 * page).getTime();
 		int differenceDay = cal.differenceDay(startOfDate,endOfDate);
@@ -136,10 +134,8 @@ public class DashboardManagerImpl implements DashboardManager {
 
 		ListBankStatementBO bankBO = new ListBankStatementBO(bankStmtRepository.findAllByDateBetween(startOfDate,endOfDate,bankSort));
 		ListSettlementBO settleBO = new ListSettlementBO(settlementRepository.findAllBySettlementDateBetween(startOfDate,endOfDate,settleSort));
-
 		for(int i = 0;i<differenceDay;i++){
 			dateDiff = cal.calcPrevDayFromCurr((i + 30 * page) * -1);
-			//dateDiff = cal.calcPrevDayFromCurr((i+60) * -1);
 
 			visaBankTotal = bankBO.getVisaMapTotal(dateDiff.getTime());
 			debitBankTotal = bankBO.getDebitMapTotal(dateDiff.getTime());
