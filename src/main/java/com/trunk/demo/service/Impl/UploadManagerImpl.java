@@ -1,6 +1,7 @@
 package com.trunk.demo.service.Impl;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,14 +35,16 @@ public class UploadManagerImpl implements UploadManager {
 
 	@Override
 	public String newUploadFile(String type, String fileName, InputStream inputStream) {
-		InputStream streamForMongo;
 		try {
-			streamForMongo = IOUtils.toBufferedInputStream(inputStream);
+			byte[] byteArray = IOUtils.toByteArray(inputStream);
+			InputStream s3Stream = new ByteArrayInputStream(byteArray);
+			InputStream mongoStream = new ByteArrayInputStream(byteArray);
+
 			String result = new String();
-			String s3Reponse = s3Service.newUploadFile(type, fileName, inputStream);
+			String s3Reponse = s3Service.newUploadFile(type, fileName, s3Stream);
 
 			if (s3Reponse.equalsIgnoreCase("SUCCESS")) {
-				BufferedReader br = new BufferedReader(new InputStreamReader(streamForMongo));
+				BufferedReader br = new BufferedReader(new InputStreamReader(mongoStream));
 				if (type.equalsIgnoreCase("Bank"))
 					result = uploadBankCSV(br);
 				else if (type.equalsIgnoreCase("Settlement"))
