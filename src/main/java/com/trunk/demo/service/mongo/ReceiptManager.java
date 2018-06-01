@@ -9,4 +9,5 @@ public interface ReceiptManager {
 
 	public String markAsReconciled(String id);
 
+	public String performBulkReconcile(boolean option, String[] allReciptNums);
 }
