@@ -1,4 +1,5 @@
 package com.trunk.demo.Util;
 
-public class SettleType {
+public enum SettleType {
+    VISA, MASTERCARD, DEBIT, AMEX
 }

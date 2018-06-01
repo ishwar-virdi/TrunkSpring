@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.trunk.demo.Util.CalenderUtil;
 import com.trunk.demo.bo.ListBankStatementBO;
 import com.trunk.demo.bo.ListSettlementBO;
+import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.repository.BankStmtRepository;
 import com.trunk.demo.repository.SettlementRepository;
 import com.trunk.demo.vo.DashDaliyTransaction;
@@ -50,7 +51,7 @@ public class DashboardManagerImpl implements DashboardManager {
 		
 		
 		calendar.setTime(new Date(today.getYear(), today.getMonth() + 1, 1));
-		DateFormat df = new SimpleDateFormat("dd MMM yy");
+		DateFormat df = new SimpleDateFormat("MMM yy");
 		
 		for (int i = 0; i < labels.length; i++) {
 			calendar.add(Calendar.MONTH, -1);
@@ -98,6 +99,7 @@ public class DashboardManagerImpl implements DashboardManager {
 		for(int i = 0; i < period;i++){
 			startOfDate = cal.getFristDayOfMonth(cal.getYear(),cal.getMonth() - i - page * period);
 			endOfDate = cal.getLastDayOfMonth(cal.getYear(),cal.getMonth() - i - page * period);
+
 			Sort bankSort = new Sort(Sort.Direction.DESC,"date");
 			Sort settleSort = new Sort(Sort.Direction.DESC,"settlementDate");
 			ListBankStatementBO bankBO = new ListBankStatementBO(bankStmtRepository.findAllByDateBetween(startOfDate,endOfDate,bankSort));
@@ -126,14 +128,15 @@ public class DashboardManagerImpl implements DashboardManager {
 
 		List<DashDaliyTransaction> dashDaliyTransactions = new ArrayList<>();
 		startOfDate = cal.calcPrevDayFromCurr(-30 * (page + 1)).getTime();
-		endOfDate = cal.calcPrevDayFromCurr(-30 * page).getTime();
+		endOfDate = cal.calcPrevDayFromCurr(-30 * page + 1).getTime();
+
 		int differenceDay = cal.differenceDay(startOfDate,endOfDate);
 
 		Sort bankSort = new Sort(Sort.Direction.DESC,"date");
 		Sort settleSort = new Sort(Sort.Direction.DESC,"settlementDate");
-
 		ListBankStatementBO bankBO = new ListBankStatementBO(bankStmtRepository.findAllByDateBetween(startOfDate,endOfDate,bankSort));
 		ListSettlementBO settleBO = new ListSettlementBO(settlementRepository.findAllBySettlementDateBetween(startOfDate,endOfDate,settleSort));
+
 		for(int i = 0;i<differenceDay;i++){
 			dateDiff = cal.calcPrevDayFromCurr((i + 30 * page) * -1);
 
@@ -146,6 +149,7 @@ public class DashboardManagerImpl implements DashboardManager {
 			DashDaliyTransaction dashDaliyTransaction = new DashDaliyTransaction(dateDiff,visaSettTotal,debitSettTotal,amexSettTotal,visaBankTotal,debitBankTotal,amexBankTotal);
 			dashDaliyTransactions.add(dashDaliyTransaction);
 		}
+
 		return gson.toJson(dashDaliyTransactions);
 	}
 

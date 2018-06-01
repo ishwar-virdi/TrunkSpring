@@ -29,7 +29,10 @@ public class Interceptor implements HandlerInterceptor {
                 ||"/api/v1/userLogout".equals(requestURI)){
             return true;
         }
-        if(session.getAttribute(session.getId()) != null){
+
+        if((session.getAttribute(session.getId()) != null)){
+            Object user = session.getAttribute(session.getId());
+            session.setAttribute(session.getId(),user.toString());
             return true;
         }
         return false;

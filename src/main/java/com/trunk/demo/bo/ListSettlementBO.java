@@ -1,31 +1,31 @@
 package com.trunk.demo.bo;
 
+import com.trunk.demo.Util.CalenderUtil;
+import com.trunk.demo.Util.CardType;
+import com.trunk.demo.Util.SettleType;
 import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.model.mongo.SettlementStmt;
 
 import java.util.*;
 
 public class ListSettlementBO {
-    private enum cardType{
-        VISA,AMEX
-    }
 
     private List<SettlementStmt> list;
-    private List<SettlementStmt> visaList;
+    private List<SettlementStmt> visaMasterList;
     private List<SettlementStmt> debitList;
     private List<SettlementStmt> amexList;
-    private Map<Date,Double> visaMap;
+    private Map<Date,Double> visaMasterMap;
     private Map<Date,Double> debitMap;
     private Map<Date,Double> amexMap;
-
+    private CalenderUtil cal = new CalenderUtil();
 
     public ListSettlementBO(List<SettlementStmt> list) {
         this.list = list;
-        this.visaList = new ArrayList<>();
+        this.visaMasterList = new ArrayList<>();
         this.debitList = new ArrayList<>();
         this.amexList = new ArrayList<>();
-        separateSettle();
-        this.visaMap = addUpSameDayTransactions(visaList);
+        this.separateSettle();
+        this.visaMasterMap = addUpSameDayTransactions(visaMasterList);
         this.debitMap = addUpSameDayTransactions(debitList);
         this.amexMap = addUpSameDayTransactions(amexList);
     }
@@ -36,12 +36,13 @@ public class ListSettlementBO {
 
 
     public Double getVisaMapTotal(Date date) {
-        if(visaMap.get(date) == null){
+        if(visaMasterMap.get(date) == null){
             return 0.0;
         }else{
-            return visaMap.get(date);
+            return visaMasterMap.get(date);
         }
     }
+
     public Double getDebitMapTotal(Date date) {
         if(debitMap.get(date) == null){
             return 0.0;
@@ -60,22 +61,32 @@ public class ListSettlementBO {
     public double getTotalAmount(){
         double totalAmount = 0;
         for(int i = 0,length = list.size();i < length; i++){
-            if("Approved".equals(list.get(i).getStatus())){
-                totalAmount += list.get(i).getPrincipalAmount();
-                totalAmount += list.get(i).getSurcharge();
-            }
+            totalAmount += list.get(i).getPrincipalAmount();
+            totalAmount += list.get(i).getSurcharge();
         }
         return totalAmount;
     }
 
     private void separateSettle(){
+        SettlementStmt settle = null;
         for(int i = 0; i < list.size();i++){
-            if(cardType.VISA.toString().equals(list.get(i).getCardSchemeName())){
-                visaList.add(list.get(i));
-            }else if(cardType.AMEX.toString().equals(list.get(i).getCardSchemeName())){
-                amexList.add(list.get(i));
-            }else{
-                debitList.add(list.get(i));
+            settle = list.get(i);
+            //unified settlement date
+            settle.setSettlementDate(cal.setDateToInit(list.get(i).getSettlementDate()));
+            if(list.get(i).getStatus().contains("Approved")){
+                System.out.println(list.get(i).getCardSchemeName() + " " + list.get(i).getPrincipalAmount() + " " + list.get(i).getSettlementDate());
+                //separate document
+                if(SettleType.VISA.toString().equals(settle.getCardSchemeName())){
+                    //System.out.println("VISA" + settle.getSettlementDate() + " " + settle.getPrincipalAmount());
+                    visaMasterList.add(settle);
+                }else if(SettleType.MASTERCARD.toString().equals(settle.getCardSchemeName())){
+                    //System.out.println("MASTERCARD" + settle.getSettlementDate() + " " + settle.getPrincipalAmount());
+                    visaMasterList.add(settle);
+                }else if(SettleType.AMEX.toString().equals(settle.getCardSchemeName())){
+                    amexList.add(settle);
+                }else{
+                    debitList.add(settle);
+                }
             }
         }
     }
@@ -85,6 +96,7 @@ public class ListSettlementBO {
         Map<Date, Double> map = new HashMap<Date, Double>();
         for (int i = 0; i < list.size(); i++) {
             Double amount = map.get(list.get(i).getSettlementDate());
+
             if (amount != null) {
                 map.put(list.get(i).getSettlementDate(), amount + list.get(i).getPrincipalAmount());
             } else {

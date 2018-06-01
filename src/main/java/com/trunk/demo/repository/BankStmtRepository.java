@@ -8,8 +8,11 @@ import com.trunk.demo.model.mongo.BankStmt;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BankStmtRepository extends MongoRepository<BankStmt, String> {
     List<BankStmt> findAllByDateBetween(Date startDate, Date endDate,Sort sort);
+
+    Optional<BankStmt> findAllById(String id);
 }

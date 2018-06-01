@@ -1,6 +1,8 @@
-package com.trunk.demo.service.mongo;
+/**
+ *
+ *  deprecated
 
-
+ package com.trunk.demo.service.mongo;
 import com.google.gson.JsonObject;
 import com.trunk.demo.Util.BCryptText;
 import com.trunk.demo.model.mongo.User;
@@ -98,3 +100,4 @@ public class UserManagerImpl implements UserManager {
 
 
 }
+*/

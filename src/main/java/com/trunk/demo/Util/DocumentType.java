@@ -1,4 +1,5 @@
 package com.trunk.demo.Util;
 
-public class DocumentType {
+public enum DocumentType {
+    SETTLEMENT,BANKSTATEMENT
 }

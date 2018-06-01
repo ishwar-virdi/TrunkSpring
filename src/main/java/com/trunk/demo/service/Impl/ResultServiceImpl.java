@@ -3,6 +3,7 @@ package com.trunk.demo.service.Impl;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.trunk.demo.Util.CalenderUtil;
 import com.trunk.demo.model.mongo.ReconcileResult;
 import com.trunk.demo.repository.ResultsRepository;
 import com.trunk.demo.service.ResultService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,7 +32,10 @@ public class ResultServiceImpl implements ResultService {
 
     @Autowired
     private Gson gson;
-    
+
+    @Autowired
+    private CalenderUtil cal;
+
     private ReconcileResult result;
 
     @Override
@@ -45,7 +50,7 @@ public class ResultServiceImpl implements ResultService {
             return gson.toJson("UserSession is Null");
         }
 
-        Pageable page = PageRequest.of(pageIndex,13,new Sort(Sort.Direction.DESC,"lastModified"));
+        Pageable page = PageRequest.of(pageIndex,20,new Sort(Sort.Direction.DESC,"lastModified"));
         results = resultsRepository.findByUserId(userSession.toString(),page);
 
         resultsVO = new ListReconcileResultVO(results);
@@ -85,33 +90,38 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public String resultSearch(HttpSession session, String param) {
+    public String resultSearch(String userId, String page, String value) {
         String json = "";
-        Object userSession = session.getAttribute(session.getId());
-        JsonObject params = new JsonParser().parse(param).getAsJsonObject();
-        String jsonPages = params.get("page").toString();
-        String jsonValue = params.get("value").toString();
-        String page = jsonPages.substring(1,jsonPages.length()-1);
-        String value = jsonValue.substring(1,jsonValue.length()-1);
 
-        if(userSession == null || !"result".equals(page)){
+        if(!"result".equals(page)){
             return "fail";
         }
 
-        String userId = userSession.toString();
         ListReconcileResultVO results;
+        int dotIndex = value.indexOf(".");
         int lessSignIndex = value.indexOf("<");
         int largeSignIndex = value.indexOf(">");
         int hyphenIndex = value.indexOf("-");
         int slashIndex = value.indexOf("/");
         int secondSlash = value.indexOf("/", slashIndex + 1);
+
         try {
-            // date
-            if (value.length() >= 10 && secondSlash - slashIndex == 3 && hyphenIndex == -1) {
-                Date date = stringToDate(value);
-                Date nextDate = getNextDate(value);
+            // Last Modified
+            if (value.length() >= 10 && dotIndex == 6) {
+                value = value.substring(0,10);
+
+                if(value.contains("May")){
+                    value = value.replace(".","");
+                }
+
+                Date date = new SimpleDateFormat("dd MMM yy").parse(value);
+
+                Date firstDayOfDate = cal.setDateToInit(date);
+                Date lastDayOfDate = cal.setDateToMax(date);
+
                 results = new ListReconcileResultVO(
-                        resultsRepository.findByUserIdAndLastModifiedBetween(userId, date, nextDate));
+                        resultsRepository.findByUserIdAndLastModifiedBetween(userId, firstDayOfDate, lastDayOfDate)
+                );
                 json = gson.toJson(results.getList());
             }
             // dateRange
@@ -182,10 +192,26 @@ public class ResultServiceImpl implements ResultService {
                 List<ReconcileResult> result = new ArrayList<>();
                 result.add(id.get());
                 json = gson.toJson(result);
-            } else {
+            }
+            // Month
+            else if (value.length() == 7 && dotIndex == 3) {
+                if(value.contains("May")){
+                    value = value.replace(".","");
+                }
+                Date date =new SimpleDateFormat("MMM yy").parse(value);
+                Date firstDayOfDate = cal.getFristDayOfMonth(cal.getDateYear(date),cal.getDateMonth(date));
+                Date lastDayOfDate = cal.getLastDayOfMonth(cal.getDateYear(date),cal.getDateMonth(date));
+                firstDayOfDate = cal.calcPrevDayFromDate(firstDayOfDate,-15).getTime();
+                lastDayOfDate = cal.calcPrevDayFromDate(lastDayOfDate, 15).getTime();
+                results = new ListReconcileResultVO(
+                        resultsRepository.findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(userId, firstDayOfDate, lastDayOfDate)
+                );
+                json = gson.toJson(results.getList());
+            }else {
                 return "fail";
             }
         } catch (Exception e) {
+            System.out.println(e);
             return "fail";
         }
         return json;

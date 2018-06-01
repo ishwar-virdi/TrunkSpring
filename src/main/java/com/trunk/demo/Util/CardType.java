@@ -1,4 +1,7 @@
 package com.trunk.demo.Util;
 
-public class CardType {
+
+public enum CardType {
+    VISAMASTERCARD,AMEX,DEBIT,
+
 }

@@ -33,16 +33,26 @@ public class SmartReconcileController {
 		return uploadManager.newUploadFile(type, file.getOriginalFilename(), file.getInputStream());
 	}
 
-	@RequestMapping(path = "/receipt/{id}", method = RequestMethod.GET)
+	@RequestMapping(path= "/api/v1/uploadRecords",method = RequestMethod.GET)
+	public String uploadRecords(){
+		return uploadManager.retrieveUploadRecords();
+	}
+
+	@RequestMapping(path = "/api/v1/receipt/{id}", method = RequestMethod.GET)
 	public String getReceipt(@PathVariable("id") String id) {
 		return receiptManager.getReceipt(id);
 	}
 
-	@RequestMapping(path = "/manualReconcile/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/api/v1/manualReconcile/{id}", method = RequestMethod.PUT)
 	public String markAsReconciled(@PathVariable("id") String id) {
 		return receiptManager.markAsReconciled(id);
 	}
-	
+
+	@RequestMapping(path = "/api/v1/manualNotReconcile/{id}", method = RequestMethod.PUT)
+	public String markAsNotReconciled(@PathVariable("id") String id) {
+		return receiptManager.markAsNotReconciled(id);
+	}
+
 	@RequestMapping(path = "/api/resultDetails/{id}", method = RequestMethod.GET)
 	public String getResultDetails(@PathVariable("id") String id) {
 		return resultDetailManager.getResultDetail(id);

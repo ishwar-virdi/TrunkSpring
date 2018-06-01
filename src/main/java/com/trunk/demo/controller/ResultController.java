@@ -25,7 +25,6 @@ public class ResultController {
             pageIndex = 0;
         }
         return resultService.retrieveResults(session,pageIndex);
-
     }
 
     @RequestMapping(method = RequestMethod.GET,value="/api/v1/seedResults")
@@ -35,14 +34,24 @@ public class ResultController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/search")
     public String SearchResult(@RequestBody String param, HttpSession session) {
-        String result = resultService.resultSearch(session,param);
         JsonObject jsonObject = new JsonObject();
+        JsonObject params = new JsonParser().parse(param).getAsJsonObject();
+        String jsonPages = params.get("page").toString();
+        String jsonValue = params.get("value").toString();
+        String page = jsonPages.substring(1,jsonPages.length()-1);
+        String value = jsonValue.substring(1,jsonValue.length()-1);
+        Object userSession = session.getAttribute(session.getId());
+        if(userSession == null){
+            jsonObject.addProperty("result","fail");
+            return jsonObject.toString();
+        }
+        String result = resultService.resultSearch(userSession.toString(),page,value);
+
         if("fail".equals(result)){
             jsonObject.addProperty("result","fail");
             return jsonObject.toString();
         }else{
-            return resultService.resultSearch(session,param);
+            return result;
         }
-
     }
 }
