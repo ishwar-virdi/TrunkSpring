@@ -93,6 +93,10 @@ public class ReconcileResult {
 
 	public void setIsReconciled(int isReconciled) {
 		this.isReconciled = isReconciled;
+		if (this.isReconciled + notReconciled > 0)
+			this.percentage = (int)((this.isReconciled / (double) (this.isReconciled + notReconciled) ) * 100);
+		else
+			this.percentage = 0;
 	}
 
 	public int getNotReconciled() {
@@ -101,6 +105,11 @@ public class ReconcileResult {
 
 	public void setNotReconciled(int notReconciled) {
 		this.notReconciled = notReconciled;
+
+		if (this.isReconciled + notReconciled > 0)
+			this.percentage = (int)((this.isReconciled / (double) (this.isReconciled + notReconciled) ) * 100);
+		else
+			this.percentage = 0;
 	}
 
 	public String getId() {
@@ -108,7 +117,7 @@ public class ReconcileResult {
 	}
 
 	public ReconcileResult(String zone, String id, String userId, Date lastModified, Date startDate, Date endDate,
-			int isReconciled, int notReconciled, int percentage) {
+						   int isReconciled, int notReconciled, int percentage) {
 		super();
 		this.zone = zone;
 		this.id = id;

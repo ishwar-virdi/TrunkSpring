@@ -32,4 +32,6 @@ public interface SettlementRepository extends MongoRepository<SettlementStmt, Lo
 	List<SettlementStmt> findAllByReconcileResultsId(String id);
 
 	List<SettlementStmt> findAllBySettlementDateBetween(Date startDate,Date endDate,Sort sort);
+
+	SettlementStmt findFirstByReceiptNumber(Long receiptNumber);
 }

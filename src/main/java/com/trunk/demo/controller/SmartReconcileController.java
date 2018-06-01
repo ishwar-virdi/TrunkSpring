@@ -1,19 +1,22 @@
 package com.trunk.demo.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.trunk.demo.service.mongo.DashboardManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.trunk.demo.service.mongo.ReceiptManager;
 import com.trunk.demo.service.mongo.ResultDetailManager;
 import com.trunk.demo.service.mongo.UploadManager;
+
+import javax.servlet.http.HttpSession;
 
 @RestController
 public class SmartReconcileController {
@@ -56,6 +59,21 @@ public class SmartReconcileController {
 	@RequestMapping(path = "/api/resultDetails/{id}", method = RequestMethod.GET)
 	public String getResultDetails(@PathVariable("id") String id) {
 		return resultDetailManager.getResultDetail(id);
+	}
+
+	@RequestMapping(path = "/api/markReconcile", method = RequestMethod.POST)
+	public String getResultDetails(@RequestBody String param, HttpSession session) {
+		String json = "";
+		JsonObject params = new JsonParser().parse(param).getAsJsonObject();
+		String markAsReconcile = params.get("markAsReconcile").toString();
+		JsonArray items = params.get("items").getAsJsonArray();
+		if("true".equals(markAsReconcile)){
+			json = resultDetailManager.markReconcile(items);
+		}else if("false".equals(markAsReconcile)){
+			json = resultDetailManager.markNotReconcile(items);
+		}
+
+		return json;
 	}
 
 	@RequestMapping(path = "/api/getChartData", method = RequestMethod.GET)
