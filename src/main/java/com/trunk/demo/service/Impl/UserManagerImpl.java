@@ -1,13 +1,12 @@
-/**
- *
- *  deprecated
+package com.trunk.demo.service.Impl;
 
- package com.trunk.demo.service.mongo;
+
 import com.google.gson.JsonObject;
 import com.trunk.demo.Util.BCryptText;
 import com.trunk.demo.model.mongo.User;
 import com.trunk.demo.repository.TokenRepository;
 import com.trunk.demo.repository.UsersRepository;
+import com.trunk.demo.service.mongo.UserManager;
 import com.trunk.demo.vo.LoginModelVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,18 +70,18 @@ public class UserManagerImpl implements UserManager {
         return json.toString();
     }
 
-    @Override
-    public String userIsLogin(HttpSession session) {
-        JsonObject json = new JsonObject();
-        Object user = session.getAttribute(session.getId());
-        if(user != null){
-            session.setAttribute(session.getId(),user.toString());
-            json.addProperty("result", true);
-        }else{
-            json.addProperty("result", false);
-        }
-        return json.toString();
-    }
+//    @Override
+//    public String userIsLogin(HttpSession session) {
+//        JsonObject json = new JsonObject();
+//        Object user = session.getAttribute(session.getId());
+//        if(user != null){
+//            session.setAttribute(session.getId(),user.toString());
+//            json.addProperty("result", true);
+//        }else{
+//            json.addProperty("result", false);
+//        }
+//        return json.toString();
+//    }
 
     @Override
     public String logOut(HttpSession session) {
@@ -100,4 +99,3 @@ public class UserManagerImpl implements UserManager {
 
 
 }
-*/

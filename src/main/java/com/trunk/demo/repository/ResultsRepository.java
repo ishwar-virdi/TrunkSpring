@@ -27,5 +27,4 @@ public interface ResultsRepository extends MongoRepository<ReconcileResult, Stri
 
     public Optional<ReconcileResult> findById(String _id);
 
-    public ReconcileResult findReconcileResultByUserIdAndStartDateAndEndDate(String uid,Date date,Date nextDate);
 }

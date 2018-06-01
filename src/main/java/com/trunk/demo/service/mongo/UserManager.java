@@ -11,7 +11,7 @@ public interface UserManager {
 
     public String loginValidator(LoginModelVO loginModelVO, HttpSession session);
 
-    public String userIsLogin(HttpSession session);
+//    public String userIsLogin(HttpSession session);
 
     public String logOut(HttpSession session);
 
