@@ -1,8 +1,10 @@
 package com.trunk.demo.repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -29,4 +31,5 @@ public interface SettlementRepository extends MongoRepository<SettlementStmt, Lo
 	
 	List<SettlementStmt> findAllByReconcileResultsId(String id);
 
+	List<SettlementStmt> findAllBySettlementDateBetween(Date startDate,Date endDate,Sort sort);
 }

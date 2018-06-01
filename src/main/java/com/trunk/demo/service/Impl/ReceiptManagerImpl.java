@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
+import com.google.gson.JsonObject;
+import com.trunk.demo.Util.CalenderUtil;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,85 +22,92 @@ public class ReceiptManagerImpl implements ReceiptManager {
 
 	@Override
 	public String getReceipt(String id) {
+		JsonObject jsonObject = new JsonObject();
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 		Optional<SettlementStmt> stmt = settlementStmtRepo.findByReceiptNumber(Long.parseLong(id));
-		try {
-			SettlementStmt stmtFound = stmt.get();
-			JSONObject result = new JSONObject();
-
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-			result.put("TransactionDate", formatter.format(stmtFound.getTransactionTimeStamp()));
+		if(stmt.isPresent()){
+			SettlementStmt settle = stmt.get();
+			if("".equals(settle.getCardSchemeName())){
+				settle.setCardSchemeName("Debit");
+			}
+			jsonObject.addProperty("TransactionDate", formatter.format(settle.getTransactionTimeStamp()));
 			formatter = new SimpleDateFormat("HH:mm:ss");
 
-			result.put("TransactionTime", formatter.format(stmtFound.getTransactionTimeStamp()));
-			result.put("CustomerName", stmtFound.getCustomerName());
-			result.put("MerchantID", stmtFound.getMerchantID());
-			result.put("BankReference", stmtFound.getBankReference());
+			jsonObject.addProperty("TransactionTime", formatter.format(settle.getTransactionTimeStamp()));
+			jsonObject.addProperty("CustomerName", settle.getCustomerName());
+			jsonObject.addProperty("MerchantID", settle.getMerchantID());
+			jsonObject.addProperty("BankReference", settle.getBankReference());
 
-			result.put("Status", stmtFound.getStatus());
-			result.put("SettlementDate", stmtFound.getSettlementDate().toString());
-
-			switch (stmtFound.getReconcileStatus()) {
-			case 3:
-				result.put("ReconcileStatus", "AutoReconciled");
-				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
-				break;
-			case 2:
-				result.put("ReconcileStatus", "Manually Reconciled");
-				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
-				break;
-			case 1:
-				result.put("ReconcileStatus", "AutoReconciler attempted but failed");
-				result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
-				break;
-			case 0:
-				result.put("ReconcileStatus", "Not Reconciled by AutoReconciler");
-				result.put("ReconciledDate", "");
-				break;
-			default:
-				result.put("ReconcileStatus", "Reconcile Status Incorrectly Set");
-				result.put("ReconciledDate", "");
-				break;
+			jsonObject.addProperty("Status", settle.getStatus());
+			jsonObject.addProperty("SettlementDate", settle.getSettlementDate().toString());
+			System.out.println(settle.getReconcileStatus());
+			switch (settle.getReconcileStatus()) {
+				case 3:
+					jsonObject.addProperty("ReconcileStatus", "AutoReconciled");
+					jsonObject.addProperty("ReconciledDate", settle.getReconciledDateTime().toString());
+					break;
+				case 2:
+					jsonObject.addProperty("ReconcileStatus", "Manually Reconciled");
+					jsonObject.addProperty("ReconciledDate", settle.getReconciledDateTime().toString());
+					break;
+				case 1:
+					jsonObject.addProperty("ReconcileStatus", "AutoReconciler attempted but failed");
+					jsonObject.addProperty("ReconciledDate", settle.getReconciledDateTime().toString());
+					break;
+				case 0:
+					jsonObject.addProperty("ReconcileStatus", "Not Reconciled by AutoReconciler");
+					jsonObject.addProperty("ReconciledDate", "");
+					break;
+				default:
+					jsonObject.addProperty("ReconcileStatus", "Reconcile Status Incorrectly Set");
+					jsonObject.addProperty("ReconciledDate", "");
+					break;
 			}
 
-			result.put("CardPAN", stmtFound.getCardPAN());
-			result.put("CardScheme", stmtFound.getCardSchemeName());
-			result.put("CardExpiry", stmtFound.getCardExpiry());
+			jsonObject.addProperty("CardPAN", settle.getCardPAN());
+			jsonObject.addProperty("CardScheme", settle.getCardSchemeName());
+			jsonObject.addProperty("CardExpiry", settle.getCardExpiry());
 
-			result.put("PrincipleAmount", stmtFound.getPrincipalAmount());
-			result.put("Surcharge", stmtFound.getSurcharge());
-			result.put("Currency", stmtFound.getCurrency());
+			jsonObject.addProperty("PrincipleAmount", settle.getPrincipalAmount());
+			jsonObject.addProperty("Surcharge", settle.getSurcharge());
+			jsonObject.addProperty("Currency", settle.getCurrency());
 
-			result.put("result", "success");
-			result.put("reason", "");
-
-			return result.toString();
-		} catch (Exception e) {
-			return "{\"result\":\"fail\",\"reason\":\"" + e.getMessage() + "\"}";
+		}else{
+			jsonObject.addProperty("result","fail");
 		}
+		return jsonObject.toString();
 	}
 
 	@Override
 	public String markAsReconciled(String id) {
 		Optional<SettlementStmt> stmt = settlementStmtRepo.findByReceiptNumber(Long.parseLong(id));
-		try {
-			SettlementStmt stmtFound = stmt.get();
-			JSONObject result = new JSONObject();
-
-			stmtFound.setReconcileStatus(2);
-			stmtFound.setReconciledDateTime(new Date());
-
-			settlementStmtRepo.save(stmtFound);
-
-			result.put("result", "success");
-			result.put("reason", "Receipt has been Manually marked as Reconciled");
-			result.put("ReconcileStatus", "Manually Reconciled");
-
-			result.put("ReconciledDate", stmtFound.getReconciledDateTime().toString());
-
-			return result.toString();
-		} catch (Exception e) {
-			return "{\"result\":\"fail\",\"reason\":\"" + e.getMessage() + "\"}";
+		JsonObject jsonObject = new JsonObject();
+		if(stmt.isPresent()){
+			SettlementStmt settle = stmt.get();
+			settle.setReconcileStatus(2);
+			settle.setReconciledDateTime(new Date());
+			settlementStmtRepo.save(settle);
+			jsonObject.addProperty("result","success");
+		}else{
+			jsonObject.addProperty("result","fail");
 		}
+		return jsonObject.toString();
+	}
+
+	@Override
+	public String markAsNotReconciled(String id) {
+		Optional<SettlementStmt> stmt = settlementStmtRepo.findByReceiptNumber(Long.parseLong(id));
+		JsonObject jsonObject = new JsonObject();
+		if(stmt.isPresent()){
+			SettlementStmt settle = stmt.get();
+			settle.setReconcileStatus(0);
+			settle.setReconciledDateTime(new Date());
+			settlementStmtRepo.save(settle);
+			jsonObject.addProperty("result","success");
+		}else{
+			jsonObject.addProperty("result","fail");
+		}
+		return jsonObject.toString();
 	}
 
 	@Override

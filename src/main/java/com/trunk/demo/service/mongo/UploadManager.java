@@ -9,4 +9,5 @@ public interface UploadManager {
 
 	public String newUploadFile(String type, String fileName, InputStream inputStream);
 
+	public String retrieveUploadRecords();
 }
