@@ -74,7 +74,6 @@ public class ListSettlementBO {
             //unified settlement date
             settle.setSettlementDate(cal.setDateToInit(list.get(i).getSettlementDate()));
             if(list.get(i).getStatus().contains("Approved")){
-                System.out.println(list.get(i).getCardSchemeName() + " " + list.get(i).getPrincipalAmount() + " " + list.get(i).getSettlementDate());
                 //separate document
                 if(SettleType.VISA.toString().equals(settle.getCardSchemeName())){
                     //System.out.println("VISA" + settle.getSettlementDate() + " " + settle.getPrincipalAmount());

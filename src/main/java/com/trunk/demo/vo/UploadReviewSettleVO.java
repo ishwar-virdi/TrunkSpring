@@ -1,6 +1,7 @@
 package com.trunk.demo.vo;
 
 import com.google.gson.JsonObject;
+import com.trunk.demo.model.mongo.SettlementStmt;
 
 public class UploadReviewSettleVO {
 
@@ -16,15 +17,15 @@ public class UploadReviewSettleVO {
         this.customerName = customerName;
     }
 
-    public UploadReviewSettleVO(JsonObject jsonObject){
-        String type = String.valueOf(jsonObject.get("cardSchemeName").toString());
-        if("\"\"".equals(type)){
+    public UploadReviewSettleVO(SettlementStmt settle){
+        String type = String.valueOf(settle.getCardSchemeName());
+        if("".equals(type)){
             type = "Debit";
         }
-        this.receiptNumber = Long.parseLong(jsonObject.get("receiptNumber").toString());
+        this.receiptNumber = settle.getReceiptNumber();
         this.cardSchemeName = type;
-        this.principalAmount = Double.parseDouble(jsonObject.get("principalAmount").toString());
-        this.customerName = String.valueOf(jsonObject.get("customerName").toString());
+        this.principalAmount = settle.getPrincipalAmount();
+        this.customerName = settle.getCustomerName();
     }
     public UploadReviewSettleVO() {
     }

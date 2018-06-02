@@ -1,5 +1,6 @@
 package com.trunk.demo.model.mongo;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -9,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "ReconcileResults")
-public class ReconcileResult {
+public class ReconcileResult implements Serializable {
 
 	@Value("${zone}")
 	private String zone;

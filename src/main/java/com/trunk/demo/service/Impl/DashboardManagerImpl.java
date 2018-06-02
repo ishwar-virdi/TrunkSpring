@@ -86,7 +86,6 @@ public class DashboardManagerImpl implements DashboardManager {
 		}
 		
 		return response.toString();
-		
 	}
 
 	@Override

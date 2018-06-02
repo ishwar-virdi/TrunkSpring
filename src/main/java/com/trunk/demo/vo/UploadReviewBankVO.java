@@ -1,30 +1,31 @@
 package com.trunk.demo.vo;
 
 import com.google.gson.JsonObject;
+import com.trunk.demo.model.mongo.BankStmt;
 
 import java.util.Date;
 
 public class UploadReviewBankVO {
-    private String date;
+    private Date date;
     private String transactionDescription;
     private double credits;
     private double debits;
 
 
-    public UploadReviewBankVO(String date, String transactionDescription, double credits, double debits) {
+    public UploadReviewBankVO(Date date, String transactionDescription, double credits, double debits) {
         this.date = date;
         this.transactionDescription = transactionDescription;
         this.credits = credits;
         this.debits = debits;
     }
 
-    public UploadReviewBankVO(JsonObject jsonObject){
-        this.date = String.valueOf(jsonObject.get("date").toString());
-        this.transactionDescription = jsonObject.get("transactionDescription").toString();
-        this.credits = Double.parseDouble(jsonObject.get("credits").toString());
-        this.debits = Double.parseDouble(jsonObject.get("debits").toString());
+    public UploadReviewBankVO(BankStmt bankStmt){
+        this.date = bankStmt.getDate();
+        this.transactionDescription = bankStmt.getTransactionDescription();
+        this.credits = bankStmt.getCredits();
+        this.debits = bankStmt.getDebits();
     }
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
