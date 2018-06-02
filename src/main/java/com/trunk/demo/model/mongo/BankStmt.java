@@ -1,5 +1,6 @@
 package com.trunk.demo.model.mongo;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,7 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "BankStatements")
-public class BankStmt {
+public class BankStmt implements Serializable {
 
 	@Id
 	private String id;

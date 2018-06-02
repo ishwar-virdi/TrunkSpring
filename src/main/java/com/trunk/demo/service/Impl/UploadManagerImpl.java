@@ -1,13 +1,27 @@
 package com.trunk.demo.service.Impl;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.*;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.trunk.demo.Util.CalenderUtil;
+import com.trunk.demo.Util.DocumentType;
+import com.trunk.demo.bo.RedisBO;
+import com.trunk.demo.model.mongo.User;
+import com.trunk.demo.repository.RedisRepository;
+
+import com.trunk.demo.vo.UploadReiewListVO;
+import com.trunk.demo.vo.UploadReviewBankVO;
+import com.trunk.demo.vo.UploadReviewSettleVO;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.trunk.demo.model.mongo.BankStmt;
@@ -19,7 +33,7 @@ import com.trunk.demo.service.mongo.UploadManager;
 import com.trunk.demo.service.s3.S3Service;
 
 @Service
-public class UploadManagerImpl implements UploadManager {
+public class UploadManagerImpl<T> implements UploadManager {
 
 	@Autowired
 	private S3Service s3Service;
@@ -33,22 +47,39 @@ public class UploadManagerImpl implements UploadManager {
 	@Autowired
 	private SettlementRepository settlementStmtRepo;
 
+	@Autowired
+	private RedisBO redisBO;
+
+	@Autowired
+	private Gson gson;
+
+	@Autowired
+	private CalenderUtil cal;
+    private DocumentType documentType;
+    private Set<String> transactionDate = new HashSet<>();
+
 	@Override
 	public String newUploadFile(String type, String fileName, InputStream inputStream) {
-		try {
-			byte[] byteArray = IOUtils.toByteArray(inputStream);
-			InputStream s3Stream = new ByteArrayInputStream(byteArray);
-			InputStream mongoStream = new ByteArrayInputStream(byteArray);
 
+		InputStream streamForMongo;
+		try {
+            redisBO.deleteCache();
+			streamForMongo = IOUtils.toBufferedInputStream(inputStream);
 			String result = new String();
-			String s3Reponse = s3Service.newUploadFile(type, fileName, s3Stream);
+			String s3Reponse = s3Service.newUploadFile(type, fileName, inputStream);
 
 			if (s3Reponse.equalsIgnoreCase("SUCCESS")) {
-				BufferedReader br = new BufferedReader(new InputStreamReader(mongoStream));
-				if (type.equalsIgnoreCase("Bank"))
+				BufferedReader br = new BufferedReader(new InputStreamReader(streamForMongo));
+				if (type.equalsIgnoreCase("Bank")){
+					redisBO.pushType(documentType.BANKSTATEMENT.name());
+					redisBO.pushFileName(fileName);
 					result = uploadBankCSV(br);
-				else if (type.equalsIgnoreCase("Settlement"))
+				}
+				else if (type.equalsIgnoreCase("Settlement")){
+					redisBO.pushType(documentType.SETTLEMENT.name());
+					redisBO.pushFileName(fileName);
 					result = uploadSettlementCSV(br);
+				}
 				else
 					return "{\"result\":\"fail\",\"reason\":\"Invalid File Type\"}";
 			} else {
@@ -56,19 +87,59 @@ public class UploadManagerImpl implements UploadManager {
 			}
 			if (result.contains("success"))
 				reconcileService.reconcile();
+
+			//System.out.println(redisBO.getTransactionDate("0"));
 			return result;
-		} catch (IOException e) {
+
+		} catch (Exception e) {
 			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + "\"}";
 		}
 	}
 
+    @Override
+    public String retrieveUploadRecords() {
+        JsonObject jsonObject = new JsonObject();
+        Object fileName = redisBO.getFileName();
+        Object type = redisBO.getType();
+        int id = 0;
+        boolean flag = false;
+        Object transaction;
+		UploadReiewListVO uploadReviewList;
+		List<T> transactions = new ArrayList<>();
+        if(fileName == null){
+            jsonObject.addProperty("result","fail");
+            return jsonObject.toString();
+        }else{
+            flag = true;
+        }
+
+        while (flag){
+            transaction = redisBO.getTransaction(id);
+            if(transaction == null){
+                flag = false;
+                break;
+            }
+            if(documentType.SETTLEMENT.name().equals(type.toString())){
+                UploadReviewSettleVO settleVO = new UploadReviewSettleVO((SettlementStmt) transaction);
+				transactions.add((T) settleVO);
+            }else if(documentType.BANKSTATEMENT.name().equals(type.toString())){
+				UploadReviewBankVO bankStmtVO = new UploadReviewBankVO((BankStmt) transaction);
+				transactions.add((T) bankStmtVO);
+            }
+            id++;
+        }
+		uploadReviewList = new UploadReiewListVO(fileName.toString(),type.toString(),transactions);
+        return gson.toJson(uploadReviewList);
+    }
+
 	private String uploadSettlementCSV(BufferedReader br) {
 
 		String line = new String();
+		StringBuffer date = new StringBuffer();
 		try {
 			// Skipping Header Row
 			br.readLine();
-
+			int id = 0;
 			while ((line = br.readLine()) != null) {
 				if (line != "") {
 					line = line.replaceAll("\"", "");
@@ -78,9 +149,16 @@ public class UploadManagerImpl implements UploadManager {
 							Double.parseDouble(elements[11].isEmpty() ? "0" : elements[11]), elements[13], elements[16],
 							elements[24], Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]), elements[26],
 							elements[27], elements[29], elements[30], "");
-					settlementStmtRepo.insert(newStmt);
+					redisBO.pushTransaction(id,newStmt);
+					date.append(cal.getDateYear(newStmt.getSettlementDate()))
+							.append(cal.getDateMonth(newStmt.getSettlementDate()));
+					transactionDate.add(date.toString());
+					date.setLength(0);
+					//settlementStmtRepo.insert(newStmt);
+					id++;
 				}
 			}
+			redisBO.pushTransactionDate(transactionDate);
 			br.close();
 			return "{\"result\":\"success\",\"reason\":\"Settlement File has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
@@ -89,11 +167,13 @@ public class UploadManagerImpl implements UploadManager {
 	}
 
 	private String uploadBankCSV(BufferedReader br) {
+
 		String line = new String();
+		StringBuffer date = new StringBuffer();
 		try {
 			// Skipping Header Row
 			br.readLine();
-
+			int id = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.trim().length() > 0) {
 					String elements[] = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -109,13 +189,22 @@ public class UploadManagerImpl implements UploadManager {
 								Double.parseDouble(elements[5].isEmpty() ? "0" : elements[5]),
 								Double.parseDouble(elements[6].isEmpty() ? "0" : elements[6]),
 								Double.parseDouble(elements[7].isEmpty() ? "0" : elements[7]));
-						bankStmtRepo.insert(newStmt);
+
+						redisBO.pushTransaction(id,newStmt);
+						date.append(cal.getDateYear(newStmt.getDate()))
+								.append(cal.getDateMonth(newStmt.getDate()));
+						transactionDate.add(date.toString());
+						date.setLength(0);
+						//bankStmtRepo.insert(newStmt);
+						id++;
 					}
 				}
 			}
+			redisBO.pushTransactionDate(transactionDate);
 			br.close();
-			return "{\"result\":\"success\",\"reason\":\"Bank Statement has been Uploaded & pushed to system\"}";
+			return "{\"result\":\"success\",\"reason\":\"Settlement File has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
+			System.out.println(e);
 			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + ". File is Incorrect.\"}";
 		}
 	}
