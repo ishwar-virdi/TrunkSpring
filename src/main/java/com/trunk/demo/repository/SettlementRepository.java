@@ -17,14 +17,14 @@ public interface SettlementRepository extends MongoRepository<SettlementStmt, Lo
 	@Query("{ 'settlementDate' : {$regex:?0 }}")
 	List<SettlementStmt> findAllBySettlementDateLike(String settlementDate);
 
-	@Query("{ 'cardSchemeName' : {$regex : '.*amex.*', $options : 'i' } }")
-	List<SettlementStmt> findAllByCardSchemeNameAmex();
+	@Query("{ $and : [ { 'cardSchemeName' : {$regex : '.*amex.*', $options : 'i' } } , { 'settlementDate' : { $gte : ?0 } } ] }")
+    List<SettlementStmt> findAllByCardSchemeNameAmex(Date date);
 
-	@Query("{ $or : [ {'cardSchemeName' : {$regex: '.*visa.*', $options : 'i'}}, {'cardSchemeName' : {$regex: '.*mastercard.*', $options : 'i'}}  ]}")
-	List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercard();
+    @Query("{ $and : [ { $or : [ {'cardSchemeName' : {$regex: '.*visa.*', $options : 'i'}}, {'cardSchemeName' : {$regex: '.*mastercard.*', $options : 'i'}}  ]}, { 'settlementDate' : { $gte : ?0 } } ] }")
+    List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercard(Date date);
 
-	@Query("{ $and : [ {'cardSchemeName' : ''}, { 'bankReference' : { $ne: '' } } ] }")
-	List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
+    @Query("{ $and : [ {'cardSchemeName' : ''}, { 'bankReference' : { $ne: '' } } , { 'settlementDate' : { $gte : ?0 } } ] }")
+    List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(Date date);
 
 	@Query("{ 'receiptNumber' : ?0 }")
 	Optional<SettlementStmt> findByReceiptNumber(Long receiptNumber);

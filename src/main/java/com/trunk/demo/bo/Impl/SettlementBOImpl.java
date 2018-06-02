@@ -22,18 +22,18 @@ public class SettlementBOImpl implements SettlementBO{
     }
 
     @Override
-    public List<SettlementStmt> findAllByCardSchemeNameAmex() {
-        return settlementRepository.findAllByCardSchemeNameAmex();
+    public List<SettlementStmt> findAllByCardSchemeNameAmex(Date date) {
+        return settlementRepository.findAllByCardSchemeNameAmex(date);
     }
 
     @Override
-    public List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercard() {
-        return settlementRepository.findAllByCardSchemeNameVisaOrMastercard();
+    public List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercard(Date date) {
+        return settlementRepository.findAllByCardSchemeNameVisaOrMastercard(date);
     }
 
     @Override
-    public List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty() {
-        return settlementRepository.findAllByCardSchemeNameVisaOrMastercard();
+    public List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(Date date) {
+        return settlementRepository.findAllByCardSchemeNameVisaOrMastercard(date);
     }
 
     @Override

@@ -15,8 +15,6 @@ public interface ResultsRepository extends MongoRepository<ReconcileResult, Stri
 
     public List<ReconcileResult> findByUserIdAndLastModifiedBetween(String uid,Date date,Date nextDate);
 
-    public List<ReconcileResult> findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(String uid,Date date,Date nextDate);
-
     public List<ReconcileResult> findByUserIdAndPercentage(String uid,int percentage);
 
     public List<ReconcileResult> findByUserIdAndPercentageGreaterThanEqual(String uid,int percentage);

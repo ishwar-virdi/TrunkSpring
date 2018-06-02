@@ -9,7 +9,6 @@ public class ReconcileResultVO {
 	private String userId;
 	private String reconcileDate;
 	private String startDate;
-	private String endDate;
 	private int percentage;
 	private String reconcileResultId;
 
@@ -17,7 +16,6 @@ public class ReconcileResultVO {
 		this.userId = userId;
 		this.reconcileDate = reconcileDate;
 		this.startDate = startDate;
-		this.endDate = endDate;
 		this.percentage = percentage;
 		this.reconcileResultId = reconcileResultId;
 	}
@@ -25,8 +23,7 @@ public class ReconcileResultVO {
 	public ReconcileResultVO(ReconcileResult result) {
 		this.userId = result.getUserId();
 		this.reconcileDate = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(result.getLastModified());
-		this.startDate = new SimpleDateFormat("yyyyMMdd").format(result.getStartDate());
-		this.endDate = new SimpleDateFormat("yyyyMMdd").format(result.getEndDate());
+		this.startDate = result.getId();
 		this.percentage = result.getPercentage();
 		this.reconcileResultId = result.getId();
 	}
@@ -53,14 +50,6 @@ public class ReconcileResultVO {
 
 	public void setStartDate(String startDate) {
 		this.startDate = startDate;
-	}
-
-	public String getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
 	}
 
 	public int getPercentage() {

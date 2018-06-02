@@ -28,11 +28,6 @@ public class ReconcileResultBOImpl implements ReconcileResultBO {
     }
 
     @Override
-    public List<ReconcileResult> findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(String uid,Date date,Date nextDate){
-        return resultsRepository.findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(uid, date, nextDate);
-    }
-
-    @Override
     public List<ReconcileResult> findByUserIdAndPercentage(String uid,int percentage){
         return resultsRepository.findByUserIdAndPercentage(uid, percentage);
     }

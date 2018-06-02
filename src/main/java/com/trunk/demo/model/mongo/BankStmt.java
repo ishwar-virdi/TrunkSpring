@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class BankStmt implements Serializable {
 
 	@Id
-	private String id;
+	private int id;
 
 	private Date createDateTime;
 	private String accountDescription;
@@ -28,7 +27,6 @@ public class BankStmt implements Serializable {
 	public BankStmt(String accountDescription, long accountNumber, String currency, String date,
 			String transactionDescription, double debits, double credits, double balance) throws ParseException {
 		super();
-		this.id = UUID.randomUUID().toString();
 		this.createDateTime = new Date();
 		this.accountDescription = accountDescription;
 		this.accountNumber = accountNumber;
@@ -38,6 +36,7 @@ public class BankStmt implements Serializable {
 		this.debits = debits;
 		this.credits = credits;
 		this.balance = balance;
+		this.id = this.hashCode();
 	}
 
 	public Date getCreateDate() {
@@ -116,18 +115,16 @@ public class BankStmt implements Serializable {
 		this.balance = balance;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-
-	
 
 	public BankStmt() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public BankStmt(String id, Date createDateTime, String accountDescription, long accountNumber, String currency,
+	public BankStmt(int id, Date createDateTime, String accountDescription, long accountNumber, String currency,
 			Date date, String transactionDescription, double debits, double credits, double balance) {
 		super();
 		this.id = id;
@@ -142,7 +139,7 @@ public class BankStmt implements Serializable {
 		this.balance = balance;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -154,7 +151,10 @@ public class BankStmt implements Serializable {
 				+ ", balance=" + balance + "]";
 	}
 
-	
-	
-	
+	@Override
+	public int hashCode() {
+		return new StringBuilder().append(accountDescription).append(accountNumber).append(currency).append(date)
+				.append(transactionDescription).append(debits).append(credits).append(balance).toString().hashCode();
+	}
+
 }

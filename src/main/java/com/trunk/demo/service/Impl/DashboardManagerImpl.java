@@ -1,7 +1,5 @@
 package com.trunk.demo.service.Impl;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,7 +9,6 @@ import com.google.gson.Gson;
 import com.trunk.demo.Util.CalenderUtil;
 import com.trunk.demo.bo.ListBankStatementBO;
 import com.trunk.demo.bo.ListSettlementBO;
-import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.repository.BankStmtRepository;
 import com.trunk.demo.repository.SettlementRepository;
 import com.trunk.demo.vo.DashDailyTransaction;
@@ -40,53 +37,40 @@ public class DashboardManagerImpl implements DashboardManager {
 	private Gson gson;
 
 	private CalenderUtil cal = new CalenderUtil();
-	@SuppressWarnings("deprecation")
+	
 	@Override
-	public String getReconcileData() {
-		JSONObject response = new JSONObject();
-		String[] labels = new String[DATA_SIZE];
-		Date[] dates = new Date[5];
-		Date today = new Date();
-		Calendar calendar = Calendar.getInstance();
-		
-		
-		calendar.setTime(new Date(today.getYear(), today.getMonth() + 1, 1));
-		DateFormat df = new SimpleDateFormat("MMM yy");
-		
-		for (int i = 0; i < labels.length; i++) {
-			calendar.add(Calendar.MONTH, -1);
-			labels[i] = df.format(calendar.getTime());
-			dates[i] = calendar.getTime();
-		}
-		
-		List<ReconcileResult> reconcileResults = reconcileResultRepo.findAll();
-		
-		DataSet reconciled = new DataSet("Reconciled", "#E57373");
-		DataSet notReconciled = new DataSet("Not Reconciled", "#7986CB");
-		
-		for (ReconcileResult item : reconcileResults) {
-			for (int i = 0; i < dates.length; i++) {
-				if (item.getStartDate().getYear() == dates[i].getYear() && item.getStartDate().getMonth() == dates[i].getMonth()) {
-					reconciled.addData(i, item.getIsReconciled());
-					notReconciled.addData(i, item.getNotReconciled());
-				}
-			}
-		}
-		
-		JSONArray jsonArray;
-		
-		
-		try {
-			jsonArray = new JSONArray(labels);
-			response.put("labels", jsonArray);
-			response.put("reconciled", reconciled.getJSON());
-			response.put("notReconciled", notReconciled.getJSON());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
-		return response.toString();
-	}
+    public String getReconcileData() {
+        JSONObject response = new JSONObject();
+        String[] labels = new String[DATA_SIZE];
+
+        List<ReconcileResult> reconcileResults = reconcileResultRepo.findAll();
+
+        DataSet reconciled = new DataSet("Reconciled", "#E57373");
+        DataSet notReconciled = new DataSet("Not Reconciled", "#7986CB");
+
+        int i = 0;
+        for (ReconcileResult item : reconcileResults) {
+            if (i == 5)
+                break;
+            labels[i] = item.getId();
+            reconciled.addData(i, item.getIsReconciled());
+            notReconciled.addData(i, item.getNotReconciled());
+        }
+
+        JSONArray jsonArray;
+
+        try {
+            jsonArray = new JSONArray(labels);
+            response.put("labels", jsonArray);
+            response.put("reconciled", reconciled.getJSON());
+            response.put("notReconciled", notReconciled.getJSON());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return response.toString();
+
+    }
 
 	@Override
 	public String getMonthTotal(int page) {
@@ -152,6 +136,7 @@ public class DashboardManagerImpl implements DashboardManager {
 		return gson.toJson(dashDaliyTransactions);
 	}
 
+	@SuppressWarnings("unused")
 	private class DataSet {
 		private String label;
 		private int data[] = new int[DATA_SIZE];

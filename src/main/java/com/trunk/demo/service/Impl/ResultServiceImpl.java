@@ -67,7 +67,7 @@ public class ResultServiceImpl implements ResultService {
         String userId = userSession.toString();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        
+        /*
         result = new ReconcileResult(userId,sdf.parse("20180401"),sdf.parse("20180501"),10,6);
         resultsRepository.save(result);
         result = new ReconcileResult(userId,sdf.parse("20180301"),sdf.parse("20180401"),100,12);
@@ -85,7 +85,7 @@ public class ResultServiceImpl implements ResultService {
         result = new ReconcileResult(userId,sdf.parse("20170801"),sdf.parse("20170901"),20,12);
         resultsRepository.save(result);
         result = new ReconcileResult(userId,sdf.parse("20170701"),sdf.parse("20170801"),50,12);
-        resultsRepository.save(result);
+        resultsRepository.save(result);*/
         return "aaaa";
     }
 
@@ -125,14 +125,14 @@ public class ResultServiceImpl implements ResultService {
                 json = gson.toJson(results.getList());
             }
             // dateRange
-            else if (value.length() >= 21 && secondSlash - slashIndex == 3 && hyphenIndex != -1) {
+ /*           else if (value.length() >= 21 && secondSlash - slashIndex == 3 && hyphenIndex != -1) {
                 String dates[] = value.split("-");
                 Date startDate = stringToDate(dates[0]);
                 Date endDate = getNextDate(dates[1]);
                 results = new ListReconcileResultVO(resultsRepository
                         .findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(userId, startDate, endDate));
                 json = gson.toJson(results.getList());
-            }
+            }*/
             // percentage
             else if (value.length() <= 3 && largeSignIndex == -1 && lessSignIndex == -1) {
                 int percentage = Integer.parseInt(value);
@@ -194,7 +194,7 @@ public class ResultServiceImpl implements ResultService {
                 json = gson.toJson(result);
             }
             // Month
-            else if (value.length() == 7 && dotIndex == 3) {
+            /*else if (value.length() == 7 && dotIndex == 3) {
                 if(value.contains("May")){
                     value = value.replace(".","");
                 }
@@ -207,7 +207,7 @@ public class ResultServiceImpl implements ResultService {
                         resultsRepository.findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(userId, firstDayOfDate, lastDayOfDate)
                 );
                 json = gson.toJson(results.getList());
-            }else {
+            }*/else {
                 return "fail";
             }
         } catch (Exception e) {

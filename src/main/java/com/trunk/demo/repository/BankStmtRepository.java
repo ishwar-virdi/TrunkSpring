@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BankStmtRepository extends MongoRepository<BankStmt, String> {
+public interface BankStmtRepository extends MongoRepository<BankStmt, Integer> {
     List<BankStmt> findAllByDateBetween(Date startDate, Date endDate,Sort sort);
 
     Optional<BankStmt> findAllById(String id);

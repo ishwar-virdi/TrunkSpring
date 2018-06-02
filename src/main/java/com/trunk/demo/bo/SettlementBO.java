@@ -11,11 +11,11 @@ import java.util.Optional;
 public interface SettlementBO {
     public List<SettlementStmt> findAllBySettlementDateLike(String settlementDate);
 
-    public List<SettlementStmt> findAllByCardSchemeNameAmex();
+    public List<SettlementStmt> findAllByCardSchemeNameAmex(Date date);
 
-    public List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercard();
+    public List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercard(Date date);
 
-    public List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
+    public List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(Date date);
 
     public SettlementStmt findByReceiptNumber(Long receiptNumber);
 
@@ -26,4 +26,5 @@ public interface SettlementBO {
     public SettlementStmt findFirstByReceiptNumber(Long receiptNumber);
 
     void save(SettlementStmt settlementStmt);
+
 }

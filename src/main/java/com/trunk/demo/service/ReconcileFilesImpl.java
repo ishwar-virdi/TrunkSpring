@@ -3,9 +3,11 @@ package com.trunk.demo.service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +28,16 @@ import com.trunk.demo.repository.UsersRepository;
 public class ReconcileFilesImpl implements ReconcileFiles {
 	private int reconciledCount;
 	private int transactionCount;
-	
+
 	@Autowired
 	private BankStmtRepository bankStmtRepo;
-	
+
 	@Autowired
 	private SettlementRepository settlementStmtRepo;
-	
+
 	@Autowired
 	private ResultsRepository reconcileResultsRepo;
-	
+
 	@Autowired
 	private UsersRepository usersRepo;
 
@@ -44,15 +46,20 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		reconciledCount = 0;
 		transactionCount = 0;
 
-		// Grabs the records it wants to work with from MongoDB
-		List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex();
-		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercard();
-		List<SettlementStmt> directDebitTransactions = settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.add(Calendar.MONTH, -3);
+
+		List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex(cal.getTime());
+		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo
+				.findAllByCardSchemeNameVisaOrMastercard(cal.getTime());
+		List<SettlementStmt> directDebitTransactions = settlementStmtRepo
+				.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(cal.getTime());
 		List<BankStmt> bankStatement = bankStmtRepo.findAll();
 
 		transactionCount = amexTransactions.size() + visaMastercardTransactions.size() + directDebitTransactions.size();
 
-		if(transactionCount <= 0 || bankStatement.size() <= 0)
+		if (transactionCount <= 0 || bankStatement.size() <= 0)
 			return;
 
 		// Work out transaction totals for different card types for each day
@@ -67,93 +74,71 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		List<SettlementStmt> finalAmex = matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
 		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
 				visaMastercardTransactions);
-		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit, directDebitTransactions);
+		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit,
+				directDebitTransactions);
+
+		List<SettlementStmt> allSettlementList = new ArrayList<SettlementStmt>(finalAmex);
+		allSettlementList.addAll(finalVisaMastercard);
+		allSettlementList.addAll(finalDirectDebit);
+
+		Map<Date, ArrayList<SettlementStmt>> monthBasedSettlementList = segregateBasedOnMonth(allSettlementList);
+
+		insertOrUpdatingReconcileResults(monthBasedSettlementList);
+
+	}
+
+	private void insertOrUpdatingReconcileResults(Map<Date, ArrayList<SettlementStmt>> monthBasedSettlementList) {
 
 		List<User> users = usersRepo.findByUsername("test@test.com");
-		//Create the reconcile results object
-		ReconcileResult result = new ReconcileResult(users.get(0).getId(), findEarliestDate(amexTransactions, visaMastercardTransactions, directDebitTransactions), findLatestDate(amexTransactions, visaMastercardTransactions, directDebitTransactions),
-				this.reconciledCount, this.transactionCount - this.reconciledCount);
 
-		//Get the id from the reconcile results object
-		String reconcileResultsId = result.getId();
+		for (Date eachMonth : monthBasedSettlementList.keySet()) {
 
-		//Set each transaction item here with that reconcile result's object ID
-		setReconcileResultsId(finalAmex, reconcileResultsId);
-		setReconcileResultsId(finalVisaMastercard, reconcileResultsId);
-		setReconcileResultsId(finalDirectDebit, reconcileResultsId);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(eachMonth);
 
-		// Save the results to the db
-		settlementStmtRepo.saveAll(finalAmex);
-		settlementStmtRepo.saveAll(finalVisaMastercard);
-		settlementStmtRepo.saveAll(finalDirectDebit);
+			String reconcileResultID = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH) + "-"
+					+ cal.get(Calendar.YEAR);
 
-		reconcileResultsRepo.save(result);
+			if (reconcileResultsRepo.findById(reconcileResultID).isPresent()) {
+				//
+				// Need to update the Counters Here :(
+				//
+			} else {
+				// Create the reconcile results object
+				ReconcileResult result = new ReconcileResult(reconcileResultID, users.get(0).getId(),
+						this.reconciledCount, this.transactionCount - this.reconciledCount);
+				// Get the id from the reconcile results object
+				String reconcileResultsId = result.getId();
+
+				for (SettlementStmt eachStmt : monthBasedSettlementList.get(eachMonth)) {
+					eachStmt.setReconcileResultsId(reconcileResultsId);
+					settlementStmtRepo.save(eachStmt);
+				}
+
+				reconcileResultsRepo.save(result);
+			}
+
+		}
+
 	}
-	
-	private void setReconcileResultsId(List<SettlementStmt> list, String id) {
-		for (SettlementStmt item : list) {
-			item.setReconcileResultsId(id);
+
+	private Map<Date, ArrayList<SettlementStmt>> segregateBasedOnMonth(List<SettlementStmt> allSettlementList) {
+
+		Map<Date, ArrayList<SettlementStmt>> segregatedList = new HashMap<Date, ArrayList<SettlementStmt>>();
+
+		Calendar cal = Calendar.getInstance();
+		for (SettlementStmt eachStmt : allSettlementList) {
+			cal.setTime(eachStmt.getSettlementDate());
+			cal.set(Calendar.DAY_OF_MONTH, 1);
+			if (segregatedList.get(cal.getTime()) == null) {
+				ArrayList<SettlementStmt> tmp = new ArrayList<SettlementStmt>();
+				tmp.add(eachStmt);
+				segregatedList.put(cal.getTime(), tmp);
+			} else {
+				segregatedList.get(cal.getTime()).add(eachStmt);
+			}
 		}
-	}
-	
-	private Date findEarliestDate(List<SettlementStmt> amexTransactions, List<SettlementStmt> visaMastercardTransactions, List<SettlementStmt> directDebitTransactions) {
-		Date earliestDate;
-		
-		if (amexTransactions.size() != 0)
-			earliestDate = amexTransactions.get(0).getSettlementDate();
-		else if (visaMastercardTransactions.size() != 0)
-			earliestDate = visaMastercardTransactions.get(0).getSettlementDate();
-		else if (directDebitTransactions.size() != 0)
-			earliestDate = directDebitTransactions.get(0).getSettlementDate();
-		else 
-			return null;
-		
-		for (SettlementStmt item : amexTransactions) {
-			if (item.getSettlementDate().before(earliestDate))
-				earliestDate = item.getSettlementDate();
-		}
-		
-		for (SettlementStmt item : visaMastercardTransactions) {
-			if (item.getSettlementDate().before(earliestDate))
-				earliestDate = item.getSettlementDate();
-		}
-		
-		for (SettlementStmt item : directDebitTransactions) {
-			if (item.getSettlementDate().before(earliestDate))
-				earliestDate = item.getSettlementDate();
-		}
-		
-		return earliestDate;
-	}
-	
-	private Date findLatestDate(List<SettlementStmt> amexTransactions, List<SettlementStmt> visaMastercardTransactions, List<SettlementStmt> directDebitTransactions) {
-		Date earliestDate;
-		
-		if (amexTransactions.size() != 0)
-			earliestDate = amexTransactions.get(0).getSettlementDate();
-		else if (visaMastercardTransactions.size() != 0)
-			earliestDate = visaMastercardTransactions.get(0).getSettlementDate();
-		else if (directDebitTransactions.size() != 0)
-			earliestDate = directDebitTransactions.get(0).getSettlementDate();
-		else 
-			return null;
-		
-		for (SettlementStmt item : amexTransactions) {
-			if (item.getSettlementDate().after(earliestDate))
-				earliestDate = item.getSettlementDate();
-		}
-		
-		for (SettlementStmt item : visaMastercardTransactions) {
-			if (item.getSettlementDate().after(earliestDate))
-				earliestDate = item.getSettlementDate();
-		}
-		
-		for (SettlementStmt item : directDebitTransactions) {
-			if (item.getSettlementDate().after(earliestDate))
-				earliestDate = item.getSettlementDate();
-		}
-		
-		return earliestDate;
+		return segregatedList;
 	}
 
 	private List<Date> reconcileDirectDebitItems(List<SettlementStmt> directDebitTransactions,
@@ -162,8 +147,10 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 
 		for (SettlementStmt eachDirectDebit : directDebitTransactions)
 			for (BankStmt eachStmt : bankStatement) {
-				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate()) && eachStmt.getCredits() == eachDirectDebit.getPrincipalAmount()
-						&& eachStmt.getTransactionDescription().replaceAll("\\s+","").contains(eachDirectDebit.getBankReference().replaceAll("\\s+",""))) {
+				if (eachStmt.getDate().equals(eachDirectDebit.getSettlementDate())
+						&& eachStmt.getCredits() == eachDirectDebit.getPrincipalAmount()
+						&& eachStmt.getTransactionDescription().replaceAll("\\s+", "")
+								.contains(eachDirectDebit.getBankReference().replaceAll("\\s+", ""))) {
 					response.add(eachStmt.getDate());
 					this.reconciledCount++;
 					break;

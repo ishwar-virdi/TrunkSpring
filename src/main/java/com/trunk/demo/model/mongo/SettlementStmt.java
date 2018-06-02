@@ -6,16 +6,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "SettlementStatements")
 public class SettlementStmt implements Serializable {
 
 	@Id
-	private String id;
-	
-	@Indexed
 	private Long receiptNumber;
 	
 	private String merchantID;
@@ -191,12 +187,11 @@ public class SettlementStmt implements Serializable {
 		this.reconcileStatus = reconcileStatus;
 	}
 
-	public SettlementStmt(String id, Long receiptNumber, String merchantID, String cardPAN, String cardExpiry,
+	public SettlementStmt(Long receiptNumber, String merchantID, String cardPAN, String cardExpiry,
 			String bankReference, double principalAmount, double surcharge, String currency, String customerName,
 			String responseText, Date settlementDate, String cardSchemeName, Date transactionTimeStamp, String status,
 			int reconcileStatus, Date reconciledDateTime, String reconcileResultsId) {
 		super();
-		this.id = id;
 		this.receiptNumber = receiptNumber;
 		this.merchantID = merchantID;
 		this.cardPAN = cardPAN;
@@ -216,14 +211,6 @@ public class SettlementStmt implements Serializable {
 		this.reconcileResultsId = reconcileResultsId;
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	public SettlementStmt() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -239,7 +226,7 @@ public class SettlementStmt implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SettlementStmt [id=" + id + ", receiptNumber=" + receiptNumber + ", merchantID=" + merchantID
+		return "SettlementStmt [receiptNumber=" + receiptNumber + ", merchantID=" + merchantID
 				+ ", cardPAN=" + cardPAN + ", cardExpiry=" + cardExpiry + ", bankReference=" + bankReference
 				+ ", principalAmount=" + principalAmount + ", surcharge=" + surcharge + ", currency=" + currency
 				+ ", customerName=" + customerName + ", responseText=" + responseText + ", settlementDate="

@@ -1,6 +1,7 @@
 package com.trunk.demo.service.Impl;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
@@ -49,32 +50,32 @@ public class UploadManagerImpl<T> implements UploadManager {
 
 	@Autowired
 	private CalenderUtil cal;
-    private DocumentType documentType;
-    private Set<String> transactionDate = new HashSet<>();
+	private DocumentType documentType;
+	private Set<String> transactionDate = new HashSet<>();
 
 	@Override
 	public String newUploadFile(String type, String fileName, InputStream inputStream) {
 
-		InputStream streamForMongo;
 		try {
-            redisBO.deleteCache();
-			streamForMongo = IOUtils.toBufferedInputStream(inputStream);
+			byte[] byteArray = IOUtils.toByteArray(inputStream);
+			InputStream s3Stream = new ByteArrayInputStream(byteArray);
+			InputStream mongoStream = new ByteArrayInputStream(byteArray);
+
+			redisBO.deleteCache();
 			String result = new String();
-			String s3Reponse = s3Service.newUploadFile(type, fileName, inputStream);
+			String s3Reponse = s3Service.newUploadFile(type, fileName, s3Stream);
 
 			if (s3Reponse.equalsIgnoreCase("SUCCESS")) {
-				BufferedReader br = new BufferedReader(new InputStreamReader(streamForMongo));
-				if (type.equalsIgnoreCase("Bank")){
+				BufferedReader br = new BufferedReader(new InputStreamReader(mongoStream));
+				if (type.equalsIgnoreCase("Bank")) {
 					redisBO.pushType(documentType.BANKSTATEMENT.name());
 					redisBO.pushFileName(fileName);
 					result = uploadBankCSV(br);
-				}
-				else if (type.equalsIgnoreCase("Settlement")){
+				} else if (type.equalsIgnoreCase("Settlement")) {
 					redisBO.pushType(documentType.SETTLEMENT.name());
 					redisBO.pushFileName(fileName);
 					result = uploadSettlementCSV(br);
-				}
-				else
+				} else
 					return "{\"result\":\"fail\",\"reason\":\"Invalid File Type\"}";
 			} else {
 				return s3Reponse;
@@ -82,7 +83,7 @@ public class UploadManagerImpl<T> implements UploadManager {
 			if (result.contains("success"))
 				reconcileService.reconcile();
 
-			//System.out.println(redisBO.getTransactionDate("0"));
+			// System.out.println(redisBO.getTransactionDate("0"));
 			return result;
 
 		} catch (Exception e) {
@@ -90,41 +91,41 @@ public class UploadManagerImpl<T> implements UploadManager {
 		}
 	}
 
-    @Override
-    public String retrieveUploadRecords() {
-        JsonObject jsonObject = new JsonObject();
-        Object fileName = redisBO.getFileName();
-        Object type = redisBO.getType();
-        int id = 0;
-        boolean flag = false;
-        Object transaction;
+	@Override
+	public String retrieveUploadRecords() {
+		JsonObject jsonObject = new JsonObject();
+		Object fileName = redisBO.getFileName();
+		Object type = redisBO.getType();
+		int id = 0;
+		boolean flag = false;
+		Object transaction;
 		UploadReviewListVO uploadReviewList;
 		List<T> transactions = new ArrayList<>();
-        if(fileName == null){
-            jsonObject.addProperty("result","fail");
-            return jsonObject.toString();
-        }else{
-            flag = true;
-        }
+		if (fileName == null) {
+			jsonObject.addProperty("result", "fail");
+			return jsonObject.toString();
+		} else {
+			flag = true;
+		}
 
-        while (flag){
-            transaction = redisBO.getTransaction(id);
-            if(transaction == null){
-                flag = false;
-                break;
-            }
-            if(documentType.SETTLEMENT.name().equals(type.toString())){
-                UploadReviewSettleVO settleVO = new UploadReviewSettleVO((SettlementStmt) transaction);
+		while (flag) {
+			transaction = redisBO.getTransaction(id);
+			if (transaction == null) {
+				flag = false;
+				break;
+			}
+			if (documentType.SETTLEMENT.name().equals(type.toString())) {
+				UploadReviewSettleVO settleVO = new UploadReviewSettleVO((SettlementStmt) transaction);
 				transactions.add((T) settleVO);
-            }else if(documentType.BANKSTATEMENT.name().equals(type.toString())){
+			} else if (documentType.BANKSTATEMENT.name().equals(type.toString())) {
 				UploadReviewBankVO bankStmtVO = new UploadReviewBankVO((BankStmt) transaction);
 				transactions.add((T) bankStmtVO);
-            }
-            id++;
-        }
-		uploadReviewList = new UploadReviewListVO(fileName.toString(),type.toString(),transactions);
-        return gson.toJson(uploadReviewList);
-    }
+			}
+			id++;
+		}
+		uploadReviewList = new UploadReviewListVO(fileName.toString(), type.toString(), transactions);
+		return gson.toJson(uploadReviewList);
+	}
 
 	private String uploadSettlementCSV(BufferedReader br) {
 
@@ -138,18 +139,22 @@ public class UploadManagerImpl<T> implements UploadManager {
 				if (line != "") {
 					line = line.replaceAll("\"", "");
 					String elements[] = line.split(",");
-					SettlementStmt newStmt = new SettlementStmt(elements[1], elements[2], elements[4], elements[7],
-							Double.parseDouble(elements[10].isEmpty() ? "0" : elements[10]),
-							Double.parseDouble(elements[11].isEmpty() ? "0" : elements[11]), elements[13], elements[16],
-							elements[24], Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]), elements[26],
-							elements[27], elements[29], elements[30], "");
-					redisBO.pushTransaction(id,newStmt);
-					date.append(cal.getDateYear(newStmt.getSettlementDate()))
-							.append(cal.getDateMonth(newStmt.getSettlementDate()));
-					transactionDate.add(date.toString());
-					date.setLength(0);
-					//settlementStmtRepo.insert(newStmt);
-					id++;
+
+					if (!settlementStmtRepo.findById(Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]))
+							.isPresent()) {
+						SettlementStmt newStmt = new SettlementStmt(elements[1], elements[2], elements[4], elements[7],
+								Double.parseDouble(elements[10].isEmpty() ? "0" : elements[10]),
+								Double.parseDouble(elements[11].isEmpty() ? "0" : elements[11]), elements[13],
+								elements[16], elements[24], Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]),
+								elements[26], elements[27], elements[29], elements[30], "");
+						redisBO.pushTransaction(id, newStmt);
+						date.append(cal.getDateYear(newStmt.getSettlementDate()))
+								.append(cal.getDateMonth(newStmt.getSettlementDate()));
+						transactionDate.add(date.toString());
+						date.setLength(0);
+						settlementStmtRepo.insert(newStmt);
+						id++;
+					}
 				}
 			}
 			redisBO.pushTransactionDate(transactionDate);
@@ -183,14 +188,14 @@ public class UploadManagerImpl<T> implements UploadManager {
 								Double.parseDouble(elements[5].isEmpty() ? "0" : elements[5]),
 								Double.parseDouble(elements[6].isEmpty() ? "0" : elements[6]),
 								Double.parseDouble(elements[7].isEmpty() ? "0" : elements[7]));
-
-						redisBO.pushTransaction(id,newStmt);
-						date.append(cal.getDateYear(newStmt.getDate()))
-								.append(cal.getDateMonth(newStmt.getDate()));
-						transactionDate.add(date.toString());
-						date.setLength(0);
-						//bankStmtRepo.insert(newStmt);
-						id++;
+						if (!bankStmtRepo.findById(newStmt.hashCode()).isPresent()) {
+							redisBO.pushTransaction(id, newStmt);
+							date.append(cal.getDateYear(newStmt.getDate())).append(cal.getDateMonth(newStmt.getDate()));
+							transactionDate.add(date.toString());
+							date.setLength(0);
+							bankStmtRepo.insert(newStmt);
+							id++;
+						}
 					}
 				}
 			}
