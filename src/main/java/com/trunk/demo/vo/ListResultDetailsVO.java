@@ -41,7 +41,7 @@ class SettlementItem {
 		this.description = settlementItem.getCustomerName();
 		this.amount = settlementItem.getPrincipalAmount();
 		this.accountNumber = settlementItem.getReceiptNumber();
-		if (settlementItem.getCardSchemeName() != "")
+		if (!"".equals(settlementItem.getCardSchemeName()))
 			this.transactionType = settlementItem.getCardSchemeName();
 		else
 			this.transactionType = "Direct Debit";
@@ -52,18 +52,22 @@ class SettlementItem {
 			this.status = 1;
 		
 		switch (settlementItem.getReconcileStatus()) {
-		case 3:
+		case 3:{
 			this.rule = "Auto Reconciled";
 			break;
-		case 2:
+		}
+		case 2:{
 			this.rule = "Manually Reconciled";
 			break;
-		case 1:
+		}
+		case 1:{
 			this.rule = "Auto Reconciled attempted but failed";
 			break;
-		case 0:
+		}
+		case 0:{
 			this.rule = "Not reconciled manually or auto";
 			break;
+		}
 		default:
 			this.rule = "Invalid status";
 			break;

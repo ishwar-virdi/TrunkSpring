@@ -43,15 +43,15 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	public void reconcile() {
 		reconciledCount = 0;
 		transactionCount = 0;
-		
+
 		// Grabs the records it wants to work with from MongoDB
 		List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex();
 		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo.findAllByCardSchemeNameVisaOrMastercard();
 		List<SettlementStmt> directDebitTransactions = settlementStmtRepo.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty();
 		List<BankStmt> bankStatement = bankStmtRepo.findAll();
-		
+
 		transactionCount = amexTransactions.size() + visaMastercardTransactions.size() + directDebitTransactions.size();
-		
+
 		if(transactionCount <= 0 || bankStatement.size() <= 0)
 			return;
 
@@ -68,20 +68,20 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
 				visaMastercardTransactions);
 		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit, directDebitTransactions);
-		
+
 		List<User> users = usersRepo.findByUsername("test@test.com");
 		//Create the reconcile results object
-		ReconcileResult result = new ReconcileResult(users.get(0).getId(), findEarliestDate(amexTransactions, visaMastercardTransactions, directDebitTransactions), findLatestDate(amexTransactions, visaMastercardTransactions, directDebitTransactions), 
+		ReconcileResult result = new ReconcileResult(users.get(0).getId(), findEarliestDate(amexTransactions, visaMastercardTransactions, directDebitTransactions), findLatestDate(amexTransactions, visaMastercardTransactions, directDebitTransactions),
 				this.reconciledCount, this.transactionCount - this.reconciledCount);
-		
+
 		//Get the id from the reconcile results object
 		String reconcileResultsId = result.getId();
-		
+
 		//Set each transaction item here with that reconcile result's object ID
 		setReconcileResultsId(finalAmex, reconcileResultsId);
 		setReconcileResultsId(finalVisaMastercard, reconcileResultsId);
 		setReconcileResultsId(finalDirectDebit, reconcileResultsId);
-		
+
 		// Save the results to the db
 		settlementStmtRepo.saveAll(finalAmex);
 		settlementStmtRepo.saveAll(finalVisaMastercard);
