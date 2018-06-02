@@ -1,9 +1,7 @@
 package com.trunk.demo.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

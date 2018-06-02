@@ -14,7 +14,7 @@ import com.trunk.demo.bo.ListSettlementBO;
 import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.repository.BankStmtRepository;
 import com.trunk.demo.repository.SettlementRepository;
-import com.trunk.demo.vo.DashDaliyTransaction;
+import com.trunk.demo.vo.DashDailyTransaction;
 import com.trunk.demo.vo.DashMonthTotalVO;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -125,7 +125,7 @@ public class DashboardManagerImpl implements DashboardManager {
 		Double debitSettTotal;
 		Double amexSettTotal;
 
-		List<DashDaliyTransaction> dashDaliyTransactions = new ArrayList<>();
+		List<DashDailyTransaction> dashDaliyTransactions = new ArrayList<>();
 		startOfDate = cal.calcPrevDayFromCurr(-30 * (page + 1)).getTime();
 		endOfDate = cal.calcPrevDayFromCurr(-30 * page + 1).getTime();
 
@@ -145,7 +145,7 @@ public class DashboardManagerImpl implements DashboardManager {
 			visaSettTotal = settleBO.getVisaMapTotal(dateDiff.getTime());
 			debitSettTotal = settleBO.getDebitMapTotal(dateDiff.getTime());
 			amexSettTotal = settleBO.getAmexMapTotal(dateDiff.getTime());
-			DashDaliyTransaction dashDaliyTransaction = new DashDaliyTransaction(dateDiff,visaSettTotal,debitSettTotal,amexSettTotal,visaBankTotal,debitBankTotal,amexBankTotal);
+			DashDailyTransaction dashDaliyTransaction = new DashDailyTransaction(dateDiff,visaSettTotal,debitSettTotal,amexSettTotal,visaBankTotal,debitBankTotal,amexBankTotal);
 			dashDaliyTransactions.add(dashDaliyTransaction);
 		}
 
