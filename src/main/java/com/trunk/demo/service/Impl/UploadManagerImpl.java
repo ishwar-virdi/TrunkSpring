@@ -1,27 +1,21 @@
 package com.trunk.demo.service.Impl;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.trunk.demo.Util.CalenderUtil;
 import com.trunk.demo.Util.DocumentType;
 import com.trunk.demo.bo.RedisBO;
-import com.trunk.demo.model.mongo.User;
-import com.trunk.demo.repository.RedisRepository;
 
-import com.trunk.demo.vo.UploadReiewListVO;
+import com.trunk.demo.vo.UploadReviewListVO;
 import com.trunk.demo.vo.UploadReviewBankVO;
 import com.trunk.demo.vo.UploadReviewSettleVO;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.trunk.demo.model.mongo.BankStmt;
@@ -104,7 +98,7 @@ public class UploadManagerImpl<T> implements UploadManager {
         int id = 0;
         boolean flag = false;
         Object transaction;
-		UploadReiewListVO uploadReviewList;
+		UploadReviewListVO uploadReviewList;
 		List<T> transactions = new ArrayList<>();
         if(fileName == null){
             jsonObject.addProperty("result","fail");
@@ -128,7 +122,7 @@ public class UploadManagerImpl<T> implements UploadManager {
             }
             id++;
         }
-		uploadReviewList = new UploadReiewListVO(fileName.toString(),type.toString(),transactions);
+		uploadReviewList = new UploadReviewListVO(fileName.toString(),type.toString(),transactions);
         return gson.toJson(uploadReviewList);
     }
 

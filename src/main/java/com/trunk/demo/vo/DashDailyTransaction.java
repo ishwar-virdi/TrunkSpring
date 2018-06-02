@@ -3,7 +3,7 @@ package com.trunk.demo.vo;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DashDaliyTransaction {
+public class DashDailyTransaction {
     private String date;
     private double settleVisa;
     private double settleDebit;
@@ -12,7 +12,7 @@ public class DashDaliyTransaction {
     private double bankDebit;
     private double bankAmex;
 
-    public DashDaliyTransaction(String date, double settleVisa, double settleDebit, double settleAmex, double bankVisa, double bankDebit, double bankAmex) {
+    public DashDailyTransaction(String date, double settleVisa, double settleDebit, double settleAmex, double bankVisa, double bankDebit, double bankAmex) {
         this.date = date;
         this.settleVisa = settleVisa;
         this.settleDebit = settleDebit;
@@ -22,7 +22,7 @@ public class DashDaliyTransaction {
         this.bankAmex = bankAmex;
     }
 
-    public DashDaliyTransaction(Calendar cal,double settleVisa, double settleDebit, double settleAmex, double bankVisa, double bankDebit, double bankAmex) {
+    public DashDailyTransaction(Calendar cal,double settleVisa, double settleDebit, double settleAmex, double bankVisa, double bankDebit, double bankAmex) {
         StringBuffer sb = new StringBuffer();
 
         sb.append(cal.get(Calendar.MONTH)+1)
