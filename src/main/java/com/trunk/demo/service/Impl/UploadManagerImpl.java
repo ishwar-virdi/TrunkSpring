@@ -1,7 +1,5 @@
 package com.trunk.demo.service.Impl;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
