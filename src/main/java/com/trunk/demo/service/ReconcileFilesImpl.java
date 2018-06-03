@@ -90,7 +90,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 			transactionCount = amexTransactions.size() + visaMastercardTransactions.size()
 					+ directDebitTransactions.size();
 
-			if (transactionCount <= 0 || bankStatement.size() <= 0)
+			if (transactionCount <= 0)
 				continue;
 
 			System.out.println("***Starting Reconcile Algortithm from " + eachMonthStart + " to " + endOfMonth + "***");
