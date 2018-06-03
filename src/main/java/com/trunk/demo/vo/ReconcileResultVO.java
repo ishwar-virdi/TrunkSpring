@@ -12,7 +12,8 @@ public class ReconcileResultVO {
 	private int percentage;
 	private String reconcileResultId;
 
-	public ReconcileResultVO(String userId, String reconcileDate, String startDate, String endDate, int percentage, String reconcileResultId) {
+	public ReconcileResultVO(String userId, String reconcileDate, String startDate, String endDate, int percentage,
+			String reconcileResultId) {
 		this.userId = userId;
 		this.reconcileDate = reconcileDate;
 		this.startDate = startDate;
@@ -59,11 +60,11 @@ public class ReconcileResultVO {
 	public void setPercentage(int percentage) {
 		this.percentage = percentage;
 	}
-	
+
 	public String getReconcileResultId() {
 		return this.reconcileResultId;
 	}
-	
+
 	public void setReconcileResultId(String id) {
 		this.reconcileResultId = id;
 	}

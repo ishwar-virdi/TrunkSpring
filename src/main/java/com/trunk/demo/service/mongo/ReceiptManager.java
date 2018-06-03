@@ -7,9 +7,8 @@ public interface ReceiptManager {
 
 	public String getReceipt(String id);
 
-	public String markAsReconciled(String id);
+	public String markAsReconciledOrNot(String id, boolean option);
 
 	//public String performBulkReconcile(boolean option, String[] allReciptNums);
 
-    public String markAsNotReconciled(String id);
 }

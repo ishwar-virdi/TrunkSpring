@@ -9,11 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.trunk.demo.Util.CalenderUtil;
 import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.model.mongo.ReconcileResult;
 import com.trunk.demo.model.mongo.SettlementStmt;
@@ -41,104 +44,113 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	@Autowired
 	private UsersRepository usersRepo;
 
+	@Value("${reconcileAlgo.limit}")
+	private String limit;
+
 	@Override
-	public void reconcile() {
-		reconciledCount = 0;
-		transactionCount = 0;
+	public void reconcile(Set<Date> monthInvolved) {
 
+		System.out.println("***Starting Reconcile Algortithm***");
+		CalenderUtil calUtil = new CalenderUtil();
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
-		cal.add(Calendar.MONTH, -3);
+		cal.setTime(calUtil.firstDayOfThisMonth(new Date()));
+		for (int i = 0; i <= Integer.parseInt(limit); ++i) {
+			cal.add(Calendar.MONTH, -1);
+			monthInvolved.add(cal.getTime());
+		}
 
-		List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex(cal.getTime());
-		List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo
-				.findAllByCardSchemeNameVisaOrMastercard(cal.getTime());
-		List<SettlementStmt> directDebitTransactions = settlementStmtRepo
-				.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(cal.getTime());
-		List<BankStmt> bankStatement = bankStmtRepo.findAll();
+		for (Date eachMonthStart : monthInvolved) {
 
-		transactionCount = amexTransactions.size() + visaMastercardTransactions.size() + directDebitTransactions.size();
+			cal.setTime(eachMonthStart);
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+			Date endOfMonth = cal.getTime();
 
-		if (transactionCount <= 0 || bankStatement.size() <= 0)
-			return;
+			reconciledCount = 0;
+			transactionCount = 0;
 
-		// Work out transaction totals for different card types for each day
-		Map<Date, Double> amexTotals = addUpSameDayTransactions(amexTransactions);
-		Map<Date, Double> visaMastercardTotals = addUpSameDayTransactions(visaMastercardTransactions);
+			System.out.println("***Finding Settlement Statments from " + eachMonthStart + " to " + endOfMonth + "***");
 
-		// Reconciles the items
-		List<Date> reconciledAmex = reconcileItems(amexTotals, bankStatement);
-		List<Date> reconciledVisaMastercard = reconcileItems(visaMastercardTotals, bankStatement);
-		List<Date> reconciledDirectDebit = reconcileDirectDebitItems(directDebitTransactions, bankStatement);
+			List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex(eachMonthStart,
+					endOfMonth);
+			List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo
+					.findAllByCardSchemeNameVisaOrMastercard(eachMonthStart, endOfMonth);
+			List<SettlementStmt> directDebitTransactions = settlementStmtRepo
+					.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(eachMonthStart, endOfMonth);
 
-		List<SettlementStmt> finalAmex = matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
-		List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
-				visaMastercardTransactions);
-		List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit,
-				directDebitTransactions);
+			System.out.println("***Finding Bank Statments from " + eachMonthStart + " to " + endOfMonth + "***");
+			List<BankStmt> bankStatement = bankStmtRepo.findAllBetweenDates(eachMonthStart, endOfMonth);
+			cal.setTime(eachMonthStart);
+			cal.add(Calendar.MONTH, 1);
+			Date nextMonthStart = cal.getTime();
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+			Date nextMonthEnd = cal.getTime();
+			System.out.println("***Finding Bank Statments from " + nextMonthStart + " to " + nextMonthEnd + "***");
+			bankStatement.addAll(bankStmtRepo.findAllBetweenDates(nextMonthStart, nextMonthEnd));
 
-		List<SettlementStmt> allSettlementList = new ArrayList<SettlementStmt>(finalAmex);
-		allSettlementList.addAll(finalVisaMastercard);
-		allSettlementList.addAll(finalDirectDebit);
+			transactionCount = amexTransactions.size() + visaMastercardTransactions.size()
+					+ directDebitTransactions.size();
 
-		Map<Date, ArrayList<SettlementStmt>> monthBasedSettlementList = segregateBasedOnMonth(allSettlementList);
+			if (transactionCount <= 0 || bankStatement.size() <= 0)
+				continue;
 
-		insertOrUpdatingReconcileResults(monthBasedSettlementList);
+			System.out.println("***Starting Reconcile Algortithm from " + eachMonthStart + " to " + endOfMonth + "***");
+
+			// Work out transaction totals for different card types for each day
+			Map<Date, Double> amexTotals = addUpSameDayTransactions(amexTransactions);
+			Map<Date, Double> visaMastercardTotals = addUpSameDayTransactions(visaMastercardTransactions);
+
+			// Reconciles the items
+			List<Date> reconciledAmex = reconcileItems(amexTotals, bankStatement);
+			List<Date> reconciledVisaMastercard = reconcileItems(visaMastercardTotals, bankStatement);
+			List<Date> reconciledDirectDebit = reconcileDirectDebitItems(directDebitTransactions, bankStatement);
+
+			List<SettlementStmt> finalAmex = matchReconciledWithSettlementItems(reconciledAmex, amexTransactions);
+			List<SettlementStmt> finalVisaMastercard = matchReconciledWithSettlementItems(reconciledVisaMastercard,
+					visaMastercardTransactions);
+			List<SettlementStmt> finalDirectDebit = matchReconciledWithSettlementItems(reconciledDirectDebit,
+					directDebitTransactions);
+
+			List<SettlementStmt> allSettlementList = new ArrayList<SettlementStmt>(finalAmex);
+			allSettlementList.addAll(finalVisaMastercard);
+			allSettlementList.addAll(finalDirectDebit);
+
+			insertOrUpdatingReconcileResults(eachMonthStart, allSettlementList);
+
+			System.out.println("***Done Reconcile Algortithm from " + eachMonthStart + " to " + endOfMonth + "***");
+
+		}
 
 	}
 
-	private void insertOrUpdatingReconcileResults(Map<Date, ArrayList<SettlementStmt>> monthBasedSettlementList) {
+	private void insertOrUpdatingReconcileResults(Date eachMonthStart, List<SettlementStmt> allSettlementList) {
 
 		List<User> users = usersRepo.findByUsername("test@test.com");
 
-		for (Date eachMonth : monthBasedSettlementList.keySet()) {
-
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(eachMonth);
-
-			String reconcileResultID = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH) + "-"
-					+ cal.get(Calendar.YEAR);
-
-			if (reconcileResultsRepo.findById(reconcileResultID).isPresent()) {
-				//
-				// Need to update the Counters Here :(
-				//
-			} else {
-				// Create the reconcile results object
-				ReconcileResult result = new ReconcileResult(reconcileResultID, users.get(0).getId(),
-						this.reconciledCount, this.transactionCount - this.reconciledCount);
-				// Get the id from the reconcile results object
-				String reconcileResultsId = result.getId();
-
-				for (SettlementStmt eachStmt : monthBasedSettlementList.get(eachMonth)) {
-					eachStmt.setReconcileResultsId(reconcileResultsId);
-					settlementStmtRepo.save(eachStmt);
-				}
-
-				reconcileResultsRepo.save(result);
-			}
-
-		}
-
-	}
-
-	private Map<Date, ArrayList<SettlementStmt>> segregateBasedOnMonth(List<SettlementStmt> allSettlementList) {
-
-		Map<Date, ArrayList<SettlementStmt>> segregatedList = new HashMap<Date, ArrayList<SettlementStmt>>();
-
 		Calendar cal = Calendar.getInstance();
+		cal.setTime(eachMonthStart);
+
+		String reconcileResultID = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH) + "-"
+				+ cal.get(Calendar.YEAR);
+
+		ReconcileResult result;
+
+		if (reconcileResultsRepo.findById(reconcileResultID).isPresent()) {
+			result = reconcileResultsRepo.findById(reconcileResultID).get();
+			result.setIsReconciled(reconciledCount);
+			result.setNotReconciled(transactionCount - reconciledCount);
+		} else
+			result = new ReconcileResult(reconcileResultID, users.get(0).getId(), reconciledCount,
+					transactionCount - reconciledCount);
+
+		// Get the id from the reconcile results object
+		String reconcileResultsId = result.getId();
+
 		for (SettlementStmt eachStmt : allSettlementList) {
-			cal.setTime(eachStmt.getSettlementDate());
-			cal.set(Calendar.DAY_OF_MONTH, 1);
-			if (segregatedList.get(cal.getTime()) == null) {
-				ArrayList<SettlementStmt> tmp = new ArrayList<SettlementStmt>();
-				tmp.add(eachStmt);
-				segregatedList.put(cal.getTime(), tmp);
-			} else {
-				segregatedList.get(cal.getTime()).add(eachStmt);
-			}
+			eachStmt.setReconcileResultsId(reconcileResultsId);
+			settlementStmtRepo.save(eachStmt);
 		}
-		return segregatedList;
+
+		reconcileResultsRepo.save(result);
 	}
 
 	private List<Date> reconcileDirectDebitItems(List<SettlementStmt> directDebitTransactions,
@@ -165,16 +177,20 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		List<SettlementStmt> modifiedSettlementStmtList = new ArrayList<SettlementStmt>();
 
 		for (SettlementStmt eachStmt : filteredSettlementStmtList) {
-			for (Date eachReconciledDate : reconciledDatesList) {
-				if (eachStmt.getSettlementDate().equals(eachReconciledDate)) {
-					eachStmt.setReconcileStatus(3);
-					eachStmt.setReconciledDateTime(new Date());
-					break;
-				}
-			}
-			if (eachStmt.getReconcileStatus() != 3) {
+			if (eachStmt.getReconcileStatus() == 2)
+				this.reconciledCount++;
+			else if (eachStmt.getReconcileStatus() != 4) {
 				eachStmt.setReconcileStatus(1);
 				eachStmt.setReconciledDateTime(new Date());
+				for (Date eachReconciledDate : reconciledDatesList) {
+
+					if (eachStmt.getSettlementDate().equals(eachReconciledDate)) {
+						eachStmt.setReconcileStatus(3);
+						eachStmt.setReconciledDateTime(new Date());
+						this.reconciledCount++;
+						break;
+					}
+				}
 			}
 			modifiedSettlementStmtList.add(eachStmt);
 		}
@@ -190,7 +206,6 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 				if (eachStmt.getDate().equals(eachDate)
 						&& eachStmt.getCredits() == totals.get(eachDate).doubleValue()) {
 					response.add(eachStmt.getDate());
-					this.reconciledCount++;
 					break;
 				}
 			}

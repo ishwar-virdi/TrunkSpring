@@ -34,8 +34,8 @@ public class SmartReconcileController {
 		return uploadManager.newUploadFile(type, file.getOriginalFilename(), file.getInputStream());
 	}
 
-	@RequestMapping(path= "/api/v1/uploadRecords",method = RequestMethod.GET)
-	public String uploadRecords(){
+	@RequestMapping(path = "/api/v1/uploadRecords", method = RequestMethod.GET)
+	public String uploadRecords() {
 		return uploadManager.retrieveUploadRecords();
 	}
 
@@ -44,14 +44,9 @@ public class SmartReconcileController {
 		return receiptManager.getReceipt(id);
 	}
 
-	@RequestMapping(path = "/api/v1/manualReconcile/{id}", method = RequestMethod.PUT)
-	public String markAsReconciled(@PathVariable("id") String id) {
-		return receiptManager.markAsReconciled(id);
-	}
-
-	@RequestMapping(path = "/api/v1/manualNotReconcile/{id}", method = RequestMethod.PUT)
-	public String markAsNotReconciled(@PathVariable("id") String id) {
-		return receiptManager.markAsNotReconciled(id);
+	@RequestMapping(path = "/api/v1/manualReconcile/{option}/{id}", method = RequestMethod.PUT)
+	public String markAsReconciled(@PathVariable("option") String option, @PathVariable("id") String id) {
+		return receiptManager.markAsReconciledOrNot(id, Boolean.parseBoolean(option));
 	}
 
 	@RequestMapping(path = "/api/resultDetails/{id}", method = RequestMethod.GET)
@@ -65,9 +60,9 @@ public class SmartReconcileController {
 		JsonObject params = new JsonParser().parse(param).getAsJsonObject();
 		String markAsReconcile = params.get("markAsReconcile").toString();
 		JsonArray items = params.get("items").getAsJsonArray();
-		if("true".equals(markAsReconcile)){
+		if ("true".equals(markAsReconcile)) {
 			json = resultDetailManager.markReconcile(items);
-		}else if("false".equals(markAsReconcile)){
+		} else if ("false".equals(markAsReconcile)) {
 			json = resultDetailManager.markNotReconcile(items);
 		}
 
@@ -82,9 +77,9 @@ public class SmartReconcileController {
 	@RequestMapping(path = "/api/v1/monthTotalAmount", method = RequestMethod.GET)
 	public String getMonthTotal(@RequestParam String page) {
 		int pageIndex;
-		try{
+		try {
 			pageIndex = Integer.parseInt(page);
-		}catch (Exception e){
+		} catch (Exception e) {
 			pageIndex = 0;
 		}
 		return dashboardManager.getMonthTotal(pageIndex);
@@ -93,9 +88,9 @@ public class SmartReconcileController {
 	@RequestMapping(path = "/api/v1/getDailyTransaction", method = RequestMethod.GET)
 	public String getDailyTransaction(@RequestParam String page) {
 		int pageIndex;
-		try{
+		try {
 			pageIndex = Integer.parseInt(page);
-		}catch (Exception e){
+		} catch (Exception e) {
 			pageIndex = 0;
 		}
 		return dashboardManager.getDailyTransaction(pageIndex);

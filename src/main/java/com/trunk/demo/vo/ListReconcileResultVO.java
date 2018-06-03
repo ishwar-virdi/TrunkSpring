@@ -6,18 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListReconcileResultVO {
-    private List<ReconcileResultVO> list;
+	private List<ReconcileResultVO> list;
 
-    public ListReconcileResultVO(List<ReconcileResult> results) {
-        list = new ArrayList<>();
-        for(int i = 0, length = results.size();i < length;i++){
-            ReconcileResultVO resultPO = new ReconcileResultVO(results.get(i));
-            list.add(resultPO);
-        }
-    }
+	public ListReconcileResultVO(List<ReconcileResult> results) {
+		list = new ArrayList<>();
+		for (ReconcileResult eachReconcileResult : results) {
+			ReconcileResultVO resultPO = new ReconcileResultVO(eachReconcileResult);
+			list.add(resultPO);
+		}
+	}
 
-    public List<ReconcileResultVO> getList() {
-        return list;
-    }
+	public List<ReconcileResultVO> getList() {
+		return list;
+	}
 
 }

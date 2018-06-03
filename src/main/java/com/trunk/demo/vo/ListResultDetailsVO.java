@@ -52,6 +52,10 @@ class SettlementItem {
 			this.status = 1;
 		
 		switch (settlementItem.getReconcileStatus()) {
+		case 4:{
+			this.rule = "Manually Not Reconciled";
+			break;
+		}
 		case 3:{
 			this.rule = "Auto Reconciled";
 			break;

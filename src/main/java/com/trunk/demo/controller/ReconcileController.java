@@ -29,10 +29,10 @@ public class ReconcileController {
 	@Autowired
 	private ReconcileFiles reconcileFiles;
 
-	@RequestMapping(method = RequestMethod.GET, path = "/api/reconcile")
-	public void reconcile() {
-		reconcileFiles.reconcile();
-	}
+	/*
+	 * @RequestMapping(method = RequestMethod.GET, path = "/api/reconcile") public
+	 * void reconcile() { reconcileFiles.reconcile(); }
+	 */
 
 	// For testing only
 	@RequestMapping(method = RequestMethod.GET, path = "/api/reset")

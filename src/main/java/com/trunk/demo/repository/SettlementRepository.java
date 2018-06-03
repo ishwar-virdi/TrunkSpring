@@ -17,21 +17,22 @@ public interface SettlementRepository extends MongoRepository<SettlementStmt, Lo
 	@Query("{ 'settlementDate' : {$regex:?0 }}")
 	List<SettlementStmt> findAllBySettlementDateLike(String settlementDate);
 
-	@Query("{ $and : [ { 'cardSchemeName' : {$regex : '.*amex.*', $options : 'i' } } , { 'settlementDate' : { $gte : ?0 } } ] }")
-    List<SettlementStmt> findAllByCardSchemeNameAmex(Date date);
+	@Query("{ $and : [ { 'cardSchemeName' : {$regex : '.*amex.*', $options : 'i' } } , { 'settlementDate' : { $gte : ?0 } }, { 'settlementDate' : { $lte : ?1 } } ] }")
+	List<SettlementStmt> findAllByCardSchemeNameAmex(Date fromDate, Date toDate);
 
-    @Query("{ $and : [ { $or : [ {'cardSchemeName' : {$regex: '.*visa.*', $options : 'i'}}, {'cardSchemeName' : {$regex: '.*mastercard.*', $options : 'i'}}  ]}, { 'settlementDate' : { $gte : ?0 } } ] }")
-    List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercard(Date date);
+	@Query("{ $and : [ { $or : [ {'cardSchemeName' : {$regex: '.*visa.*', $options : 'i'}}, {'cardSchemeName' : {$regex: '.*mastercard.*', $options : 'i'}}  ]}, { 'settlementDate' : { $gte : ?0 } }, { 'settlementDate' : { $lte : ?1 } } ] }")
+	List<SettlementStmt> findAllByCardSchemeNameVisaOrMastercard(Date fromDate, Date toDate);
 
-    @Query("{ $and : [ {'cardSchemeName' : ''}, { 'bankReference' : { $ne: '' } } , { 'settlementDate' : { $gte : ?0 } } ] }")
-    List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(Date date);
+	@Query("{ $and : [ {'cardSchemeName' : ''}, { 'bankReference' : { $ne: '' } } , { 'settlementDate' : { $gte : ?0 } }, { 'settlementDate' : { $lte : ?1 } } ] }")
+	List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(Date fromDate, Date toDate);
 
 	@Query("{ 'receiptNumber' : ?0 }")
 	Optional<SettlementStmt> findByReceiptNumber(Long receiptNumber);
-	
+
 	List<SettlementStmt> findAllByReconcileResultsId(String id);
 
-	List<SettlementStmt> findAllBySettlementDateBetween(Date startDate,Date endDate,Sort sort);
+	@Query("{ $and : [ { 'settlementDate' : { $gte : ?0 } }, { 'settlementDate' : { $lte : ?1 } } ] }")
+	List<SettlementStmt> findAllBySettlementDateBetween(Date startDate, Date endDate, Sort sort);
 
 	SettlementStmt findFirstByReceiptNumber(Long receiptNumber);
 }

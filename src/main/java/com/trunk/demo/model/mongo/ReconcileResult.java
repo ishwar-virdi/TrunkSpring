@@ -9,91 +9,80 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "ReconcileResults")
 public class ReconcileResult {
 
-    @Id
-    private String id;
+	@Id
+	private String id;
 
-    @Field
-    private String userId;
-    @Field
-    private Date lastModified;
-    @Field
-    private int isReconciled;
-    @Field
-    private int notReconciled;
-    @Field
-    private int percentage;
+	@Field
+	private String userId;
+	@Field
+	private Date lastModified;
+	@Field
+	private int isReconciled;
+	@Field
+	private int notReconciled;
 
-    public ReconcileResult(String id, String userId, int isReconciled, int notReconciled) {
-        super();
-        this.id = id;
-        this.userId = userId;
-        this.lastModified = new Date();
-        this.isReconciled = isReconciled;
-        this.notReconciled = notReconciled;
-        if (isReconciled + notReconciled > 0)
-            this.percentage = (int) ((isReconciled / (isReconciled + notReconciled)) * 100);
-        else
-            this.percentage = 0;
-    }
+	public ReconcileResult(String id, String userId, int isReconciled, int notReconciled) {
+		super();
+		this.id = id;
+		this.userId = userId;
+		this.lastModified = new Date();
+		this.isReconciled = isReconciled;
+		this.notReconciled = notReconciled;
+	}
 
-    public int getPercentage() {
-        return percentage;
-    }
+	public String getUserId() {
+		return userId;
+	}
 
-    public void setPercentage(int percentage) {
-        this.percentage = percentage;
-    }
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
-    public String getUserId() {
-        return userId;
-    }
+	public Date getLastModified() {
+		return lastModified;
+	}
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+	public void setLastModified(Date lastModified) {
+		this.lastModified = lastModified;
+	}
 
-    public Date getLastModified() {
-        return lastModified;
-    }
+	public int getIsReconciled() {
+		return isReconciled;
+	}
 
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
-    }
+	public void setIsReconciled(int isReconciled) {
+		this.isReconciled = isReconciled;
+	}
 
-    public int getIsReconciled() {
-        return isReconciled;
-    }
+	public int getNotReconciled() {
+		return notReconciled;
+	}
 
-    public void setIsReconciled(int isReconciled) {
-        this.isReconciled = isReconciled;
-    }
+	public void setNotReconciled(int notReconciled) {
+		this.notReconciled = notReconciled;
+	}
 
-    public int getNotReconciled() {
-        return notReconciled;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setNotReconciled(int notReconciled) {
-        this.notReconciled = notReconciled;
-    }
+	public ReconcileResult(String id, String userId, Date lastModified, Date startDate, Date endDate, int isReconciled,
+			int notReconciled, int percentage) {
+		super();
+		this.id = id;
+		this.userId = userId;
+		this.lastModified = lastModified;
+		this.isReconciled = isReconciled;
+		this.notReconciled = notReconciled;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public ReconcileResult() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
-    public ReconcileResult(String id, String userId, Date lastModified, Date startDate, Date endDate, int isReconciled,
-            int notReconciled, int percentage) {
-        super();
-        this.id = id;
-        this.userId = userId;
-        this.lastModified = lastModified;
-        this.isReconciled = isReconciled;
-        this.notReconciled = notReconciled;
-        this.percentage = percentage;
-    }
-
-    public ReconcileResult() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+	public int getPercentage() {
+		return Integer.valueOf((isReconciled * 100) / (isReconciled + notReconciled));
+	}
 
 }

@@ -51,7 +51,7 @@ public class UploadManagerImpl<T> implements UploadManager {
 	@Autowired
 	private CalenderUtil cal;
 	private DocumentType documentType;
-	private Set<String> transactionDate = new HashSet<>();
+	private Set<Date> monthInvolved = new HashSet<>();
 
 	@Override
 	public String newUploadFile(String type, String fileName, InputStream inputStream) {
@@ -80,10 +80,10 @@ public class UploadManagerImpl<T> implements UploadManager {
 			} else {
 				return s3Reponse;
 			}
+			System.out.println(monthInvolved);
 			if (result.contains("success"))
-				reconcileService.reconcile();
+				reconcileService.reconcile(monthInvolved);
 
-			// System.out.println(redisBO.getTransactionDate("0"));
 			return result;
 
 		} catch (Exception e) {
@@ -130,7 +130,6 @@ public class UploadManagerImpl<T> implements UploadManager {
 	private String uploadSettlementCSV(BufferedReader br) {
 
 		String line = new String();
-		StringBuffer date = new StringBuffer();
 		try {
 			// Skipping Header Row
 			br.readLine();
@@ -148,16 +147,12 @@ public class UploadManagerImpl<T> implements UploadManager {
 								elements[16], elements[24], Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]),
 								elements[26], elements[27], elements[29], elements[30], "");
 						redisBO.pushTransaction(id, newStmt);
-						date.append(cal.getDateYear(newStmt.getSettlementDate()))
-								.append(cal.getDateMonth(newStmt.getSettlementDate()));
-						transactionDate.add(date.toString());
-						date.setLength(0);
+						monthInvolved.add(cal.firstDayOfThisMonth(newStmt.getSettlementDate()));
 						settlementStmtRepo.insert(newStmt);
 						id++;
 					}
 				}
 			}
-			redisBO.pushTransactionDate(transactionDate);
 			br.close();
 			return "{\"result\":\"success\",\"reason\":\"Settlement File has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
@@ -168,7 +163,6 @@ public class UploadManagerImpl<T> implements UploadManager {
 	private String uploadBankCSV(BufferedReader br) {
 
 		String line = new String();
-		StringBuffer date = new StringBuffer();
 		try {
 			// Skipping Header Row
 			br.readLine();
@@ -190,18 +184,15 @@ public class UploadManagerImpl<T> implements UploadManager {
 								Double.parseDouble(elements[7].isEmpty() ? "0" : elements[7]));
 						if (!bankStmtRepo.findById(newStmt.hashCode()).isPresent()) {
 							redisBO.pushTransaction(id, newStmt);
-							date.append(cal.getDateYear(newStmt.getDate())).append(cal.getDateMonth(newStmt.getDate()));
-							transactionDate.add(date.toString());
-							date.setLength(0);
+							monthInvolved.add(cal.firstDayOfThisMonth(newStmt.getDate()));
 							bankStmtRepo.insert(newStmt);
 							id++;
 						}
 					}
 				}
 			}
-			redisBO.pushTransactionDate(transactionDate);
 			br.close();
-			return "{\"result\":\"success\",\"reason\":\"Settlement File has been Uploaded & pushed to system\"}";
+			return "{\"result\":\"success\",\"reason\":\"Bank Statement File has been Uploaded & pushed to system\"}";
 		} catch (Exception e) {
 			System.out.println(e);
 			return "{\"result\":\"fail\",\"reason\":\"Fatal Error:" + e.getMessage() + ". File is Incorrect.\"}";
