@@ -164,7 +164,6 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 						&& eachStmt.getTransactionDescription().replaceAll("\\s+", "")
 								.contains(eachDirectDebit.getBankReference().replaceAll("\\s+", ""))) {
 					response.add(eachStmt.getDate());
-					this.reconciledCount++;
 					break;
 				}
 			}
