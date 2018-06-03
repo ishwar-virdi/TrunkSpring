@@ -48,8 +48,8 @@ public class DashboardManagerImpl implements DashboardManager {
 
 		List<ReconcileResult> reconcileResults = reconcileResultRepo.findAll();
 
-		DataSet reconciled = new DataSet("Reconciled", "#E57373");
-		DataSet notReconciled = new DataSet("Not Reconciled", "#7986CB");
+		DataSet reconciled = new DataSet("Reconciled", "#7986CB");
+		DataSet notReconciled = new DataSet("Not Reconciled", "#E57373");
 
 		int dashboardLimit = Integer.parseInt(limit);
 

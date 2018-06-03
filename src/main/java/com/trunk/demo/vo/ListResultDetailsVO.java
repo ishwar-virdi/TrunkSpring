@@ -13,15 +13,15 @@ import com.trunk.demo.model.mongo.SettlementStmt;
 
 public class ListResultDetailsVO {
 	private List<SettlementItem> list;
-	
-	public ListResultDetailsVO (List<SettlementStmt> list) {
+
+	public ListResultDetailsVO(List<SettlementStmt> list) {
 		this.list = new ArrayList<SettlementItem>();
-		
+
 		for (SettlementStmt item : list) {
 			this.list.add(new SettlementItem(item));
 		}
 	}
-	
+
 	public String getJSON() {
 		return new Gson().toJson(this.list);
 	}
@@ -35,8 +35,8 @@ class SettlementItem {
 	private String transactionType;
 	private int status;
 	private String rule;
-	
-	public SettlementItem (SettlementStmt settlementItem){
+
+	public SettlementItem(SettlementStmt settlementItem) {
 		this.date = settlementItem.getSettlementDate();
 		this.description = settlementItem.getCustomerName();
 		this.amount = settlementItem.getPrincipalAmount();
@@ -45,31 +45,31 @@ class SettlementItem {
 			this.transactionType = settlementItem.getCardSchemeName();
 		else
 			this.transactionType = "Direct Debit";
-		
-		if(settlementItem.getReconcileStatus() == 0 || settlementItem.getReconcileStatus() == 1)
+
+		if (settlementItem.getReconcileStatus() < 2 || settlementItem.getReconcileStatus() == 4)
 			this.status = 0;
 		else
 			this.status = 1;
-		
+
 		switch (settlementItem.getReconcileStatus()) {
-		case 4:{
+		case 4: {
 			this.rule = "Manually Not Reconciled";
 			break;
 		}
-		case 3:{
+		case 3: {
 			this.rule = "Auto Reconciled";
 			break;
 		}
-		case 2:{
+		case 2: {
 			this.rule = "Manually Reconciled";
 			break;
 		}
-		case 1:{
-			this.rule = "Auto Reconciled attempted but failed";
+		case 1: {
+			this.rule = "Auto Reconciled Attempted but Failed";
 			break;
 		}
-		case 0:{
-			this.rule = "Not reconciled manually or auto";
+		case 0: {
+			this.rule = "Auto Reconciled Not Attempted";
 			break;
 		}
 		default:
@@ -77,11 +77,11 @@ class SettlementItem {
 			break;
 		}
 	}
-	
+
 	public String getJSON() {
 		JSONObject json = new JSONObject();
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-		
+
 		try {
 			json.put("date", formatter.format(this.date));
 			json.put("description", this.description);
@@ -94,7 +94,7 @@ class SettlementItem {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return json.toString();
 	}
 }
