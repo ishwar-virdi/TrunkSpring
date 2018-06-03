@@ -1,5 +1,7 @@
 package com.trunk.demo.service.Impl;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -115,11 +117,15 @@ public class UploadManagerImpl<T> implements UploadManager {
 				break;
 			}
 			if (documentType.SETTLEMENT.name().equals(type.toString())) {
-				UploadReviewSettleVO settleVO = new UploadReviewSettleVO((SettlementStmt) transaction);
-				transactions.add((T) settleVO);
+				if (transaction.getClass().getName().equalsIgnoreCase("com.trunk.demo.model.mongo.SettlementStmt")) {
+					UploadReviewSettleVO settleVO = new UploadReviewSettleVO((SettlementStmt) transaction);
+					transactions.add((T) settleVO);
+				}
 			} else if (documentType.BANKSTATEMENT.name().equals(type.toString())) {
-				UploadReviewBankVO bankStmtVO = new UploadReviewBankVO((BankStmt) transaction);
-				transactions.add((T) bankStmtVO);
+				if (transaction.getClass().getName().equalsIgnoreCase("com.trunk.demo.model.mongo.BankStmt")) {
+					UploadReviewBankVO bankStmtVO = new UploadReviewBankVO((BankStmt) transaction);
+					transactions.add((T) bankStmtVO);
+				}
 			}
 			id++;
 		}

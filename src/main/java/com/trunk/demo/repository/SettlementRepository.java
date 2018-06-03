@@ -34,5 +34,8 @@ public interface SettlementRepository extends MongoRepository<SettlementStmt, Lo
 	@Query("{ $and : [ { 'settlementDate' : { $gte : ?0 } }, { 'settlementDate' : { $lte : ?1 } } ] }")
 	List<SettlementStmt> findAllBySettlementDateBetween(Date startDate, Date endDate, Sort sort);
 
+	@Query("{ $and : [ { 'settlementDate' : { $gte : ?0 } }, { 'settlementDate' : { $lte : ?1 } } ] }")
+	List<SettlementStmt> findAllBySettlementDateBetweenValues(Date startDate, Date endDate);
+
 	SettlementStmt findFirstByReceiptNumber(Long receiptNumber);
 }

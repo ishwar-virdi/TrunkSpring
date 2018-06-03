@@ -55,8 +55,8 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(calUtil.firstDayOfThisMonth(new Date()));
 		for (int i = 0; i <= Integer.parseInt(limit); ++i) {
-			cal.add(Calendar.MONTH, -1);
 			monthInvolved.add(cal.getTime());
+			cal.add(Calendar.MONTH, -1);
 		}
 
 		for (Date eachMonthStart : monthInvolved) {
@@ -129,8 +129,8 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(eachMonthStart);
 
-		String reconcileResultID = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH) + "-"
-				+ cal.get(Calendar.YEAR);
+		String reconcileResultID = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH).substring(0, 3)
+				+ "-" + cal.get(Calendar.YEAR);
 
 		ReconcileResult result;
 

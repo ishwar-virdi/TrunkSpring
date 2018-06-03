@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import com.google.gson.Gson;
 import com.trunk.demo.Util.CalenderUtil;
@@ -40,8 +41,6 @@ public class DashboardManagerImpl implements DashboardManager {
 	@Autowired
 	private Gson gson;
 
-	private CalenderUtil cal = new CalenderUtil();
-
 	@Override
 	public String getReconcileData() {
 		JSONObject response = new JSONObject();
@@ -52,13 +51,24 @@ public class DashboardManagerImpl implements DashboardManager {
 		DataSet reconciled = new DataSet("Reconciled", "#E57373");
 		DataSet notReconciled = new DataSet("Not Reconciled", "#7986CB");
 
-		int i = 0;
+		int dashboardLimit = Integer.parseInt(limit);
+
+		CalenderUtil calUtil = new CalenderUtil();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(calUtil.firstDayOfThisMonth(new Date()));
+		for (int i = 0; i < dashboardLimit; ++i) {
+			labels[i] = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH).substring(0, 3) + "-"
+					+ cal.get(Calendar.YEAR);
+			cal.add(Calendar.MONTH, -1);
+		}
+
 		for (ReconcileResult item : reconcileResults) {
-			if (i == 5)
-				break;
-			labels[i] = item.getId();
-			reconciled.addData(i, item.getIsReconciled());
-			notReconciled.addData(i, item.getNotReconciled());
+			for (int i = 0; i < labels.length; ++i) {
+				if (item.getId().equals(labels[i])) {
+					reconciled.addData(i, item.getIsReconciled());
+					notReconciled.addData(i, item.getNotReconciled());
+				}
+			}
 		}
 
 		JSONArray jsonArray;
@@ -79,23 +89,32 @@ public class DashboardManagerImpl implements DashboardManager {
 	@Override
 	public String getMonthTotal(int page) {
 		ArrayList<DashMonthTotalVO> list = new ArrayList<>();
-		Date startOfDate = null;
-		Date endOfDate = null;
 
 		int period = Integer.parseInt(limit);
+		CalenderUtil calUtil = new CalenderUtil();
+		Calendar cal = Calendar.getInstance();
+		Calendar cal2 = Calendar.getInstance();
+		cal.setTime(calUtil.firstDayOfThisMonth(new Date()));
+		cal2.setTime(calUtil.firstDayOfThisMonth(new Date()));
 
 		for (int i = 0; i < period; i++) {
-			startOfDate = cal.getFristDayOfMonth(cal.getYear(), cal.getMonth() - i - page * period);
-			endOfDate = cal.getLastDayOfMonth(cal.getYear(), cal.getMonth() - i - page * period);
 
-			Sort bankSort = new Sort(Sort.Direction.DESC, "date");
-			Sort settleSort = new Sort(Sort.Direction.DESC, "settlementDate");
+			cal.add(Calendar.MONTH, -1 - (page * period));
+			cal2.add(Calendar.MONTH, -1 - (page * period));
+			Date startOfMonth = cal.getTime();
+			cal2.set(Calendar.DAY_OF_MONTH, cal2.getActualMaximum(Calendar.DAY_OF_MONTH));
+			Date endOfMonth = cal2.getTime();
+
 			ListBankStatementBO bankBO = new ListBankStatementBO(
-					bankStmtRepository.findAllByDateBetween(startOfDate, endOfDate, bankSort));
+					bankStmtRepository.findAllBetweenDates(startOfMonth, endOfMonth));
 			ListSettlementBO settleBO = new ListSettlementBO(
-					settlementRepository.findAllBySettlementDateBetween(startOfDate, endOfDate, settleSort));
-			DashMonthTotalVO dashMonthTotalVO = new DashMonthTotalVO(cal.getDateYear(startOfDate),
-					cal.getDateMonth(startOfDate), settleBO.getTotalAmount(), bankBO.getTotalAmount());
+					settlementRepository.findAllBySettlementDateBetweenValues(startOfMonth, endOfMonth));
+
+			String id = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH).substring(0, 3) + "-"
+					+ cal.get(Calendar.YEAR);
+
+			DashMonthTotalVO dashMonthTotalVO = new DashMonthTotalVO(id, settleBO.getTotalAmount(),
+					bankBO.getTotalAmount());
 
 			list.add(dashMonthTotalVO);
 		}
@@ -104,9 +123,6 @@ public class DashboardManagerImpl implements DashboardManager {
 
 	@Override
 	public String getDailyTransaction(int page) {
-		Calendar dateDiff = null;
-		Date startOfDate = null;
-		Date endOfDate = null;
 
 		Double visaBankTotal;
 		Double debitBankTotal;
@@ -116,28 +132,41 @@ public class DashboardManagerImpl implements DashboardManager {
 		Double amexSettTotal;
 
 		List<DashDailyTransaction> dashDaliyTransactions = new ArrayList<>();
-		startOfDate = cal.calcPrevDayFromCurr(-30 * (page + 1)).getTime();
-		endOfDate = cal.calcPrevDayFromCurr(-30 * page + 1).getTime();
 
-		int differenceDay = cal.differenceDay(startOfDate, endOfDate);
+		CalenderUtil calUtil = new CalenderUtil();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(calUtil.firstDayOfThisMonth(new Date()));
 
-		Sort bankSort = new Sort(Sort.Direction.DESC, "date");
-		Sort settleSort = new Sort(Sort.Direction.DESC, "settlementDate");
-		ListBankStatementBO bankBO = new ListBankStatementBO(
-				bankStmtRepository.findAllByDateBetween(startOfDate, endOfDate, bankSort));
-		ListSettlementBO settleBO = new ListSettlementBO(
-				settlementRepository.findAllBySettlementDateBetween(startOfDate, endOfDate, settleSort));
+		cal.add(Calendar.MONTH, (-1 * page));
+		Date startOfMonth = cal.getTime();
 
-		for (int i = 0; i < differenceDay; i++) {
-			dateDiff = cal.calcPrevDayFromCurr((i + 30 * page) * -1);
+		for (int i = cal.get(Calendar.DAY_OF_MONTH); i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); i++) {
 
-			visaBankTotal = bankBO.getVisaMapTotal(dateDiff.getTime());
-			debitBankTotal = bankBO.getDebitMapTotal(dateDiff.getTime());
-			amexBankTotal = bankBO.getAmexMapTotal(dateDiff.getTime());
-			visaSettTotal = settleBO.getVisaMapTotal(dateDiff.getTime());
-			debitSettTotal = settleBO.getDebitMapTotal(dateDiff.getTime());
-			amexSettTotal = settleBO.getAmexMapTotal(dateDiff.getTime());
-			DashDailyTransaction dashDaliyTransaction = new DashDailyTransaction(dateDiff, visaSettTotal,
+			Calendar eachDayCal = Calendar.getInstance();
+			eachDayCal.setTime(startOfMonth);
+			eachDayCal.set(Calendar.DAY_OF_MONTH, i);
+
+			Date eachDayStart = eachDayCal.getTime();
+			cal.add(Calendar.DAY_OF_MONTH, 1);
+			cal.add(Calendar.MILLISECOND, -1);
+			Date eachDayEnd = eachDayCal.getTime();
+
+			ListBankStatementBO bankBO = new ListBankStatementBO(
+					bankStmtRepository.findAllBetweenDates(eachDayStart, eachDayEnd));
+			ListSettlementBO settleBO = new ListSettlementBO(
+					settlementRepository.findAllBySettlementDateBetweenValues(eachDayStart, eachDayEnd));
+
+			visaBankTotal = bankBO.getVisaMapTotal(eachDayStart);
+			debitBankTotal = bankBO.getDebitMapTotal(eachDayStart);
+			amexBankTotal = bankBO.getAmexMapTotal(eachDayStart);
+			visaSettTotal = settleBO.getVisaMapTotal(eachDayStart);
+			debitSettTotal = settleBO.getDebitMapTotal(eachDayStart);
+			amexSettTotal = settleBO.getAmexMapTotal(eachDayStart);
+
+			String dateAsString = cal.get(Calendar.DAY_OF_MONTH) + "-"
+					+ cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH).substring(0, 3) + "-"
+					+ cal.get(Calendar.YEAR);
+			DashDailyTransaction dashDaliyTransaction = new DashDailyTransaction(dateAsString, visaSettTotal,
 					debitSettTotal, amexSettTotal, visaBankTotal, debitBankTotal, amexBankTotal);
 			dashDaliyTransactions.add(dashDaliyTransaction);
 		}
