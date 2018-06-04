@@ -164,9 +164,10 @@ public class CalenderUtil {
 	}
 
 	public int isMonth(String value){
-		final String[] months = {"January","February","March","April",
-				"May","June","July","August", "September","October","November","December",
-				"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"};
+		value = value.toLowerCase();
+		final String[] months = {"january","february","march","april",
+				"may","june","july","august", "september","october","november","december",
+				"jan","feb","mar","apr","may","jun","jul","aug","sept","oct","nov","dec"};
 		int month = 0;
 		for(int i = 0,length = months.length;i<length;i++){
 			if(value.equals(months[i])){
