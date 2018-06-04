@@ -33,19 +33,19 @@ public class RedisBOImpl implements RedisBO {
 	@Override
 	public void pushTransaction(int id, Object settle) {
 		redisRepository.pushObjectToHash(session.getId(), String.valueOf(id), settle);
-		redisRepository.setObjectExpireTime(session.getId(), 60);
+		//redisRepository.setObjectExpireTime(session.getId(), 60);
 	}
 
 	@Override
 	public void pushType(String type) {
 		redisRepository.pushStringToHash(session.getId(), this.type, type);
-		redisRepository.setExpireTime(session.getId(), 60);
+		//redisRepository.setExpireTime(session.getId(), 60);
 	}
 
 	@Override
 	public void pushFileName(String filename) {
 		redisRepository.pushStringToHash(session.getId(), this.filename, filename);
-		redisRepository.setExpireTime(session.getId(), 60);
+		//redisRepository.setExpireTime(session.getId(), 60);
 	}
 
 	@Override

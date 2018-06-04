@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.*;
 
 @RestController
 public class ResultController {
 
 	@Autowired
 	private ResultService resultService;
+
 
 	@RequestMapping(method = RequestMethod.GET, value = "/api/v1/results")
 	public String Results(@RequestParam String page, HttpSession session) {
@@ -24,12 +26,6 @@ public class ResultController {
 		}
 		return resultService.retrieveResults(session, pageIndex);
 	}
-
-	/*
-	 * @RequestMapping(method = RequestMethod.GET,value="/api/v1/seedResults")
-	 * public String saveSeedData(HttpSession session) throws ParseException {
-	 * return resultService.saveSeedData(session); }
-	 */
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/api/v1/search")
 	public String SearchResult(@RequestBody String param, HttpSession session) {

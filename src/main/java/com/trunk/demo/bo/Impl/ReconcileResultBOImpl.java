@@ -5,6 +5,7 @@ import com.trunk.demo.model.mongo.ReconcileResult;
 import com.trunk.demo.repository.ResultsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -18,6 +19,11 @@ public class ReconcileResultBOImpl implements ReconcileResultBO {
     private ResultsRepository resultsRepository;
 
     @Override
+    public List<ReconcileResult> findAllByUserId(String uid){
+        return resultsRepository.findAllByUserId(uid);
+    }
+
+    @Override
     public List<ReconcileResult> findByUserId(String uid, Pageable page){
         return resultsRepository.findByUserId(uid, page);
     }
@@ -28,23 +34,28 @@ public class ReconcileResultBOImpl implements ReconcileResultBO {
     }
 
     @Override
-    public List<ReconcileResult> findByUserIdAndPercentage(String uid,int percentage){
-        return resultsRepository.findByUserIdAndPercentage(uid, percentage);
+    public List<ReconcileResult> findByUserIdAndPercentage(String uid,int percentage,Sort sort){
+        return resultsRepository.findByUserIdAndPercentage(uid, percentage,sort);
     }
 
     @Override
-    public List<ReconcileResult> findByUserIdAndPercentageGreaterThanEqual(String uid,int percentage){
-        return resultsRepository.findByUserIdAndPercentageGreaterThanEqual(uid, percentage);
+    public List<ReconcileResult> findByUserIdAndPercentageGreaterThanEqual(String uid,int percentage,Sort sort){
+        return resultsRepository.findByUserIdAndPercentageGreaterThanEqual(uid, percentage,sort);
     }
 
     @Override
-    public List<ReconcileResult> findByUserIdAndPercentageLessThanEqual(String uid,int percentage){
-        return resultsRepository.findByUserIdAndPercentageLessThanEqual(uid, percentage);
+    public List<ReconcileResult> findByUserIdAndPercentageLessThanEqual(String uid,int percentage,Sort sort){
+        return resultsRepository.findByUserIdAndPercentageLessThanEqual(uid, percentage,sort);
     }
 
     @Override
-    public List<ReconcileResult> findByUserIdAndPercentageBetween(String uid,int lessThanValue,int largerThanValue){
-        return resultsRepository.findByUserIdAndPercentageBetween(uid, lessThanValue, largerThanValue);
+    public List<ReconcileResult> findByUserIdAndPercentageBetween(String uid,int lessThanValue,int largerThanValue,Sort sort){
+        return resultsRepository.findByUserIdAndPercentageBetween(uid, lessThanValue, largerThanValue,sort);
+    }
+
+    @Override
+    public List<ReconcileResult> findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(String uid, Date startDate, Date endDate) {
+        return resultsRepository.findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(uid, startDate, endDate);
     }
 
     @Override

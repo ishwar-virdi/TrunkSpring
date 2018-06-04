@@ -46,13 +46,12 @@ public class ResultDetailManagerImpl implements ResultDetailManager {
 			if (resultsId == null) {
 				resultsId = settle.getReconcileResultsId();
 			}
-			if (settle != null) {
+			if (settle != null && (settle.getReconcileStatus() == 1 || settle.getReconcileStatus() == 4)) {
 				settle.setReconcileStatus(2);
 				settlementBO.save(settle);
 				count++;
 			}
 		}
-
 		result = reconcileResultBO.findById(resultsId);
 		reconcileResultBO.updateIncreaseIsReconcile(count, result);
 		return jsonObject.toString();
@@ -75,7 +74,7 @@ public class ResultDetailManagerImpl implements ResultDetailManager {
 			if (resultsId == null) {
 				resultsId = settle.getReconcileResultsId();
 			}
-			if (settle != null) {
+			if (settle != null&& (settle.getReconcileStatus() == 2 || settle.getReconcileStatus() == 3)) {
 				settle.setReconcileStatus(4);
 				settlementBO.save(settle);
 				count++;
