@@ -2,6 +2,8 @@ package com.trunk.demo.Util;
 
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -9,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class CalenderUtil {
 	private Calendar cal;
+
+
 
 	public CalenderUtil() {
 		cal = Calendar.getInstance();
@@ -128,4 +132,51 @@ public class CalenderUtil {
 		return cal.getTime();
 	}
 
+	public Date firstDayOfMonthByString(String value,String format){
+		Date date = null;
+		if(value.contains("May")){
+			value = value.replace(".","");
+		}
+		try {
+			date = new SimpleDateFormat(format).parse(value);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return date;
+	}
+
+	public Date EndDayOfMonthByString(String value,String format){
+		Date date = null;
+		if(value.contains("May")){
+			value = value.replace(".","");
+		}
+		try {
+			date = new SimpleDateFormat(format).parse(value);
+			cal = Calendar.getInstance();
+			cal.setTime(date);
+			int month = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+			cal.set(Calendar.DAY_OF_MONTH,month);
+			date = this.setDateToMax(cal.getTime());
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return date;
+	}
+
+	public int isMonth(String value){
+		final String[] months = {"January","February","March","April",
+				"May","June","July","August", "September","October","November","December",
+				"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"};
+		int month = 0;
+		for(int i = 0,length = months.length;i<length;i++){
+			if(value.equals(months[i])){
+				month = i;
+				if(month > 12){
+					month = month - 12;
+				}
+				return month;
+			}
+		}
+		return -1;
+	}
 }
