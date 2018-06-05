@@ -144,7 +144,7 @@ public class UploadManagerImpl<T> implements UploadManager {
 					String elements[] = line.split(",");
 
 					if (!settlementStmtRepo.findById(Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]))
-							.isPresent()) {
+							.isPresent() && elements[24].equalsIgnoreCase("approved")) {
 						SettlementStmt newStmt = new SettlementStmt(elements[1], elements[2], elements[4], elements[7],
 								Double.parseDouble(elements[10].isEmpty() ? "0" : elements[10]),
 								Double.parseDouble(elements[11].isEmpty() ? "0" : elements[11]), elements[13],
