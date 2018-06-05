@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.trunk.demo.Util.CalenderUtil;
+import com.trunk.demo.bo.ReconcileResultBO;
 import com.trunk.demo.model.mongo.ReconcileResult;
 import com.trunk.demo.repository.ResultsRepository;
 import com.trunk.demo.service.ResultService;
@@ -28,15 +29,13 @@ import java.util.Optional;
 public class ResultServiceImpl implements ResultService {
 
     @Autowired
-    private ResultsRepository resultsRepository;
+    private ReconcileResultBO reconcileResultBO;
 
     @Autowired
     private Gson gson;
 
     @Autowired
     private CalenderUtil cal;
-
-    private ReconcileResult result;
 
     @Override
     public String retrieveResults(HttpSession session,int pageIndex) {
@@ -51,52 +50,18 @@ public class ResultServiceImpl implements ResultService {
         }
 
         Pageable page = PageRequest.of(pageIndex,20,new Sort(Sort.Direction.DESC,"lastModified"));
-        results = resultsRepository.findByUserId(userSession.toString(),page);
-
+        results = reconcileResultBO.findByUserId(userSession.toString(),page);
         resultsVO = new ListReconcileResultVO(results);
 
         return gson.toJson(resultsVO.getList());
     }
 
     @Override
-    public String saveSeedData(HttpSession session) throws ParseException {
-        Object userSession = session.getAttribute(session.getId());
-        if(userSession == null){
-            return gson.toJson("");
-        }
-        String userId = userSession.toString();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        /*
-        result = new ReconcileResult(userId,sdf.parse("20180401"),sdf.parse("20180501"),10,6);
-        resultsRepository.save(result);
-        result = new ReconcileResult(userId,sdf.parse("20180301"),sdf.parse("20180401"),100,12);
-        resultsRepository.save(result);
-        result = new ReconcileResult(userId,sdf.parse("20180201"),sdf.parse("20180301"),60,12);
-        resultsRepository.save(result);
-        result = new ReconcileResult(userId,sdf.parse("20180101"),sdf.parse("20180201"),67,12);
-        resultsRepository.save(result);
-        result = new ReconcileResult(userId,sdf.parse("20171101"),sdf.parse("20171201"),78,31);
-        resultsRepository.save(result);
-        result = new ReconcileResult(userId,sdf.parse("20171001"),sdf.parse("20171101"),45,12);
-        resultsRepository.save(result);
-        result = new ReconcileResult(userId,sdf.parse("20170901"),sdf.parse("20171001"),40,12);
-        resultsRepository.save(result);
-        result = new ReconcileResult(userId,sdf.parse("20170801"),sdf.parse("20170901"),20,12);
-        resultsRepository.save(result);
-        result = new ReconcileResult(userId,sdf.parse("20170701"),sdf.parse("20170801"),50,12);
-        resultsRepository.save(result);*/
-        return "aaaa";
-    }
-
-    @Override
     public String resultSearch(String userId, String page, String value) {
         String json = "";
-
         if(!"result".equals(page)){
             return "fail";
         }
-
         ListReconcileResultVO results;
         int dotIndex = value.indexOf(".");
         int lessSignIndex = value.indexOf("<");
@@ -104,10 +69,25 @@ public class ResultServiceImpl implements ResultService {
         int hyphenIndex = value.indexOf("-");
         int slashIndex = value.indexOf("/");
         int secondSlash = value.indexOf("/", slashIndex + 1);
-
         try {
+            // Month
+            if(cal.isMonth(value) != -1){
+                Pageable pageable = PageRequest.of(0,20,new Sort(Sort.Direction.DESC,"lastModified"));
+                List<ReconcileResult> result= reconcileResultBO.findByUserId(userId,pageable);
+                List<ReconcileResult> returnJson = new ArrayList<>();
+                int month = 0;
+                int searchMonth = cal.isMonth(value);
+                for(int i = 0, length = result.size();i<length;i++){
+                    month = cal.getDateMonth(result.get(i).getStartDate());
+                    if(month == searchMonth){
+                        returnJson.add(result.get(i));
+                    }
+                }
+                results = new ListReconcileResultVO(returnJson);
+                return gson.toJson(results.getList());
+            }
             // Last Modified
-            if (value.length() >= 10 && dotIndex == 6) {
+            else if (value.length() >= 10 && dotIndex == 6) {
                 value = value.substring(0,10);
 
                 if(value.contains("May")){
@@ -120,26 +100,33 @@ public class ResultServiceImpl implements ResultService {
                 Date lastDayOfDate = cal.setDateToMax(date);
 
                 results = new ListReconcileResultVO(
-                        resultsRepository.findByUserIdAndLastModifiedBetween(userId, firstDayOfDate, lastDayOfDate)
+                        reconcileResultBO.findByUserIdAndLastModifiedBetween(userId, firstDayOfDate, lastDayOfDate)
                 );
                 json = gson.toJson(results.getList());
             }
             // dateRange
- /*           else if (value.length() >= 21 && secondSlash - slashIndex == 3 && hyphenIndex != -1) {
+            else if (value.length() >= 21 && secondSlash - slashIndex == 3 && hyphenIndex != -1) {
                 String dates[] = value.split("-");
                 Date startDate = stringToDate(dates[0]);
                 Date endDate = getNextDate(dates[1]);
-                results = new ListReconcileResultVO(resultsRepository
+                results = new ListReconcileResultVO(reconcileResultBO
                         .findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(userId, startDate, endDate));
                 json = gson.toJson(results.getList());
-            }*/
+            }
             // percentage
             else if (value.length() <= 3 && largeSignIndex == -1 && lessSignIndex == -1) {
                 int percentage = Integer.parseInt(value);
                 if (percentage > 100 || percentage < 0) {
                     return "fail";
                 }
-                results = new ListReconcileResultVO(resultsRepository.findByUserIdAndPercentage(userId, percentage));
+                List<ReconcileResult> result= reconcileResultBO.findAllByUserId(userId);
+                List<ReconcileResult> returnJson = new ArrayList<>();
+                for(int i = 0, length = result.size();i<length;i++){
+                    if(percentage == result.get(i).getPercentage()){
+                        returnJson.add(result.get(i));
+                    }
+                }
+                results = new ListReconcileResultVO(returnJson);
                 json = gson.toJson(results.getList());
             }
             // Retrieve percentage by greater than
@@ -148,8 +135,14 @@ public class ResultServiceImpl implements ResultService {
                 if (percentage > 100 || percentage < 0) {
                     return "fail";
                 }
-                results = new ListReconcileResultVO(
-                        resultsRepository.findByUserIdAndPercentageGreaterThanEqual(userId, percentage));
+                List<ReconcileResult> result= reconcileResultBO.findAllByUserId(userId);
+                List<ReconcileResult> returnJson = new ArrayList<>();
+                for(int i = 0, length = result.size();i<length;i++){
+                    if(result.get(i).getPercentage() > percentage){
+                        returnJson.add(result.get(i));
+                    }
+                }
+                results = new ListReconcileResultVO(returnJson);
                 json = gson.toJson(results.getList());
             }
             // Retrieve percentage by less than
@@ -158,8 +151,14 @@ public class ResultServiceImpl implements ResultService {
                 if (percentage > 100 || percentage < 0) {
                     return "fail";
                 }
-                results = new ListReconcileResultVO(
-                        resultsRepository.findByUserIdAndPercentageLessThanEqual(userId, percentage));
+                List<ReconcileResult> result= reconcileResultBO.findAllByUserId(userId);
+                List<ReconcileResult> returnJson = new ArrayList<>();
+                for(int i = 0, length = result.size();i<length;i++){
+                    if(result.get(i).getPercentage() < percentage){
+                        returnJson.add(result.get(i));
+                    }
+                }
+                results = new ListReconcileResultVO(returnJson);
                 json = gson.toJson(results.getList());
             }
             // Retrieve percentage by greater than and less than
@@ -179,35 +178,24 @@ public class ResultServiceImpl implements ResultService {
                 }
                 lessThanValue++;
                 largerThanValue--;
-                results = new ListReconcileResultVO(
-                        resultsRepository.findByUserIdAndPercentageBetween(userId, largerThanValue, lessThanValue));
-                json = gson.toJson(results.getList());
-            }
-            // Retrieve by ID
-            else if (value.length() == 24) {
-                Optional<ReconcileResult> id = resultsRepository.findById(value);
-                if (!id.isPresent()) {
-                    return "fail";
+                List<ReconcileResult> result= reconcileResultBO.findAllByUserId(userId);
+                List<ReconcileResult> returnJson = new ArrayList<>();
+                for(int i = 0, length = result.size();i<length;i++){
+                    if(result.get(i).getPercentage() < lessThanValue && result.get(i).getPercentage() > largerThanValue ){
+                        returnJson.add(result.get(i));
+                    }
                 }
-                List<ReconcileResult> result = new ArrayList<>();
-                result.add(id.get());
-                json = gson.toJson(result);
+                results = new ListReconcileResultVO(returnJson);
+                json = gson.toJson(results.getList());
             }
             // Month
-            /*else if (value.length() == 7 && dotIndex == 3) {
-                if(value.contains("May")){
-                    value = value.replace(".","");
-                }
-                Date date =new SimpleDateFormat("MMM yy").parse(value);
-                Date firstDayOfDate = cal.getFristDayOfMonth(cal.getDateYear(date),cal.getDateMonth(date));
-                Date lastDayOfDate = cal.getLastDayOfMonth(cal.getDateYear(date),cal.getDateMonth(date));
-                firstDayOfDate = cal.calcPrevDayFromDate(firstDayOfDate,-15).getTime();
-                lastDayOfDate = cal.calcPrevDayFromDate(lastDayOfDate, 15).getTime();
-                results = new ListReconcileResultVO(
-                        resultsRepository.findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(userId, firstDayOfDate, lastDayOfDate)
-                );
+            else if (value.length() == 8 && hyphenIndex == 3) {
+                ReconcileResult result = reconcileResultBO.findById(value);
+                List<ReconcileResult> resultList = new ArrayList<>();
+                resultList.add(result);
+                results = new ListReconcileResultVO(resultList);
                 json = gson.toJson(results.getList());
-            }*/else {
+            }else {
                 return "fail";
             }
         } catch (Exception e) {
@@ -239,4 +227,6 @@ public class ResultServiceImpl implements ResultService {
         date = sdf.parse(sb.toString());
         return date;
     }
+
+
 }

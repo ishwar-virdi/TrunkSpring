@@ -5,7 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import com.trunk.demo.Util.CalenderUtil;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -23,14 +25,36 @@ public class ReconcileResult implements Comparable<ReconcileResult> {
 	private int isReconciled;
 	@Field
 	private int notReconciled;
+	@Field
+	private Date startDate;
+	@Field
+	private Date endDate;
 
+	public ReconcileResult() {
+		super();
+	}
+
+	@PersistenceConstructor
 	public ReconcileResult(String id, String userId, int isReconciled, int notReconciled) {
 		super();
+		CalenderUtil cal = new CalenderUtil();
 		this.id = id;
 		this.userId = userId;
 		this.lastModified = new Date();
 		this.isReconciled = isReconciled;
 		this.notReconciled = notReconciled;
+		this.startDate = cal.firstDayOfMonthByString(id.replace("-",". "),"MMM yyyy");
+		this.endDate = cal.EndDayOfMonthByString(id.replace("-",". "),"MMM yyyy");
+	}
+
+	public ReconcileResult(String id, String userId, Date lastModified, int isReconciled, int notReconciled, Date startDate, Date endDate) {
+		this.id = id;
+		this.userId = userId;
+		this.lastModified = lastModified;
+		this.isReconciled = isReconciled;
+		this.notReconciled = notReconciled;
+		this.startDate = startDate;
+		this.endDate = endDate;
 	}
 
 	public String getUserId() {
@@ -69,23 +93,16 @@ public class ReconcileResult implements Comparable<ReconcileResult> {
 		return id;
 	}
 
-	public ReconcileResult(String id, String userId, Date lastModified, Date startDate, Date endDate, int isReconciled,
-			int notReconciled, int percentage) {
-		super();
-		this.id = id;
-		this.userId = userId;
-		this.lastModified = lastModified;
-		this.isReconciled = isReconciled;
-		this.notReconciled = notReconciled;
-	}
-
-	public ReconcileResult() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
 	public int getPercentage() {
-		return Integer.valueOf((isReconciled * 100) / (isReconciled + notReconciled));
+		return (isReconciled * 100) / (isReconciled + notReconciled);
+	}
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
 	}
 
 	@Override

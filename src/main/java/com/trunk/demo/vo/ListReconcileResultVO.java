@@ -11,8 +11,8 @@ public class ListReconcileResultVO {
 	public ListReconcileResultVO(List<ReconcileResult> results) {
 		list = new ArrayList<>();
 		for (ReconcileResult eachReconcileResult : results) {
-			ReconcileResultVO resultPO = new ReconcileResultVO(eachReconcileResult);
-			list.add(resultPO);
+			ReconcileResultVO resultVO = new ReconcileResultVO(eachReconcileResult);
+			list.add(resultVO);
 		}
 	}
 
