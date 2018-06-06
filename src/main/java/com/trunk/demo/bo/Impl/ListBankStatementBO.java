@@ -52,6 +52,7 @@ public class ListBankStatementBO {
 			} else {
 				// Since we aren't aware of how Amex credits will appear in a Bank Stmt, we are
 				// assuming that all other transactions will be Amex.
+				amexs.add(this.list.get(i));
 			}
 		}
 	}
