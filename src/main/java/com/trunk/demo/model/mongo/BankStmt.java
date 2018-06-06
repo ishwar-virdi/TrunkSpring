@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "BankStatements")
@@ -18,6 +19,7 @@ public class BankStmt implements Serializable {
 	private String accountDescription;
 	private long accountNumber;
 	private String currency;
+	@Indexed
 	private Date date;
 	private String transactionDescription;
 	private double debits;

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "SettlementStatements")
@@ -23,7 +24,9 @@ public class SettlementStmt implements Serializable {
 	private String currency;
 	private String customerName;
 	private String responseText;
+	@Indexed
 	private Date settlementDate;
+	@Indexed
 	private String cardSchemeName;
 	private Date transactionTimeStamp;
 	private String status;
