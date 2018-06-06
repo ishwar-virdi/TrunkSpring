@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UploadManager {
 
-	public String newUploadFile(String type, String fileName, InputStream inputStream);
+	public String newUploadFile(String type, String fileName, InputStream inputStream,String userId);
 
 	public String retrieveUploadRecords();
 }

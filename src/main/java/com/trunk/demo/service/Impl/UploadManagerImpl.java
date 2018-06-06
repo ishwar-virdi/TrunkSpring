@@ -56,7 +56,7 @@ public class UploadManagerImpl<T> implements UploadManager {
 	private Set<Date> monthInvolved = new HashSet<>();
 
 	@Override
-	public String newUploadFile(String type, String fileName, InputStream inputStream) {
+	public String newUploadFile(String type, String fileName, InputStream inputStream,String userId) {
 
 		try {
 			byte[] byteArray = IOUtils.toByteArray(inputStream);
@@ -84,7 +84,7 @@ public class UploadManagerImpl<T> implements UploadManager {
 			}
 			System.out.println(monthInvolved);
 			if (result.contains("success"))
-				reconcileService.reconcile(monthInvolved);
+				reconcileService.reconcile(monthInvolved,userId);
 
 			return result;
 

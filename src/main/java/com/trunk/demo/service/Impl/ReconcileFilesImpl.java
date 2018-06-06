@@ -25,9 +25,7 @@ import com.trunk.demo.model.mongo.BankStmt;
 import com.trunk.demo.model.mongo.ReconcileResult;
 import com.trunk.demo.model.mongo.SettlementStmt;
 import com.trunk.demo.model.mongo.User;
-import com.trunk.demo.repository.BankStmtRepository;
-import com.trunk.demo.repository.ResultsRepository;
-import com.trunk.demo.repository.SettlementRepository;
+
 import com.trunk.demo.repository.UsersRepository;
 
 import javax.servlet.http.HttpSession;
@@ -50,11 +48,12 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	@Autowired
 	private UsersRepository usersRepo;
 
+
 	@Value("${reconcileAlgo.limit}")
 	private String limit;
 
 	@Override
-	public void reconcile(Set<Date> monthInvolved) {
+	public void reconcile(Set<Date> monthInvolved,String userId) {
 
 		System.out.println("***Starting Reconcile Algortithm***");
 		CalenderUtil calUtil = new CalenderUtil();
@@ -120,7 +119,7 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 			allSettlementList.addAll(finalVisaMastercard);
 			allSettlementList.addAll(finalDirectDebit);
 
-			insertOrUpdatingReconcileResults(eachMonthStart, allSettlementList);
+			insertOrUpdatingReconcileResults(eachMonthStart, allSettlementList,userId);
 
 			System.out.println("***Done Reconcile Algortithm from " + eachMonthStart + " to " + endOfMonth + "***");
 
@@ -128,8 +127,8 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 
 	}
 
-	private void insertOrUpdatingReconcileResults(Date eachMonthStart, List<SettlementStmt> allSettlementList) {
-		List<User> users = usersRepo.findByUsername("test@test.com");
+	private void insertOrUpdatingReconcileResults(Date eachMonthStart, List<SettlementStmt> allSettlementList,String userId) {
+
 
 		Calendar cal = Calendar.getInstance();
 		CalenderUtil calUtil = new CalenderUtil();
@@ -144,10 +143,9 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 			result.setIsReconciled(reconciledCount);
 			result.setNotReconciled(transactionCount - reconciledCount);
 		} else{
-
 			Date startDate = calUtil.firstDayOfMonthByString(reconcileResultID.replace("-",". "),"MMM yyyy");
 			Date endDate = calUtil.EndDayOfMonthByString(reconcileResultID.replace("-",". "),"MMM yyyy");
-			result = new ReconcileResult(reconcileResultID, users.get(0).getId(), reconciledCount,
+			result = new ReconcileResult(reconcileResultID, userId, reconciledCount,
 					transactionCount - reconciledCount,startDate,endDate);
 		}
 

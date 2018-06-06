@@ -32,9 +32,10 @@ public class SmartReconcileController {
 	private Gson gson;
 
 	@RequestMapping(path = "/{type}/upload", method = RequestMethod.POST)
-	public String uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file)
+	public String uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file,HttpSession session)
 			throws IOException {
-		return uploadManager.newUploadFile(type, file.getOriginalFilename(), file.getInputStream());
+		String userId = session.getAttribute(session.getId()).toString();
+		return uploadManager.newUploadFile(type, file.getOriginalFilename(), file.getInputStream(),userId);
 	}
 
 	@RequestMapping(path = "/api/v1/uploadRecords", method = RequestMethod.GET)
