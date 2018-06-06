@@ -49,7 +49,7 @@ public class ResultServiceImpl implements ResultService {
             return gson.toJson("UserSession is Null");
         }
 
-        Pageable page = PageRequest.of(pageIndex,20,new Sort(Sort.Direction.DESC,"lastModified"));
+        Pageable page = PageRequest.of(pageIndex,20,new Sort(Sort.Direction.DESC,"startDate"));
         results = reconcileResultBO.findByUserId(userSession.toString(),page);
         resultsVO = new ListReconcileResultVO(results);
 

@@ -57,9 +57,9 @@ public class DashboardManagerImpl implements DashboardManager {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(calUtil.firstDayOfThisMonth(new Date()));
 		for (int i = 0; i < dashboardLimit; ++i) {
+			cal.add(Calendar.MONTH, -1);	
 			labels[i] = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH).substring(0, 3) + "-"
 					+ cal.get(Calendar.YEAR);
-			cal.add(Calendar.MONTH, -1);
 		}
 
 		for (ReconcileResult item : reconcileResults) {
