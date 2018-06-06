@@ -97,10 +97,14 @@ public class DashboardManagerImpl implements DashboardManager {
 		cal.setTime(calUtil.firstDayOfThisMonth(new Date()));
 		cal2.setTime(calUtil.firstDayOfThisMonth(new Date()));
 
+		cal.add(Calendar.MONTH, (-1 * page * period));
+		cal2.add(Calendar.MONTH, (-1 * page * period));
+
 		for (int i = 0; i < period; i++) {
 
-			cal.add(Calendar.MONTH, -1 - (page * period));
-			cal2.add(Calendar.MONTH, -1 - (page * period));
+			cal.add(Calendar.MONTH, -1);
+			cal2.add(Calendar.MONTH, -1);
+
 			Date startOfMonth = cal.getTime();
 			cal2.set(Calendar.DAY_OF_MONTH, cal2.getActualMaximum(Calendar.DAY_OF_MONTH));
 			Date endOfMonth = cal2.getTime();
@@ -149,7 +153,7 @@ public class DashboardManagerImpl implements DashboardManager {
 			Date eachDayStart = eachDayCal.getTime();
 			cal.add(Calendar.DAY_OF_MONTH, 1);
 			cal.add(Calendar.MILLISECOND, -1);
-			Date eachDayEnd = eachDayCal.getTime();
+			Date eachDayEnd = cal.getTime();
 
 			ListBankStatementBO bankBO = new ListBankStatementBO(
 					bankStmtRepository.findAllBetweenDates(eachDayStart, eachDayEnd));

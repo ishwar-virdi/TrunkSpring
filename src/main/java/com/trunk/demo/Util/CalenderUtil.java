@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 public class CalenderUtil {
 	private Calendar cal;
 
-
-
 	public CalenderUtil() {
 		cal = Calendar.getInstance();
 	}
@@ -132,11 +130,9 @@ public class CalenderUtil {
 		return cal.getTime();
 	}
 
-	public Date firstDayOfMonthByString(String value,String format){
+	public Date firstDayOfMonthByString(String value, String format) {
 		Date date = null;
-		if(value.contains("May")){
-			value = value.replace(".","");
-		}
+		value = value.replace(".", "");
 		try {
 			date = new SimpleDateFormat(format).parse(value);
 		} catch (ParseException e) {
@@ -145,17 +141,15 @@ public class CalenderUtil {
 		return date;
 	}
 
-	public Date EndDayOfMonthByString(String value,String format){
+	public Date EndDayOfMonthByString(String value, String format) {
 		Date date = null;
-		if(value.contains("May")){
-			value = value.replace(".","");
-		}
+		value = value.replace(".", "");
 		try {
 			date = new SimpleDateFormat(format).parse(value);
 			cal = Calendar.getInstance();
 			cal.setTime(date);
 			int month = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-			cal.set(Calendar.DAY_OF_MONTH,month);
+			cal.set(Calendar.DAY_OF_MONTH, month);
 			date = this.setDateToMax(cal.getTime());
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -163,16 +157,16 @@ public class CalenderUtil {
 		return date;
 	}
 
-	public int isMonth(String value){
+	public int isMonth(String value) {
 		value = value.toLowerCase();
-		final String[] months = {"january","february","march","april",
-				"may","june","july","august", "september","october","november","december",
-				"jan","feb","mar","apr","may","jun","jul","aug","sept","oct","nov","dec"};
+		final String[] months = { "january", "february", "march", "april", "may", "june", "july", "august", "september",
+				"october", "november", "december", "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept",
+				"oct", "nov", "dec" };
 		int month = 0;
-		for(int i = 0,length = months.length;i<length;i++){
-			if(value.equals(months[i])){
+		for (int i = 0, length = months.length; i < length; i++) {
+			if (value.equals(months[i])) {
 				month = i;
-				if(month > 12){
+				if (month > 12) {
 					month = month - 12;
 				}
 				return month;
