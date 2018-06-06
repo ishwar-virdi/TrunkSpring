@@ -132,7 +132,10 @@ public class CalenderUtil {
 
 	public Date firstDayOfMonthByString(String value, String format) {
 		Date date = null;
-		value = value.replace(".", "");
+		if(value.contains("May")){
+			value = value.replace(".","");
+		}
+
 		try {
 			date = new SimpleDateFormat(format).parse(value);
 		} catch (ParseException e) {
@@ -143,7 +146,9 @@ public class CalenderUtil {
 
 	public Date EndDayOfMonthByString(String value, String format) {
 		Date date = null;
-		value = value.replace(".", "");
+		if(value.contains("May")){
+			value = value.replace(".","");
+		}
 		try {
 			date = new SimpleDateFormat(format).parse(value);
 			cal = Calendar.getInstance();

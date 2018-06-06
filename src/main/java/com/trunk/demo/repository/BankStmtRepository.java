@@ -15,8 +15,6 @@ import java.util.Optional;
 public interface BankStmtRepository extends MongoRepository<BankStmt, Integer> {
     List<BankStmt> findAllByDateBetween(Date startDate, Date endDate,Sort sort);
 
-    Optional<BankStmt> findAllById(String id);
-
 	@Query("{ $and : [ { 'date' : { $gte : ?0 } }, { 'date' : { $lte : ?1 } } ] }")
     List<BankStmt> findAllBetweenDates(Date startDate, Date endDate);
 

@@ -15,14 +15,6 @@ public interface ReconcileResultBO {
 
     public List<ReconcileResult> findByUserIdAndLastModifiedBetween(String uid, Date date, Date nextDate);
 
-    public List<ReconcileResult> findByUserIdAndPercentage(String uid,int percentage,Sort sort);
-
-    public List<ReconcileResult> findByUserIdAndPercentageGreaterThanEqual(String uid,int percentage,Sort sort);
-
-    public List<ReconcileResult> findByUserIdAndPercentageLessThanEqual(String uid,int percentage,Sort sort);
-
-    public List<ReconcileResult> findByUserIdAndPercentageBetween(String uid,int lessThanValue,int largerThanValue,Sort sort);
-
     public List<ReconcileResult> findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(String uid,Date startDate,Date endDate);
 
     public ReconcileResult findById(String _id);

@@ -10,8 +10,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.trunk.demo.Util.CalenderUtil;
 import com.trunk.demo.Util.DocumentType;
+import com.trunk.demo.bo.BankStmtBO;
 import com.trunk.demo.bo.RedisBO;
 
+import com.trunk.demo.bo.SettlementBO;
 import com.trunk.demo.vo.UploadReviewListVO;
 import com.trunk.demo.vo.UploadReviewBankVO;
 import com.trunk.demo.vo.UploadReviewSettleVO;
@@ -37,10 +39,10 @@ public class UploadManagerImpl<T> implements UploadManager {
 	private ReconcileFiles reconcileService;
 
 	@Autowired
-	private BankStmtRepository bankStmtRepo;
+	private BankStmtBO bankStmtBO;
 
 	@Autowired
-	private SettlementRepository settlementStmtRepo;
+	private SettlementBO settlementBO;
 
 	@Autowired
 	private RedisBO redisBO;
@@ -143,7 +145,7 @@ public class UploadManagerImpl<T> implements UploadManager {
 					line = line.replaceAll("\"", "");
 					String elements[] = line.split(",");
 
-					if (!settlementStmtRepo.findById(Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]))
+					if (!settlementBO.findById(Long.parseLong(elements[25].isEmpty() ? "0" : elements[25]))
 							.isPresent()  && elements[30].equalsIgnoreCase("approved")) {
 						SettlementStmt newStmt = new SettlementStmt(elements[1], elements[2], elements[4], elements[7],
 								Double.parseDouble(elements[10].isEmpty() ? "0" : elements[10]),
@@ -152,7 +154,7 @@ public class UploadManagerImpl<T> implements UploadManager {
 								elements[26], elements[27], elements[29], elements[30], "");
 						redisBO.pushTransaction(id, newStmt);
 						monthInvolved.add(cal.firstDayOfThisMonth(newStmt.getSettlementDate()));
-						settlementStmtRepo.insert(newStmt);
+						settlementBO.insert(newStmt);
 						id++;
 					}
 				}
@@ -186,10 +188,10 @@ public class UploadManagerImpl<T> implements UploadManager {
 								Double.parseDouble(elements[5].isEmpty() ? "0" : elements[5]),
 								Double.parseDouble(elements[6].isEmpty() ? "0" : elements[6]),
 								Double.parseDouble(elements[7].isEmpty() ? "0" : elements[7]));
-						if (!bankStmtRepo.findById(newStmt.hashCode()).isPresent()) {
+						if (!bankStmtBO.findById(newStmt.hashCode()).isPresent()) {
 							redisBO.pushTransaction(id, newStmt);
 							monthInvolved.add(cal.firstDayOfThisMonth(newStmt.getDate()));
-							bankStmtRepo.insert(newStmt);
+							bankStmtBO.insert(newStmt);
 							id++;
 						}
 					}

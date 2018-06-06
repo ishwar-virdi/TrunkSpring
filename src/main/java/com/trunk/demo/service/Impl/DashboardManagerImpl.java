@@ -8,10 +8,10 @@ import java.util.Locale;
 
 import com.google.gson.Gson;
 import com.trunk.demo.Util.CalenderUtil;
-import com.trunk.demo.bo.ListBankStatementBO;
-import com.trunk.demo.bo.ListSettlementBO;
-import com.trunk.demo.repository.BankStmtRepository;
-import com.trunk.demo.repository.SettlementRepository;
+import com.trunk.demo.bo.*;
+
+import com.trunk.demo.bo.Impl.ListBankStatementBO;
+import com.trunk.demo.bo.Impl.ListSettlementBO;
 import com.trunk.demo.vo.DashDailyTransaction;
 import com.trunk.demo.vo.DashMonthTotalVO;
 import org.json.JSONArray;
@@ -19,11 +19,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.trunk.demo.model.mongo.ReconcileResult;
-import com.trunk.demo.repository.ResultsRepository;
 import com.trunk.demo.service.mongo.DashboardManager;
 
 @Service
@@ -33,20 +31,20 @@ public class DashboardManagerImpl implements DashboardManager {
 	private String limit;
 
 	@Autowired
-	private ResultsRepository reconcileResultRepo;
+	private ReconcileResultBO reconcileResultBO;
 	@Autowired
-	private SettlementRepository settlementRepository;
+	private SettlementBO settlementBO;
 	@Autowired
-	private BankStmtRepository bankStmtRepository;
+	private BankStmtBO bankStmtBO;
 	@Autowired
 	private Gson gson;
 
 	@Override
-	public String getReconcileData() {
+	public String getReconcileData(String userId) {
 		JSONObject response = new JSONObject();
 		String[] labels = new String[Integer.parseInt(limit)];
 
-		List<ReconcileResult> reconcileResults = reconcileResultRepo.findAll();
+		List<ReconcileResult> reconcileResults = reconcileResultBO.findAllByUserId(userId);
 
 		DataSet reconciled = new DataSet("Reconciled", "#7986CB");
 		DataSet notReconciled = new DataSet("Not Reconciled", "#E57373");
@@ -110,9 +108,9 @@ public class DashboardManagerImpl implements DashboardManager {
 			Date endOfMonth = cal2.getTime();
 
 			ListBankStatementBO bankBO = new ListBankStatementBO(
-					bankStmtRepository.findAllBetweenDates(startOfMonth, endOfMonth));
+					bankStmtBO.findAllBetweenDates(startOfMonth, endOfMonth));
 			ListSettlementBO settleBO = new ListSettlementBO(
-					settlementRepository.findAllBySettlementDateBetweenValues(startOfMonth, endOfMonth));
+					settlementBO.findAllBySettlementDateBetweenValues(startOfMonth, endOfMonth));
 
 			String id = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH).substring(0, 3) + "-"
 					+ cal.get(Calendar.YEAR);
@@ -156,9 +154,11 @@ public class DashboardManagerImpl implements DashboardManager {
 			Date eachDayEnd = cal.getTime();
 
 			ListBankStatementBO bankBO = new ListBankStatementBO(
-					bankStmtRepository.findAllBetweenDates(eachDayStart, eachDayEnd));
+					bankStmtBO.findAllBetweenDates(eachDayStart, eachDayEnd));
+
+
 			ListSettlementBO settleBO = new ListSettlementBO(
-					settlementRepository.findAllBySettlementDateBetweenValues(eachDayStart, eachDayEnd));
+					settlementBO.findAllBySettlementDateBetweenValues(eachDayStart, eachDayEnd));
 
 			visaBankTotal = bankBO.getVisaMapTotal(eachDayStart);
 			debitBankTotal = bankBO.getDebitMapTotal(eachDayStart);

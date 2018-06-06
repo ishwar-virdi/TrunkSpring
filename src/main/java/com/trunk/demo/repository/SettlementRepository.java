@@ -14,8 +14,6 @@ import com.trunk.demo.model.mongo.SettlementStmt;
 @Repository
 public interface SettlementRepository extends MongoRepository<SettlementStmt, Long> {
 
-	@Query("{ 'settlementDate' : {$regex:?0 }}")
-	List<SettlementStmt> findAllBySettlementDateLike(String settlementDate);
 
 	@Query("{ $and : [ { 'cardSchemeName' : {$regex : '.*amex.*', $options : 'i' } } , { 'settlementDate' : { $gte : ?0 } }, { 'settlementDate' : { $lte : ?1 } } ] }")
 	List<SettlementStmt> findAllByCardSchemeNameAmex(Date fromDate, Date toDate);

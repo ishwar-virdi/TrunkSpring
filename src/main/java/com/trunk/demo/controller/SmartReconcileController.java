@@ -2,6 +2,7 @@ package com.trunk.demo.controller;
 
 import java.io.IOException;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -27,6 +28,8 @@ public class SmartReconcileController {
 	private ResultDetailManager resultDetailManager;
 	@Autowired
 	private DashboardManager dashboardManager;
+	@Autowired
+	private Gson gson;
 
 	@RequestMapping(path = "/{type}/upload", method = RequestMethod.POST)
 	public String uploadFile(@PathVariable("type") String type, @RequestParam("file") MultipartFile file)
@@ -70,8 +73,14 @@ public class SmartReconcileController {
 	}
 
 	@RequestMapping(path = "/api/getChartData", method = RequestMethod.GET)
-	public String getChartData() {
-		return dashboardManager.getReconcileData();
+	public String getChartData(HttpSession session) {
+		Object userId = session.getAttribute(session.getId());
+		JsonObject jsonObject = new JsonObject();
+		if(userId == null){
+			jsonObject.addProperty("result","fail");
+			return jsonObject.toString();
+		}
+		return dashboardManager.getReconcileData(userId.toString());
 	}
 
 	@RequestMapping(path = "/api/v1/monthTotalAmount", method = RequestMethod.GET)

@@ -1,6 +1,6 @@
-package com.trunk.demo.repository;
+package com.trunk.demo.bo;
 
-public interface TokenRepository {
+public interface TokenBO {
     public String generateToken();
 
     public boolean destroyToken();

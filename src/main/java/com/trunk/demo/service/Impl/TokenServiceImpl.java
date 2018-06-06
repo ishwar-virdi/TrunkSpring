@@ -1,7 +1,7 @@
 package com.trunk.demo.service.Impl;
 
 import com.google.gson.JsonObject;
-import com.trunk.demo.repository.TokenRepository;
+import com.trunk.demo.bo.TokenBO;
 import com.trunk.demo.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 public class TokenServiceImpl implements TokenService {
 
     @Autowired
-    private TokenRepository tokenRepository;
+    private TokenBO tokenBO;
 
     @Override
     public String generateToken() {
         JsonObject json = new JsonObject();
-        json.addProperty("token", tokenRepository.generateToken());
+        json.addProperty("token", tokenBO.generateToken());
         return json.toString();
     }
 

@@ -33,25 +33,6 @@ public class ReconcileResultBOImpl implements ReconcileResultBO {
         return resultsRepository.findByUserIdAndLastModifiedBetween(uid, date, nextDate);
     }
 
-    @Override
-    public List<ReconcileResult> findByUserIdAndPercentage(String uid,int percentage,Sort sort){
-        return resultsRepository.findByUserIdAndPercentage(uid, percentage,sort);
-    }
-
-    @Override
-    public List<ReconcileResult> findByUserIdAndPercentageGreaterThanEqual(String uid,int percentage,Sort sort){
-        return resultsRepository.findByUserIdAndPercentageGreaterThanEqual(uid, percentage,sort);
-    }
-
-    @Override
-    public List<ReconcileResult> findByUserIdAndPercentageLessThanEqual(String uid,int percentage,Sort sort){
-        return resultsRepository.findByUserIdAndPercentageLessThanEqual(uid, percentage,sort);
-    }
-
-    @Override
-    public List<ReconcileResult> findByUserIdAndPercentageBetween(String uid,int lessThanValue,int largerThanValue,Sort sort){
-        return resultsRepository.findByUserIdAndPercentageBetween(uid, lessThanValue, largerThanValue,sort);
-    }
 
     @Override
     public List<ReconcileResult> findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(String uid, Date startDate, Date endDate) {

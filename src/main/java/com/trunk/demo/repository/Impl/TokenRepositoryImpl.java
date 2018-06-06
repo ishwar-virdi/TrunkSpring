@@ -24,7 +24,7 @@ public class TokenRepositoryImpl implements TokenRepository {
     }
 
     @Override
-    public boolean destoryToken(){
+    public boolean destroyToken(){
         Token token = new Token();
         Object tokenSession = session.getAttribute(token.getName());
         if(tokenSession == null){

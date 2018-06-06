@@ -16,8 +16,6 @@ import com.trunk.demo.service.mongo.ReceiptManager;
 @Service
 public class ReceiptManagerImpl implements ReceiptManager {
 
-	// @Autowired
-	// private SettlementRepository settlementStmtRepo;
 	@Autowired
 	private SettlementBO settlementBO;
 	@Autowired

@@ -23,8 +23,7 @@ public class RedisBOImpl implements RedisBO {
 	private RedisRepository redisRepository;
 	@Autowired
 	private HttpSession session;
-	@Autowired
-	private StringRedisTemplate redisTemplate;
+
 	private final String type = "type";
 	private final String filename = "filename";
 
@@ -33,19 +32,19 @@ public class RedisBOImpl implements RedisBO {
 	@Override
 	public void pushTransaction(int id, Object settle) {
 		redisRepository.pushObjectToHash(session.getId(), String.valueOf(id), settle);
-		//redisRepository.setObjectExpireTime(session.getId(), 60);
+		redisRepository.setObjectExpireTime(session.getId(), 60);
 	}
 
 	@Override
 	public void pushType(String type) {
 		redisRepository.pushStringToHash(session.getId(), this.type, type);
-		//redisRepository.setExpireTime(session.getId(), 60);
+		redisRepository.setExpireTime(session.getId(), 60);
 	}
 
 	@Override
 	public void pushFileName(String filename) {
 		redisRepository.pushStringToHash(session.getId(), this.filename, filename);
-		//redisRepository.setExpireTime(session.getId(), 60);
+		redisRepository.setExpireTime(session.getId(), 60);
 	}
 
 	@Override
@@ -63,17 +62,6 @@ public class RedisBOImpl implements RedisBO {
 		return redisRepository.getStringFromHash(session.getId(), this.type);
 	}
 
-	/*
-	 * @Override public void pushTransactionDate(Set<String> sets) { int i = 0;
-	 * for(String date:sets){
-	 * redisRepository.pushStringToHash(session.getId()+"date", String.valueOf(i)
-	 * ,date); i++; } }
-	 * 
-	 * @Override public Object getTransactionDate(String id){ Object dateString =
-	 * redisRepository.getStringFromHash(session.getId()+"date", id);
-	 * redisTemplate.opsForHash().delete(session.getId()+"date",id,dateString);
-	 * return dateString; }
-	 */
 
 	@Override
 	public void deleteSpecificValue(String value) {

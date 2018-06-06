@@ -11,15 +11,11 @@ public interface RedisBO {
 
 	public Object getFileName();
 
-	// Object getTransactionDate(String id);
-
-	void deleteSpecificValue(String value);
+	public void deleteSpecificValue(String value);
 
 	public void deleteCache();
 
 	public Object getType();
-
-	// public void pushTransactionDate(Set<String> sets);
 
 	public void deleteObjectCache();
 }

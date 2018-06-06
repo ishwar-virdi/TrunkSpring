@@ -18,11 +18,6 @@ public class SettlementBOImpl implements SettlementBO {
 	private SettlementRepository settlementRepository;
 
 	@Override
-	public List<SettlementStmt> findAllBySettlementDateLike(String settlementDate) {
-		return settlementRepository.findAllBySettlementDateLike(settlementDate);
-	}
-
-	@Override
 	public List<SettlementStmt> findAllByCardSchemeNameAmex(Date fromDate, Date toDate) {
 		return settlementRepository.findAllByCardSchemeNameAmex(fromDate, toDate);
 	}
@@ -34,7 +29,7 @@ public class SettlementBOImpl implements SettlementBO {
 
 	@Override
 	public List<SettlementStmt> findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(Date fromDate, Date toDate) {
-		return settlementRepository.findAllByCardSchemeNameVisaOrMastercard(fromDate, toDate);
+		return settlementRepository.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(fromDate, toDate);
 	}
 
 	@Override
@@ -57,6 +52,10 @@ public class SettlementBOImpl implements SettlementBO {
 	}
 
 	@Override
+	public List<SettlementStmt> findAllBySettlementDateBetweenValues(Date startDate, Date endDate){
+		return settlementRepository.findAllBySettlementDateBetweenValues(startDate, endDate);
+	}
+	@Override
 	public SettlementStmt findFirstByReceiptNumber(Long receiptNumber) {
 		return settlementRepository.findFirstByReceiptNumber(receiptNumber);
 	}
@@ -65,5 +64,25 @@ public class SettlementBOImpl implements SettlementBO {
 	public void save(SettlementStmt settlementStmt) {
 		settlementStmt.setReconciledDateTime(new Date());
 		settlementRepository.save(settlementStmt);
+	}
+
+	@Override
+	public void saveAll(List<SettlementStmt> settles){
+		settlementRepository.saveAll(settles);
+	}
+
+	@Override
+	public List<SettlementStmt> findAll(){
+		return settlementRepository.findAll();
+	}
+
+	@Override
+	public Optional<SettlementStmt> findById(Long _id){
+		return settlementRepository.findById(_id);
+	}
+
+	@Override
+	public void insert(SettlementStmt settlementStmt){
+		settlementRepository.insert(settlementStmt);
 	}
 }

@@ -1,4 +1,4 @@
-package com.trunk.demo.service;
+package com.trunk.demo.service.Impl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,6 +11,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.trunk.demo.bo.BankStmtBO;
+import com.trunk.demo.bo.ReconcileResultBO;
+import com.trunk.demo.bo.SettlementBO;
+import com.trunk.demo.service.ReconcileFiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -26,6 +30,8 @@ import com.trunk.demo.repository.ResultsRepository;
 import com.trunk.demo.repository.SettlementRepository;
 import com.trunk.demo.repository.UsersRepository;
 
+import javax.servlet.http.HttpSession;
+
 @Async
 @Service
 public class ReconcileFilesImpl implements ReconcileFiles {
@@ -33,13 +39,13 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	private int transactionCount;
 
 	@Autowired
-	private BankStmtRepository bankStmtRepo;
+	private BankStmtBO bankStmtBO;
 
 	@Autowired
-	private SettlementRepository settlementStmtRepo;
+	private SettlementBO settlementBO;
 
 	@Autowired
-	private ResultsRepository reconcileResultsRepo;
+	private ReconcileResultBO reconcileResultBO;
 
 	@Autowired
 	private UsersRepository usersRepo;
@@ -70,22 +76,22 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 
 			System.out.println("***Finding Settlement Statments from " + eachMonthStart + " to " + endOfMonth + "***");
 
-			List<SettlementStmt> amexTransactions = settlementStmtRepo.findAllByCardSchemeNameAmex(eachMonthStart,
+			List<SettlementStmt> amexTransactions = settlementBO.findAllByCardSchemeNameAmex(eachMonthStart,
 					endOfMonth);
-			List<SettlementStmt> visaMastercardTransactions = settlementStmtRepo
+			List<SettlementStmt> visaMastercardTransactions = settlementBO
 					.findAllByCardSchemeNameVisaOrMastercard(eachMonthStart, endOfMonth);
-			List<SettlementStmt> directDebitTransactions = settlementStmtRepo
+			List<SettlementStmt> directDebitTransactions = settlementBO
 					.findAllByCardSchemeNameEmptyAndBankReferenceNotEmpty(eachMonthStart, endOfMonth);
 
 			System.out.println("***Finding Bank Statments from " + eachMonthStart + " to " + endOfMonth + "***");
-			List<BankStmt> bankStatement = bankStmtRepo.findAllBetweenDates(eachMonthStart, endOfMonth);
+			List<BankStmt> bankStatement = bankStmtBO.findAllBetweenDates(eachMonthStart, endOfMonth);
 			cal.setTime(eachMonthStart);
 			cal.add(Calendar.MONTH, 1);
 			Date nextMonthStart = cal.getTime();
 			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
 			Date nextMonthEnd = cal.getTime();
 			System.out.println("***Finding Bank Statments from " + nextMonthStart + " to " + nextMonthEnd + "***");
-			bankStatement.addAll(bankStmtRepo.findAllBetweenDates(nextMonthStart, nextMonthEnd));
+			bankStatement.addAll(bankStmtBO.findAllBetweenDates(nextMonthStart, nextMonthEnd));
 
 			transactionCount = amexTransactions.size() + visaMastercardTransactions.size()
 					+ directDebitTransactions.size();
@@ -123,34 +129,38 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 	}
 
 	private void insertOrUpdatingReconcileResults(Date eachMonthStart, List<SettlementStmt> allSettlementList) {
-
 		List<User> users = usersRepo.findByUsername("test@test.com");
 
 		Calendar cal = Calendar.getInstance();
+		CalenderUtil calUtil = new CalenderUtil();
 		cal.setTime(eachMonthStart);
 
 		String reconcileResultID = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH).substring(0, 3)
 				+ "-" + cal.get(Calendar.YEAR);
 
-		ReconcileResult result;
+		ReconcileResult result = reconcileResultBO.findById(reconcileResultID);
 
-		if (reconcileResultsRepo.findById(reconcileResultID).isPresent()) {
-			result = reconcileResultsRepo.findById(reconcileResultID).get();
+		if (result != null) {
 			result.setIsReconciled(reconciledCount);
 			result.setNotReconciled(transactionCount - reconciledCount);
-		} else
+		} else{
+
+			Date startDate = calUtil.firstDayOfMonthByString(reconcileResultID.replace("-",". "),"MMM yyyy");
+			Date endDate = calUtil.EndDayOfMonthByString(reconcileResultID.replace("-",". "),"MMM yyyy");
 			result = new ReconcileResult(reconcileResultID, users.get(0).getId(), reconciledCount,
-					transactionCount - reconciledCount);
+					transactionCount - reconciledCount,startDate,endDate);
+		}
+
 
 		// Get the id from the reconcile results object
 		String reconcileResultsId = result.getId();
 
 		for (SettlementStmt eachStmt : allSettlementList) {
 			eachStmt.setReconcileResultsId(reconcileResultsId);
-			settlementStmtRepo.save(eachStmt);
+			settlementBO.save(eachStmt);
 		}
 
-		reconcileResultsRepo.save(result);
+		reconcileResultBO.save(result);
 	}
 
 	private List<Date> reconcileDirectDebitItems(List<SettlementStmt> directDebitTransactions,
@@ -227,13 +237,13 @@ public class ReconcileFilesImpl implements ReconcileFiles {
 
 	@Override
 	public void reset() throws ParseException {
-		List<SettlementStmt> settlementDocument = settlementStmtRepo.findAll();
+		List<SettlementStmt> settlementDocument = settlementBO.findAll();
 
 		for (SettlementStmt eachSettlementStmt : settlementDocument) {
 			eachSettlementStmt.setReconcileStatus(0);
 			eachSettlementStmt.setReconciledDateTime(new SimpleDateFormat("dd-MM-yyyy").parse("01-01-1990"));
 		}
 
-		this.settlementStmtRepo.saveAll(settlementDocument);
+		this.settlementBO.saveAll(settlementDocument);
 	}
 }

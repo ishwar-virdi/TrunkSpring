@@ -35,22 +35,12 @@ public class ReconcileResult implements Comparable<ReconcileResult> {
 	}
 
 	@PersistenceConstructor
-	public ReconcileResult(String id, String userId, int isReconciled, int notReconciled) {
+	public ReconcileResult(String id, String userId, int isReconciled, int notReconciled,Date startDate,Date endDate) {
 		super();
 		CalenderUtil cal = new CalenderUtil();
 		this.id = id;
 		this.userId = userId;
 		this.lastModified = new Date();
-		this.isReconciled = isReconciled;
-		this.notReconciled = notReconciled;
-		this.startDate = cal.firstDayOfMonthByString(id.replace("-",". "),"MMM yyyy");
-		this.endDate = cal.EndDayOfMonthByString(id.replace("-",". "),"MMM yyyy");
-	}
-
-	public ReconcileResult(String id, String userId, Date lastModified, int isReconciled, int notReconciled, Date startDate, Date endDate) {
-		this.id = id;
-		this.userId = userId;
-		this.lastModified = lastModified;
 		this.isReconciled = isReconciled;
 		this.notReconciled = notReconciled;
 		this.startDate = startDate;
