@@ -33,7 +33,6 @@ public class ReconcileResultBOImpl implements ReconcileResultBO {
         return resultsRepository.findByUserIdAndLastModifiedBetween(uid, date, nextDate);
     }
 
-
     @Override
     public List<ReconcileResult> findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(String uid, Date startDate, Date endDate) {
         return resultsRepository.findByUserIdAndStartDateGreaterThanEqualAndEndDateLessThan(uid, startDate, endDate);

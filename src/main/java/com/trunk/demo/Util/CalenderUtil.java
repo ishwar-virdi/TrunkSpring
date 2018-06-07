@@ -171,7 +171,7 @@ public class CalenderUtil {
 		for (int i = 0, length = months.length; i < length; i++) {
 			if (value.equals(months[i])) {
 				month = i;
-				if (month > 12) {
+				if (month >= 12) {
 					month = month - 12;
 				}
 				return month;
