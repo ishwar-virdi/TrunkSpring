@@ -30,7 +30,7 @@ spring.data.mongodb.uri=mongodb://localhost:27017/trunkSpring
 ```
 6. Modify Redis setting under **#redis** to point to the local Redis instance.
 7. Modify AWS S3 setting under **#aws s3** to point to your AWS S3 bucket.
-8. Run **SmartReconcileApplication.java** under **/src/main/java/com/trunk/demo** as a **_Java Application_**. 
+8. Run **SmartReconcileApplication.java** under **src/main/java/com/trunk/demo** as a **_Java Application_**. 
 ## System Configurations
 1. Upto how many months of data needs to be shown in the Dashboard,
 ```
