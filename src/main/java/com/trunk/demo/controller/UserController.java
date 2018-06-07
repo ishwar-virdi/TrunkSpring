@@ -2,6 +2,7 @@ package com.trunk.demo.controller;
 
 import com.trunk.demo.service.mongo.UserManager;
 import com.trunk.demo.vo.LoginModelVO;
+import com.trunk.demo.vo.RegisterModelVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +20,8 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/register")
-    public String registerUser(@RequestBody LoginModelVO loginModelVO, HttpSession session) {
-        return userManager.register(loginModelVO,session);
+    public String registerUser(@RequestBody RegisterModelVO registerModelVO, HttpSession session) {
+        return userManager.register(registerModelVO,session);
     }
 
 //    @RequestMapping(method = RequestMethod.GET, value = "/api/v1/userLogin")

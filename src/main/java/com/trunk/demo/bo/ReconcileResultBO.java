@@ -21,7 +21,9 @@ public interface ReconcileResultBO {
 
     public void save(ReconcileResult reconcileResult);
 
-    void updateIncreaseIsReconcile(int count, ReconcileResult result);
+    public void updateIncreaseIsReconcile(int count, ReconcileResult result);
 
-    void updateIncreaseNotReconcile(int count, ReconcileResult result);
+    public void updateIncreaseNotReconcile(int count, ReconcileResult result);
+
+    public void updateResultUserID(String userId);
 }

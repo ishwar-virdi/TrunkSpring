@@ -69,4 +69,13 @@ public class ReconcileResultBOImpl implements ReconcileResultBO {
         result.setLastModified(new Date());
         resultsRepository.save(result);
     }
+
+    @Override
+    public void updateResultUserID(String userId){
+        List<ReconcileResult> results = resultsRepository.findAll();
+        for(int i = 0;i<results.size();i++){
+            results.get(i).setUserId(userId);
+        }
+        resultsRepository.saveAll(results);
+    }
 }
