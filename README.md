@@ -9,7 +9,7 @@ git clone https://github.com/ishwarvirdi/TrunkSpring.git
 3. Under General, select *Projects from Folder or Archive*.
 4. For Import Source, click Directory and select the TrunkSpring folder created from the git clone (/home/ABC/Workspaces/STS/TrunkSpring).
 5. Click Finish.
-6. Wait for Maven to install all packages. Once complete, your local IDE setup is ready.
+6. Wait for Maven to install all packages/dependencies. Once complete, your local IDE setup is ready.
 ## If you want to Run Locally and Not Heroku & AWS
 1. Open the **application.properties** file under **src/main/resources**.
 2. Comment the below line which points to the Heroku frontend,
